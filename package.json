@@ -25,7 +25,8 @@
     "resend": "^6.3.0",
     "terser-webpack-plugin": "5.3.14",
     "typescript": "^4.9.0",
-    "web-vitals": "^2.1.0"
+    "web-vitals": "^2.1.0",
+    "webpack": "5.102.1"
   },
   "scripts": {
     "postinstall": "npm install terser-webpack-plugin@5.3.14 --save-exact --ignore-scripts || true",
@@ -58,6 +59,9 @@
     "tailwindcss": "^3.3.0"
   },
   "overrides": {
+    "terser-webpack-plugin": "5.3.14"
+  },
+  "resolutions": {
     "terser-webpack-plugin": "5.3.14"
   }
 }
