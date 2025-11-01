@@ -1,7 +1,7 @@
 {
   "buildCommand": "npm run build",
   "devCommand": "npm start",
-  "installCommand": "npm install --legacy-peer-deps && npm install terser-webpack-plugin@5.3.14 --save-exact --ignore-scripts && node -e \"const fs=require('fs');if(!fs.existsSync('node_modules/terser-webpack-plugin/dist/index.js')){console.error('ERROR: terser-webpack-plugin dist missing');process.exit(1);}\"",
+  "installCommand": "npm install --legacy-peer-deps && npm install terser-webpack-plugin@5.3.14 --save-exact --ignore-scripts && node scripts/ensure-terser.js",
   "framework": "create-react-app",
   "outputDirectory": "build"
 }
