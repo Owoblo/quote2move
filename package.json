@@ -29,7 +29,7 @@
     "webpack": "5.102.1"
   },
   "scripts": {
-    "postinstall": "npm install terser-webpack-plugin@5.3.14 --save-exact --ignore-scripts || true",
+    "postinstall": "npm install terser-webpack-plugin@5.3.14 --save-exact || true",
     "prebuild": "node scripts/ensure-terser.js",
     "build": "react-scripts build",
     "start": "react-scripts start",
