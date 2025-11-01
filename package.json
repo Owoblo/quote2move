@@ -30,7 +30,7 @@
   "scripts": {
     "postinstall": "npm install terser-webpack-plugin@5.3.14 --save-exact --force --ignore-scripts=false || true",
     "prebuild": "npm install terser-webpack-plugin@5.3.14 --save-exact --force --ignore-scripts=false || true",
-    "build": "test -f node_modules/terser-webpack-plugin/dist/index.js || (cd node_modules/terser-webpack-plugin && npm install && npm run build) && react-scripts build",
+    "build": "if [ ! -f node_modules/terser-webpack-plugin/dist/index.js ]; then cd node_modules/terser-webpack-plugin && npm install && npm run build && cd ../..; fi && react-scripts build",
     "start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
