@@ -28,8 +28,8 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "postinstall": "npm install terser-webpack-plugin@5.3.14 --save-exact --force || true",
-    "build": "npm install terser-webpack-plugin@5.3.14 --save-exact --force && react-scripts build",
+    "postinstall": "npm install terser-webpack-plugin@5.3.14 --save-exact --force && (cd node_modules/terser-webpack-plugin && npm run build) || true",
+    "build": "npm install terser-webpack-plugin@5.3.14 --save-exact --force && (cd node_modules/terser-webpack-plugin && npm run build || true) && react-scripts build",
     "start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
