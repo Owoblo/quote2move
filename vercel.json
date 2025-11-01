@@ -3,6 +3,11 @@
   "devCommand": "npm start",
   "installCommand": "npm install",
   "framework": "create-react-app",
-  "outputDirectory": "build"
+  "outputDirectory": "build",
+  "functions": {
+    "app/**": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
 
