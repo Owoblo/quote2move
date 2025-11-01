@@ -1,7 +1,7 @@
 {
   "buildCommand": "npm run build",
   "devCommand": "npm start",
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "npm install --ignore-scripts && npm install terser-webpack-plugin@5.3.14 --save-exact --ignore-scripts",
   "framework": "create-react-app",
   "outputDirectory": "build"
 }
