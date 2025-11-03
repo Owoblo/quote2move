@@ -19,12 +19,23 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+          },
         });
         if (error) throw error;
-        setError('Check your email for the confirmation link!');
+        
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          // Email confirmation is required
+          setError('success:Check your email for the confirmation link! We sent you a verification email.');
+        } else if (data.session) {
+          // No email confirmation required, user is signed in
+          navigate('/dashboard');
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -34,7 +45,18 @@ export default function LoginPage() {
         navigate('/dashboard');
       }
     } catch (error: any) {
-      setError(error.message);
+      // Handle common errors with user-friendly messages
+      let errorMessage = error.message;
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please try again.';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link to verify your account.';
+      } else if (error.message.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please sign in instead.';
+      } else if (error.message.includes('Password')) {
+        errorMessage = 'Password must be at least 6 characters long.';
+      }
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -63,13 +85,25 @@ export default function LoginPage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-200">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <div className={`${error.startsWith('success:') 
+                ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
+                : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'} rounded-lg p-4`}>
                 <div className="flex">
-                  <svg className="w-5 h-5 text-red-400 dark:text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  {error.startsWith('success:') ? (
+                    <svg className="w-5 h-5 text-green-400 dark:text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-red-400 dark:text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
                   <div className="ml-3">
-                    <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                    <p className={`text-sm ${error.startsWith('success:') 
+                      ? 'text-green-800 dark:text-green-200' 
+                      : 'text-red-800 dark:text-red-200'}`}>
+                      {error.replace('success:', '')}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -104,8 +138,8 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                placeholder="Enter your password"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                placeholder={isSignUp ? 'Create a password (min. 6 characters)' : 'Enter your password'}
               />
             </div>
 
@@ -116,16 +150,20 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-accent600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
+                    className="h-4 w-4 text-accent focus:ring-accent border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                     Remember me
                   </label>
                 </div>
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-accent600 dark:text-accent400 hover:text-accent500 dark:hover:text-accent300">
+                  <button
+                    type="button"
+                    onClick={() => setError('Password reset coming soon!')}
+                    className="font-medium text-accent dark:text-accent-light hover:text-accent-dark dark:hover:text-accent transition-colors"
+                  >
                     Forgot your password?
-                  </a>
+                  </button>
                 </div>
               </div>
             )}
@@ -179,8 +217,14 @@ export default function LoginPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="font-medium text-accent600 dark:text-accent400 hover:text-accent500 dark:hover:text-accent300 transition-colors"
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError('');
+                  setEmail('');
+                  setPassword('');
+                }}
+                className="font-medium text-accent dark:text-accent-light hover:text-accent-dark dark:hover:text-accent transition-colors"
               >
                 {isSignUp ? 'Sign in' : 'Sign up'}
               </button>
