@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import ThemeToggle from '../components/ThemeToggle';
+import MovSenseLogo from '../components/MovSenseLogo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
