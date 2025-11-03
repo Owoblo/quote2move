@@ -47,7 +47,6 @@ export default function LoginPage() {
           <div className="absolute top-0 right-0">
             <ThemeToggle />
           </div>
-          <Link to="/" className="flex items-center justify-center space-x-3 mb-8">
           <Link to="/" className="flex items-center justify-center mb-8">
             <MovSenseLogo size="lg" />
           </Link>
