@@ -585,7 +585,7 @@ export default function EstimatePage() {
                       type="checkbox"
                       checked={baseEstimate.stairs}
                       disabled
-                      className="w-4 h-4 text-accent600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">Origin has stairs</span>
                   </label>
@@ -594,7 +594,7 @@ export default function EstimatePage() {
                       type="checkbox"
                       checked={baseEstimate.elevator}
                       disabled
-                      className="w-4 h-4 text-accent600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                      className="w-4 h-4 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">Origin has elevator</span>
                   </label>
@@ -665,7 +665,7 @@ export default function EstimatePage() {
                         type="checkbox"
                         checked={stairsDestination}
                         onChange={(e) => setStairsDestination(e.target.checked)}
-                        className="w-4 h-4 text-accent600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                        className="w-4 h-4 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">Destination has stairs</span>
                     </label>
@@ -674,7 +674,7 @@ export default function EstimatePage() {
                         type="checkbox"
                         checked={elevatorDestination}
                         onChange={(e) => setElevatorDestination(e.target.checked)}
-                        className="w-4 h-4 text-accent600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                        className="w-4 h-4 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">Destination has elevator</span>
                     </label>
@@ -743,8 +743,8 @@ export default function EstimatePage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                    <div className="text-xs font-semibold text-accent700 dark:text-accent300 uppercase mb-1">Total Items</div>
-                    <div className="text-2xl font-bold text-accent900 dark:text-accent100">{totalItems}</div>
+                    <div className="text-xs font-semibold text-accent-dark dark:text-accent-light uppercase mb-1">Total Items</div>
+                    <div className="text-2xl font-bold text-primary dark:text-white">{totalItems}</div>
                   </div>
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
                     <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase mb-1">Total Volume</div>
@@ -821,7 +821,7 @@ export default function EstimatePage() {
                       type="checkbox"
                       checked={upsell.selected}
                       onChange={() => handleUpsellToggle(upsell.id)}
-                      className="mt-1 w-5 h-5 text-accent600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                      className="mt-1 w-5 h-5 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                     />
                     <div className="ml-3 flex-1">
                       <div className="flex items-center justify-between">
@@ -924,8 +924,8 @@ export default function EstimatePage() {
 
                 {gptReasoning && (
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                    <h3 className="text-xs font-semibold text-accent900 dark:text-accent200 mb-2">🤖 AI Analysis</h3>
-                    <p className="text-xs text-accent800 dark:text-accent300 leading-relaxed">{gptReasoning}</p>
+                    <h3 className="text-xs font-semibold text-primary dark:text-gray-100 mb-2">🤖 AI Analysis</h3>
+                    <p className="text-xs text-primary dark:text-accent-light leading-relaxed">{gptReasoning}</p>
                   </div>
                 )}
 

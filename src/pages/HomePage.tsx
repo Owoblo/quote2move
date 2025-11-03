@@ -30,16 +30,16 @@ export default function HomePage() {
       <section className="relative overflow-hidden pt-20 pb-32 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-accent/10 dark:bg-accent/20 border border-accent/30 dark:border-accent/40 mb-8">
-            <span className="text-sm font-medium text-accent dark:text-accent-light">AI-Powered Moving Quotes</span>
+            <span className="text-sm font-medium text-accent dark:text-accent-light">AI that sees what movers can't</span>
           </div>
           
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-primary dark:text-white tracking-tight leading-[1.1] mb-6 [-webkit-font-smoothing:antialiased]">
             Turn property photos into
-            <span className="block text-accent dark:text-accent-light mt-2">accurate moving quotes</span>
+            <span className="block text-accent dark:text-accent-light mt-2">precise moving quotes — instantly</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-            Our AI analyzes furniture, calculates dimensions, and generates professional estimates in seconds—not hours.
+            MovSense uses AI to analyze real estate listing photos, detect furniture automatically, and generate complete moving inventory with accurate quotes — all in seconds. No walkthroughs. No guesswork. Just pure accuracy.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -110,14 +110,58 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Problem → Solution Section */}
+      <section className="py-24 bg-background dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            {/* Old Way */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border-2 border-red-100 dark:border-red-900/30">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Old Way</h3>
+              </div>
+              <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                Sales reps waste hours building quotes manually, traveling for estimates, and dealing with inconsistent quoting.
+              </p>
+            </div>
+
+            {/* New Way */}
+            <div className="bg-accent/5 dark:bg-accent/10 rounded-2xl p-8 border-2 border-accent/30 dark:border-accent/40">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-accent/20 dark:bg-accent/30 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-primary dark:text-white">New Way</h3>
+              </div>
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                MovSense detects every item from MLS photos, builds the inventory automatically, and generates an exact quote instantly.
+              </p>
+            </div>
+          </div>
+
+          {/* Tagline Row */}
+          <div className="text-center py-8 border-t border-b border-gray-200 dark:border-gray-700">
+            <p className="text-2xl md:text-3xl font-bold text-primary dark:text-white tracking-tight">
+              No walkthroughs. No spreadsheets. No wasted hours.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-24 bg-white dark:bg-[#0a0a0a]">
+      <section className="py-24 bg-white dark:bg-primary">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
               Everything you need
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               AI-powered tools that save time and increase accuracy for moving companies
             </p>
           </div>
@@ -125,79 +169,80 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-accent600 dark:text-accent400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-accent dark:text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">AI Photo Analysis</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Advanced AI detects furniture, appliances, and household items with 95%+ accuracy from property photos.
+              <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">Photo-to-Inventory AI</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Detects what's in every photo — furniture, boxes, volume. Vision AI trained on real MLS/home photos with 95%+ accuracy.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-accent600 dark:text-accent400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-accent/50 dark:hover:border-accent/50 transition-colors bg-white dark:bg-gray-800">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-accent dark:text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Instant Quotes</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Generate professional moving estimates in seconds instead of hours. Save time and increase productivity.
+              <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">Quote Engine</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Builds detailed room-by-room lists in seconds. Calculates distance, weight, and cubic footage automatically.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-accent600 dark:text-accent400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-accent/50 dark:hover:border-accent/50 transition-colors bg-white dark:bg-gray-800">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-accent dark:text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Room Organization</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Automatically organize detected items by room with visual photo thumbnails for easy verification.
+              <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">Instant Inventory</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Automatically organize detected items by room. Removes human error and saves hours of back-and-forth.
               </p>
             </div>
 
             {/* Feature 4 */}
-            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-accent600 dark:text-accent400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-accent/50 dark:hover:border-accent/50 transition-colors bg-white dark:bg-gray-800">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-accent dark:text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Secure & Reliable</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Enterprise-grade security with encrypted data storage and 99.9% uptime guarantee.
+              <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">CRM + Email Integration</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Instant lead follow-ups. Sales reps focus on closing, not counting. Seamless workflow integration.
               </p>
             </div>
 
             {/* Feature 5 */}
-            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-accent600 dark:text-accent400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-accent/50 dark:hover:border-accent/50 transition-colors bg-white dark:bg-gray-800">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-accent dark:text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Easy Integration</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Seamlessly integrate with your existing workflow. Export to CSV, PDF, or connect via API.
+              <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">Accuracy Tracking</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Dashboard shows detection accuracy, quote performance, and helps optimize your moving estimates over time.
               </p>
             </div>
 
             {/* Feature 6 */}
-            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-accent600 dark:text-accent400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
+            <div className="p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-accent/50 dark:hover:border-accent/50 transition-colors bg-white dark:bg-gray-800">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-accent dark:text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Real-time Detection</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Watch as AI detects items in real-time. See inventory build up as each photo is analyzed.
+              <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">See the Move. Quote Instantly.</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Professional experience for customers. Accurate quotes in seconds — not hours. Smarter workflow for your team.
               </p>
             </div>
           </div>

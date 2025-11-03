@@ -1,6 +1,12 @@
-# Instant Quote Builder
+# MovSense
 
-A clean, single-page React + Tailwind application for AI-powered moving estimates.
+**AI that sees what movers can't.**
+
+MovSense is an AI-powered estimation platform that helps moving companies quote jobs instantly from MLS listings and photos. Our vision technology identifies every major item in the home, builds an inventory list automatically, and calculates accurate move time and cost — saving hours of manual work and giving customers a professional experience.
+
+**Core Value:** See the move. Quote it instantly.
+
+**Tagline:** No walkthroughs. No spreadsheets. No wasted hours.
 
 ## Features
 

@@ -604,7 +604,7 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowProjectHistory(true)}
-                className="text-sm font-medium text-accent600 dark:text-accent400 hover:text-accent700 dark:hover:text-accent300 transition-colors flex items-center space-x-1"
+                className="text-sm font-medium text-accent dark:text-accent-light hover:text-accent-dark dark:hover:text-accent-light transition-colors flex items-center space-x-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
