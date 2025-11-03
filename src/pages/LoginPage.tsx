@@ -50,8 +50,6 @@ export default function LoginPage() {
           <Link to="/" className="flex items-center justify-center space-x-3 mb-8">
           <Link to="/" className="flex items-center justify-center mb-8">
             <MovSenseLogo size="lg" />
-          </Link>            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">MovSense</h1>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {isSignUp ? 'Create your account' : 'Welcome back'}
