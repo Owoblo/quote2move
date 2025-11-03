@@ -36,10 +36,10 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 bg-white dark:bg-[#0a0a0a]">
+    <section id="faq" className="py-24 bg-background dark:bg-primary">
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             Frequently asked questions
           </h2>
         </div>

@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function SocialProofSection() {
   return (
-    <section className="py-8 bg-gray-50 dark:bg-gray-900/50 border-y border-gray-200 dark:border-gray-800">
+    <section className="py-8 bg-background dark:bg-primary border-y border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col items-center justify-center">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">

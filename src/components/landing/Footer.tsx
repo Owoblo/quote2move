@@ -1,18 +1,17 @@
 import React from 'react';
+import MovSenseLogo from '../MovSenseLogo';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 py-16">
+    <footer className="bg-background dark:bg-primary border-t border-gray-200 dark:border-gray-700 py-16">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Left: Logo and description */}
           <div>
             <div className="mb-4">
-              <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-                MovSense
-              </span>
+              <MovSenseLogo size="md" />
             </div>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               AI powered quoting for moving companies.

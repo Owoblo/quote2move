@@ -41,10 +41,10 @@ export default function KeyFeaturesSection() {
   ];
 
   return (
-    <section id="product" className="py-24 bg-gray-50 dark:bg-gray-900/50">
+    <section id="product" className="py-24 bg-background dark:bg-primary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             Everything your sales team needs to quote in minutes.
           </h2>
         </div>
@@ -55,7 +55,7 @@ export default function KeyFeaturesSection() {
               key={index} 
               className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors bg-white dark:bg-gray-900"
             >
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400">
+              <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6 text-accent dark:text-accent-light">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">

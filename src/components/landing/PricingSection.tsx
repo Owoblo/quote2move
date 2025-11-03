@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="py-24 bg-gray-50 dark:bg-gray-900/50">
+    <section id="pricing" className="py-24 bg-background dark:bg-primary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             Early access pricing.
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
@@ -51,13 +51,13 @@ export default function PricingSection() {
             </ul>
             <Link 
               to="/login" 
-              className="block w-full text-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              className="block w-full text-center px-6 py-3 bg-accent hover:bg-accent-dark text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Join early access list
             </Link>
           </div>
           <p className="text-center text-gray-600 dark:text-gray-400 text-sm mt-6">
-            Enterprise and multi location? <a href="#contact" className="text-blue-600 dark:text-blue-400 hover:underline">Contact us</a>.
+            Enterprise and multi location? <a href="#contact" className="text-accent dark:text-accent-light hover:underline">Contact us</a>.
           </p>
         </div>
       </div>

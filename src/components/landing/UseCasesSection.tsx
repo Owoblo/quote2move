@@ -17,10 +17,10 @@ export default function UseCasesSection() {
   ];
 
   return (
-    <section className="py-24 bg-white dark:bg-[#0a0a0a]">
+    <section className="py-24 bg-background dark:bg-primary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             Built for modern moving companies.
           </h2>
         </div>

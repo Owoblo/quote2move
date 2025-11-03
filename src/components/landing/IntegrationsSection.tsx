@@ -4,10 +4,10 @@ export default function IntegrationsSection() {
   const integrations = ['CRMs', 'Email tools', 'Zapier', 'Internal dashboards'];
 
   return (
-    <section className="py-24 bg-white dark:bg-[#0a0a0a]">
+    <section className="py-24 bg-background dark:bg-primary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             Fits into your existing workflow.
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">

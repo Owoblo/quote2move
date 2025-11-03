@@ -14,7 +14,7 @@ import Footer from '../components/landing/Footer';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-200">
+    <div className="min-h-screen bg-background dark:bg-primary transition-colors duration-200">
       <Navigation />
       <HeroSection />
       <SocialProofSection />
