@@ -19,6 +19,8 @@ node_modules/.cache/
 .env.development.local
 .env.test.local
 .env.production.local
+# Allow .env.example to be committed (it's a template without real keys)
+!.env.example
 
 npm-debug.log*
 yarn-debug.log*
