@@ -67,8 +67,8 @@ export default function PricingPage() {
           bg: 'bg-blue-600',
           hover: 'hover:bg-blue-700',
           border: 'border-blue-200',
-          text: 'text-blue-600',
-          badge: 'bg-blue-100 text-blue-800',
+          text: 'text-accent600',
+          badge: 'bg-blue-100 text-accent800',
         };
       case 'purple':
         return {
@@ -115,7 +115,7 @@ export default function PricingPage() {
               <Link to="/" className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
                 Home
               </Link>
-              <Link to="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              <Link to="/login" className="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg font-medium transition-colors">
                 Get Started
               </Link>
             </div>
@@ -291,12 +291,12 @@ export default function PricingPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-accent100 mb-8">
             Join hundreds of moving companies already using AI to generate accurate quotes faster.
           </p>
           <Link 
             to="/login" 
-            className="bg-white hover:bg-gray-100 text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="bg-white hover:bg-gray-100 text-accent600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             Start Your Free Trial
           </Link>

@@ -33,7 +33,7 @@ export default function QuotePreviewPage() {
           <p className="text-gray-600 mb-8">Please go back and create a quote first.</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-accent hover:bg-accent-dark text-white font-semibold py-2 px-4 rounded-lg"
           >
             Go Back
           </button>
@@ -95,7 +95,7 @@ export default function QuotePreviewPage() {
           <div className="space-y-3">
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg"
+              className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 px-4 rounded-lg"
             >
               Back to Dashboard
             </button>
@@ -273,13 +273,13 @@ export default function QuotePreviewPage() {
 
             {/* Email Preview Button */}
             <div className="bg-blue-50 rounded-xl p-6">
-              <h3 className="font-semibold text-blue-900 mb-2">Email Preview</h3>
-              <p className="text-sm text-blue-700 mb-4">
+              <h3 className="font-semibold text-accent900 mb-2">Email Preview</h3>
+              <p className="text-sm text-accent700 mb-4">
                 See exactly what your customer will receive in their email.
               </p>
               <button
                 onClick={() => setShowEmailPreview(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+                className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-2 px-4 rounded-lg"
               >
                 Preview Email Content
               </button>
@@ -308,7 +308,7 @@ export default function QuotePreviewPage() {
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <div className="bg-blue-600 text-white p-4 rounded-t-lg">
                     <h1 className="text-xl font-bold">QUOTE2MOVE</h1>
-                    <p className="text-blue-100">Professional Moving Services</p>
+                    <p className="text-accent100">Professional Moving Services</p>
                   </div>
                   
                   <div className="p-6">

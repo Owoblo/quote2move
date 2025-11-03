@@ -102,7 +102,7 @@ export default function QuoteViewerPage() {
           <p className="text-gray-600 mb-8">The quote you're looking for doesn't exist or has been removed.</p>
           <button
             onClick={() => navigate('/')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-accent hover:bg-accent-dark text-white font-semibold py-2 px-4 rounded-lg"
           >
             Go Home
           </button>
@@ -277,7 +277,7 @@ export default function QuoteViewerPage() {
                   
                   <button
                     onClick={() => setShowQuestions(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                    className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors"
                   >
                     Ask Questions
                   </button>
@@ -325,7 +325,7 @@ export default function QuoteViewerPage() {
                   <div className="flex space-x-3 mt-4">
                     <button
                       onClick={handleSubmitQuestion}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+                      className="flex-1 bg-accent hover:bg-accent-dark text-white font-semibold py-2 px-4 rounded-lg"
                     >
                       Submit
                     </button>
