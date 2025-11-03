@@ -325,23 +325,23 @@ export default function PricingPage() {
               <ul className="space-y-2 text-gray-400">
                 <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link to="/login" className="hover:text-white transition-colors">Get Started</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
+                <li><a href="https://docs.quote2move.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">API Documentation</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                <li><a href="https://support.quote2move.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="mailto:support@quote2move.com" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="https://status.quote2move.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Status</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="https://quote2move.com/about" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="https://quote2move.com/privacy" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="https://quote2move.com/terms" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Terms of Service</a></li>
               </ul>
             </div>
           </div>

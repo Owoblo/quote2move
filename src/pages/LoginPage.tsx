@@ -7,36 +7,66 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setFeedback(null);
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { error: authError } = await supabase.auth.signUp({
           email,
           password,
         });
-        if (error) throw error;
-        setError('Check your email for the confirmation link!');
+        if (authError) throw authError;
+        setFeedback({ type: 'success', message: 'Check your email for the confirmation link!' });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error: authError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        if (authError) throw authError;
         navigate('/dashboard');
       }
     } catch (error: any) {
-      setError(error.message);
+      setFeedback({ type: 'error', message: error?.message || 'Something went wrong. Please try again.' });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setFeedback({ type: 'error', message: 'Enter your email above to receive a reset link.' });
+      return;
+    }
+
+    setIsResettingPassword(true);
+    setFeedback(null);
+
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+
+      if (resetError) throw resetError;
+
+      setFeedback({ type: 'success', message: 'Check your email for a password reset link.' });
+    } catch (error: any) {
+      setFeedback({ type: 'error', message: error?.message || 'Failed to send password reset email.' });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  const handleToggleAuthMode = () => {
+    setIsSignUp((prev) => !prev);
+    setFeedback(null);
   };
 
   return (
@@ -66,16 +96,35 @@ export default function LoginPage() {
         {/* Form */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-200">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <div className="flex">
-                  <svg className="w-5 h-5 text-red-400 dark:text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
-                  </div>
-                </div>
+            {feedback && (
+              <div
+                className={`rounded-lg p-4 border flex items-start space-x-3 ${
+                  feedback.type === 'error'
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                    : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                }`}
+              >
+                <svg
+                  className={`w-5 h-5 mt-0.5 ${
+                    feedback.type === 'error'
+                      ? 'text-red-400 dark:text-red-500'
+                      : 'text-green-500 dark:text-green-400'
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p
+                  className={`text-sm ${
+                    feedback.type === 'error'
+                      ? 'text-red-800 dark:text-red-200'
+                      : 'text-green-800 dark:text-green-200'
+                  }`}
+                >
+                  {feedback.message}
+                </p>
               </div>
             )}
 
@@ -127,9 +176,14 @@ export default function LoginPage() {
                   </label>
                 </div>
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
-                    Forgot your password?
-                  </a>
+                  <button
+                    type="button"
+                    onClick={handlePasswordReset}
+                    disabled={isResettingPassword}
+                    className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 disabled:opacity-60"
+                  >
+                    {isResettingPassword ? 'Sending reset link...' : 'Forgot your password?'}
+                  </button>
                 </div>
               </div>
             )}
@@ -183,7 +237,7 @@ export default function LoginPage() {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={handleToggleAuthMode}
                 className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors"
               >
                 {isSignUp ? 'Sign in' : 'Sign up'}
@@ -195,7 +249,7 @@ export default function LoginPage() {
         {/* Back to Home */}
         <div className="text-center">
           <Link to="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
-            ← Back to home
+            &larr; Back to home
           </Link>
         </div>
       </div>

@@ -21,9 +21,6 @@ interface QuoteData {
 export class SimplePDFService {
   static async downloadQuote(quoteData: QuoteData): Promise<void> {
     try {
-      // For now, create a simple text-based PDF
-      const content = this.generateQuoteContent(quoteData);
-      
       // Create a simple HTML content
       const htmlContent = `
         <!DOCTYPE html>
@@ -101,12 +98,6 @@ export class SimplePDFService {
       console.error('Error generating PDF:', error);
       throw new Error('Failed to generate PDF');
     }
-  }
-
-  private static generateQuoteContent(quoteData: QuoteData): string {
-    // This method is kept for future use but not currently used
-    // It generates a text-based quote content
-    return `QUOTE ${quoteData.id} - ${quoteData.customerName}`;
   }
 
   private static generateInventoryHTML(detections: any[]): string {

@@ -247,50 +247,52 @@ export default function EstimatePage() {
         });
 
         // Step 5: Auto-apply detected upsells from GPT
-        const newUpsells = [...upsells];
+        setUpsells(prevUpsells => {
+          const updatedUpsells = [...prevUpsells];
 
-        // Update existing upsells with GPT recommendations
-        gptResult.detectedUpsells.forEach(gptUpsell => {
-          const existingIndex = newUpsells.findIndex(u => u.id === gptUpsell.id);
-          if (existingIndex >= 0) {
-            newUpsells[existingIndex] = {
-              ...newUpsells[existingIndex],
-              price: gptUpsell.price,
-              description: gptUpsell.reason,
-              recommended: true,
-              selected: gptUpsell.required || newUpsells[existingIndex].selected
-            };
-          } else {
-            // Add new upsell from GPT
-            newUpsells.push({
-              id: gptUpsell.id,
-              name: gptUpsell.name,
-              description: gptUpsell.reason,
-              price: gptUpsell.price,
-              recommended: true,
-              selected: gptUpsell.required
-            });
-          }
-        });
-
-        // Add specialty item surcharges as separate upsells
-        if (gptResult.specialtyItems.length > 0) {
-          gptResult.specialtyItems.forEach(item => {
-            const existingSpecialtyIndex = newUpsells.findIndex(u => u.id === `specialty-${item.category}`);
-            if (existingSpecialtyIndex < 0) {
-              newUpsells.push({
-                id: `specialty-${item.category}`,
-                name: `${item.item} Specialty Handling`,
-                description: `Specialty handling for ${item.item} (+${item.extraTime} min)`,
-                price: item.surcharge,
+          // Update existing upsells with GPT recommendations
+          gptResult.detectedUpsells.forEach(gptUpsell => {
+            const existingIndex = updatedUpsells.findIndex(u => u.id === gptUpsell.id);
+            if (existingIndex >= 0) {
+              updatedUpsells[existingIndex] = {
+                ...updatedUpsells[existingIndex],
+                price: gptUpsell.price,
+                description: gptUpsell.reason,
                 recommended: true,
-                selected: true
+                selected: gptUpsell.required || updatedUpsells[existingIndex].selected
+              };
+            } else {
+              // Add new upsell from GPT
+              updatedUpsells.push({
+                id: gptUpsell.id,
+                name: gptUpsell.name,
+                description: gptUpsell.reason,
+                price: gptUpsell.price,
+                recommended: true,
+                selected: gptUpsell.required
               });
             }
           });
-        }
 
-        setUpsells(newUpsells);
+          // Add specialty item surcharges as separate upsells
+          if (gptResult.specialtyItems.length > 0) {
+            gptResult.specialtyItems.forEach(item => {
+              const existingSpecialtyIndex = updatedUpsells.findIndex(u => u.id === `specialty-${item.category}`);
+              if (existingSpecialtyIndex < 0) {
+                updatedUpsells.push({
+                  id: `specialty-${item.category}`,
+                  name: `${item.item} Specialty Handling`,
+                  description: `Specialty handling for ${item.item} (+${item.extraTime} min)`,
+                  price: item.surcharge,
+                  recommended: true,
+                  selected: true
+                });
+              }
+            });
+          }
+
+          return updatedUpsells;
+        });
         setGptReasoning(gptResult.reasoning);
         setGptBreakdown(gptResult.breakdown);
 
@@ -721,6 +723,9 @@ export default function EstimatePage() {
                   </div>
                   {distanceError && (
                     <p className="text-xs text-red-600 dark:text-red-400 mt-2">{distanceError}</p>
+                  )}
+                  {gptError && (
+                    <p className="text-xs text-red-600 dark:text-red-400 mt-2">{gptError}</p>
                   )}
                 </div>
               </div>
