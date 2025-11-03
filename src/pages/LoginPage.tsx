@@ -53,7 +53,7 @@ export default function LoginPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Quote2Move</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">MovSense</h1>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {isSignUp ? 'Create your account' : 'Welcome back'}

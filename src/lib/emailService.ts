@@ -44,9 +44,9 @@ export class EmailService {
         total_amount: data.totalAmount.toFixed(2),
         quote_id: data.quoteId,
         quote_url: data.quoteUrl,
-        company_name: 'Quote2Move',
+        company_name: 'MovSense',
         // Add some common alternative variable names
-        from_name: 'Quote2Move',
+        from_name: 'MovSense',
         reply_to: 'noreply@instantquotebuilder.com',
         subject: `Moving Quote - ${data.customerName}`
       };
@@ -83,7 +83,7 @@ export class EmailService {
     const subject = `Moving Quote - ${data.customerName}`;
     const body = `Hi ${data.customerName},
 
-Thank you for choosing Quote2Move for your move!
+Thank you for choosing MovSense for your move!
 
 Move Details:
 - From: ${data.originAddress}
@@ -94,7 +94,7 @@ Move Details:
 View your detailed quote: ${data.quoteUrl}
 
 Best regards,
-Quote2Move Team`;
+MovSense Team`;
 
     return `mailto:${data.customerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }

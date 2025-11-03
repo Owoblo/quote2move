@@ -5,6 +5,7 @@ import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
 import ThemeToggle from '../components/ThemeToggle';
+import MovSenseLogo from '../components/MovSenseLogo';
 import { AppState, Photo, MappingTable, QuotePayload } from '../types';
 import { calculateEstimate } from '../lib/estimate';
 import { toCSV, generatePdf, downloadFile } from '../lib/export';
@@ -598,7 +599,7 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">Quote2Move</h1>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">MovSense</h1>
             </div>
             <div className="flex items-center space-x-4">
               <button

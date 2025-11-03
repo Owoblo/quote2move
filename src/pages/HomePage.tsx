@@ -1,26 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
+import MovSenseLogo from '../components/MovSenseLogo';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-200">
+    <div className="min-h-screen bg-background dark:bg-primary transition-colors duration-200">
       {/* Navigation */}
-      <nav className="bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
+      <nav className="bg-background/80 dark:bg-primary/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">Q2M</span>
-              </div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Quote2Move</h1>
-            </div>
+            <Link to="/" className="flex items-center">
+              <MovSenseLogo size="md" />
+            </Link>
             <div className="flex items-center space-x-6">
               <Link to="/pricing" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium text-sm transition-colors">
                 Pricing
               </Link>
               <ThemeToggle />
-              <Link to="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow">
+              <Link to="/login" className="bg-accent hover:bg-accent-dark text-primary px-5 py-2 rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow">
                 Get Started
               </Link>
             </div>
@@ -31,13 +29,13 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-32 px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 mb-8">
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-400">AI-Powered Moving Quotes</span>
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-accent/10 dark:bg-accent/20 border border-accent/30 dark:border-accent/40 mb-8">
+            <span className="text-sm font-medium text-accent dark:text-accent-light">AI-Powered Moving Quotes</span>
           </div>
           
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-[1.1] mb-6 [-webkit-font-smoothing:antialiased]">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-primary dark:text-white tracking-tight leading-[1.1] mb-6 [-webkit-font-smoothing:antialiased]">
             Turn property photos into
-            <span className="block text-blue-600 dark:text-blue-500 mt-2">accurate moving quotes</span>
+            <span className="block text-accent dark:text-accent-light mt-2">accurate moving quotes</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
@@ -104,7 +102,7 @@ export default function HomePage() {
                 frameBorder="0"
                 allowFullScreen
                 className="w-full h-full"
-                title="Quote2Move Demo"
+                title="MovSense Demo"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               ></iframe>
             </div>
@@ -279,9 +277,9 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">Q2M</span>
+                  <span className="text-white font-bold text-sm">MS</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Quote2Move</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">MovSense</h3>
               </div>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 AI-powered moving estimates that save time and increase accuracy.
@@ -313,7 +311,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-800 pt-8 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">&copy; 2024 Quote2Move. All rights reserved.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">&copy; 2024 MovSense. All rights reserved.</p>
           </div>
         </div>
       </footer>

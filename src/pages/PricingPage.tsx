@@ -109,7 +109,7 @@ export default function PricingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-gray-900 tracking-tight">Quote2Move</h1>
+              <h1 className="text-xl font-semibold text-gray-900 tracking-tight">MovSense</h1>
             </Link>
             <div className="flex items-center space-x-6">
               <Link to="/" className="text-gray-600 hover:text-gray-900 font-medium transition-colors">
@@ -314,7 +314,7 @@ export default function PricingPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold">Quote2Move</h3>
+                <h3 className="text-xl font-semibold">MovSense</h3>
               </div>
               <p className="text-gray-400">
                 AI-powered moving estimates that save time and increase accuracy.
@@ -346,7 +346,7 @@ export default function PricingPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Quote2Move. All rights reserved.</p>
+            <p>&copy; 2024 MovSense. All rights reserved.</p>
           </div>
         </div>
       </footer>

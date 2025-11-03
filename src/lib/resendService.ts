@@ -31,7 +31,7 @@ export class ResendService {
 
     try {
       const emailData = {
-        from: 'Quote2Move <onboarding@resend.dev>',
+        from: 'MovSense <onboarding@resend.dev>',
         to: [data.customerEmail],
         subject: `Your Moving Quote - ${data.customerName}`,
         html: this.generateEmailHTML(data)
@@ -96,7 +96,7 @@ export class ResendService {
             
             <p>Hi ${data.customerName},</p>
             
-            <p>Thank you for choosing Quote2Move for your move. We've prepared a detailed quote based on your inventory and requirements.</p>
+            <p>Thank you for choosing MovSense for your move. We've prepared a detailed quote based on your inventory and requirements.</p>
             
             <div class="quote-box">
               <h3 style="margin-top: 0; color: #374151;">Move Details</h3>
@@ -126,7 +126,7 @@ export class ResendService {
             
             <p style="margin-top: 30px;">
               Best regards,<br>
-              <strong>Quote2Move Team</strong>
+              <strong>MovSense Team</strong>
             </p>
           </div>
           

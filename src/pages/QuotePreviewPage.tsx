@@ -316,7 +316,7 @@ export default function QuotePreviewPage() {
                     
                     <p>Hi {quoteData.customerName},</p>
                     
-                    <p className="mt-4">Thank you for choosing Quote2Move for your move. We've prepared a detailed quote based on your inventory and requirements.</p>
+                    <p className="mt-4">Thank you for choosing MovSense for your move. We've prepared a detailed quote based on your inventory and requirements.</p>
                     
                     <div className="bg-gray-50 p-4 rounded-lg my-6 border-l-4 border-blue-600">
                       <h3 className="font-semibold text-gray-900 mb-2">Move Details</h3>
@@ -338,7 +338,7 @@ export default function QuotePreviewPage() {
                     
                     <p className="mt-4 text-sm text-gray-600">
                       Best regards,<br />
-                      <strong>Quote2Move Team</strong>
+                      <strong>MovSense Team</strong>
                     </p>
                   </div>
                   
