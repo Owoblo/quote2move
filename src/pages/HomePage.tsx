@@ -35,11 +35,11 @@ export default function HomePage() {
           
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-primary dark:text-white tracking-tight leading-[1.1] mb-6 [-webkit-font-smoothing:antialiased]">
             Turn property photos into
-            <span className="block text-accent dark:text-accent-light mt-2">precise moving quotes — instantly</span>
+            <span className="block text-accent dark:text-accent-light mt-2">precise moving quotes - instantly</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-            MovSense uses AI to analyze real estate listing photos, detect furniture automatically, and generate complete moving inventory with accurate quotes — all in seconds. No walkthroughs. No guesswork. Just pure accuracy.
+            MovSense uses AI to analyze real estate listing photos, detect furniture automatically, and generate complete moving inventory with accurate quotes - all in seconds. No walkthroughs. No guesswork. Just pure accuracy.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -176,7 +176,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">Photo-to-Inventory AI</h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Detects what's in every photo — furniture, boxes, volume. Vision AI trained on real MLS/home photos with 95%+ accuracy.
+                Detects what's in every photo - furniture, boxes, volume. Vision AI trained on real MLS/home photos with 95%+ accuracy.
               </p>
             </div>
 
@@ -242,7 +242,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-semibold text-primary dark:text-white mb-3">See the Move. Quote Instantly.</h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Professional experience for customers. Accurate quotes in seconds — not hours. Smarter workflow for your team.
+                Professional experience for customers. Accurate quotes in seconds - not hours. Smarter workflow for your team.
               </p>
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function HomePage() {
               How it works
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Simple, fast, and accurate—three steps to your moving quote
+              Simple, fast, and accurate-three steps to your moving quote
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
