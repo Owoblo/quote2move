@@ -16,6 +16,15 @@ interface Listing {
 
 const MAX_DEMO_SEARCHES = 2;
 const DEFAULT_ADDRESS = '125 Links Dr, Amherstburg, ON';
+const CACHE_KEY = 'movsense_demo_cache';
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+
+interface CachedData {
+  photos: Photo[];
+  detections: Detection[];
+  timestamp: number;
+  address: string;
+}
 
 export default function InteractiveDemo() {
   const [address, setAddress] = useState(DEFAULT_ADDRESS);
@@ -29,12 +38,66 @@ export default function InteractiveDemo() {
   const [searchCount, setSearchCount] = useState(0);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDefaultAddress, setIsDefaultAddress] = useState(true);
 
-  // Auto-select default address if it matches a listing
+  // Load cached data for default address
+  const loadCachedData = (): CachedData | null => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const data: CachedData = JSON.parse(cached);
+        // Check if cache is valid and for default address
+        if (data.address === DEFAULT_ADDRESS && Date.now() - data.timestamp < CACHE_EXPIRY) {
+          return data;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading cache:', error);
+    }
+    return null;
+  };
+
+  // Save data to cache
+  const saveToCache = (photos: Photo[], detections: Detection[], address: string) => {
+    try {
+      const cacheData: CachedData = {
+        photos,
+        detections,
+        timestamp: Date.now(),
+        address
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+    } catch (error) {
+      console.error('Error saving cache:', error);
+    }
+  };
+
+  // Auto-start for default address
   useEffect(() => {
-    const autoSelectDefault = async () => {
-      if (address === DEFAULT_ADDRESS && !selectedListing) {
+    const autoStartDefault = async () => {
+      if (address === DEFAULT_ADDRESS && photos.length === 0) {
+        setIsDefaultAddress(true);
+        
+        // Check cache first
+        const cached = loadCachedData();
+        if (cached) {
+          // Simulate loading for better UX
+          setIsLoading(true);
+          await new Promise(resolve => setTimeout(resolve, 800)); // Show loading briefly
+          setPhotos(cached.photos);
+          setIsDetecting(true);
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate detection
+          setDetections(cached.detections);
+          setIsLoading(false);
+          setIsDetecting(false);
+          return;
+        }
+
+        // If no cache, fetch and detect
         try {
+          setIsLoading(true);
+          
+          // Find listing
           const [currentResult, soldResult] = await Promise.all([
             supabase
               .from('just_listed')
@@ -54,24 +117,61 @@ export default function InteractiveDemo() {
           ];
 
           if (allListings.length > 0) {
-            setSelectedListing(allListings[0]);
+            const listing = allListings[0];
+            setSelectedListing(listing);
+
+            // Fetch photos
+            let photoUrls: string[] = [];
+            if (listing.carousel_photos_composable) {
+              photoUrls = parseZillowPhotos(listing.carousel_photos_composable);
+            }
+
+            if (photoUrls.length > 0) {
+              // Skip first 4 photos (exterior) and show up to 12 interior photos
+              const interiorPhotos = photoUrls.slice(4, 16); // Skip 4, take next 12
+              
+              const formattedPhotos: Photo[] = interiorPhotos.map((url, index) => ({
+                id: `photo-${index}`,
+                url: url,
+                thumbnailUrl: url,
+                filename: `property-photo-${index + 1}.jpg`,
+                uploadedAt: new Date()
+              }));
+
+              setPhotos(formattedPhotos);
+              setIsLoading(false);
+
+              // Start detection with simulated delay for better UX
+              setIsDetecting(true);
+              const detectedItems = await detectFurniture(interiorPhotos.slice(0, 6)); // Detect first 6 for speed
+              
+              setDetections(detectedItems);
+              setIsDetecting(false);
+
+              // Cache the results
+              saveToCache(formattedPhotos, detectedItems, DEFAULT_ADDRESS);
+            }
           }
         } catch (error) {
-          console.error('Error auto-selecting default:', error);
+          console.error('Error auto-starting default:', error);
+          setIsLoading(false);
+          setIsDetecting(false);
         }
       }
     };
-    autoSelectDefault();
+    autoStartDefault();
   }, []);
 
   // Search for listings as user types
   useEffect(() => {
     const searchListings = async () => {
-      if (address.length < 3) {
+      if (address.length < 3 || address === DEFAULT_ADDRESS) {
         setSuggestions([]);
         setShowSuggestions(false);
         return;
       }
+
+      setIsDefaultAddress(false);
 
       try {
         const [currentListings, soldListings] = await Promise.all([
@@ -109,6 +209,7 @@ export default function InteractiveDemo() {
     setAddress(fullAddress);
     setSelectedListing(listing);
     setShowSuggestions(false);
+    setIsDefaultAddress(false);
   };
 
   const fetchPhotos = async () => {
@@ -129,13 +230,12 @@ export default function InteractiveDemo() {
 
     try {
       let photoUrls: string[] = [];
-      let listingWithPhotos = selectedListing;
 
       // Check if selected listing has carousel_photos_composable
       if (selectedListing.carousel_photos_composable) {
         photoUrls = parseZillowPhotos(selectedListing.carousel_photos_composable);
       } else {
-        // Try to fetch from database with optimized search
+        // Try to fetch from database
         const addressParts = selectedListing.address.split(' ');
         const houseNumber = addressParts[0];
         const streetName = addressParts.slice(1, 3).join(' ');
@@ -147,7 +247,6 @@ export default function InteractiveDemo() {
           streetName
         ];
 
-        // Search both tables
         for (const term of searchTerms) {
           const [currentResult, soldResult] = await Promise.all([
             supabase
@@ -167,13 +266,11 @@ export default function InteractiveDemo() {
             ...(soldResult.data || [])
           ];
 
-          // Find listing with photos
           const listingWithCarousel = allListings.find(
             (listing: any) => listing.carousel_photos_composable
           );
 
           if (listingWithCarousel?.carousel_photos_composable) {
-            listingWithPhotos = listingWithCarousel;
             photoUrls = parseZillowPhotos(listingWithCarousel.carousel_photos_composable);
             break;
           }
@@ -181,7 +278,10 @@ export default function InteractiveDemo() {
       }
 
       if (photoUrls.length > 0) {
-        const formattedPhotos: Photo[] = photoUrls.slice(0, 6).map((url, index) => ({
+        // For non-default addresses, show all photos (first 12)
+        const photosToShow = isDefaultAddress ? photoUrls.slice(4, 16) : photoUrls.slice(0, 12);
+        
+        const formattedPhotos: Photo[] = photosToShow.map((url, index) => ({
           id: `photo-${index}`,
           url: url,
           thumbnailUrl: url,
@@ -192,8 +292,11 @@ export default function InteractiveDemo() {
         setPhotos(formattedPhotos);
         setSearchCount(prev => prev + 1);
 
-        // Automatically start detection
-        await runDetection(formattedPhotos);
+        // Start detection
+        setIsDetecting(true);
+        const detectedItems = await detectFurniture(photosToShow.slice(0, 6));
+        setDetections(detectedItems);
+        setIsDetecting(false);
       } else {
         setError('No photos found for this address. Try searching for another property!');
       }
@@ -202,33 +305,6 @@ export default function InteractiveDemo() {
       setError('Error fetching photos. Please try again.');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const runDetection = async (photosToDetect: Photo[]) => {
-    setIsDetecting(true);
-    setDetections([]);
-
-    try {
-      const photoUrls = photosToDetect.map(p => p.url);
-      const detectedItems = await detectFurniture(photoUrls);
-
-      // Group by room
-      const roomGroups: { [key: string]: Detection[] } = {};
-      detectedItems.forEach(item => {
-        const room = item.room || 'Other';
-        if (!roomGroups[room]) {
-          roomGroups[room] = [];
-        }
-        roomGroups[room].push(item);
-      });
-
-      setDetections(detectedItems);
-    } catch (error: any) {
-      console.error('Detection error:', error);
-      setError('AI detection failed. Please try again.');
-    } finally {
-      setIsDetecting(false);
     }
   };
 
@@ -248,9 +324,9 @@ export default function InteractiveDemo() {
 
   return (
     <div className="relative">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 max-h-[600px] flex flex-col">
         {/* Top: Address search field */}
-        <div className="mb-6">
+        <div className="mb-4 flex-shrink-0">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Property Address
           </label>
@@ -266,12 +342,12 @@ export default function InteractiveDemo() {
                   setAddress(e.target.value);
                   setShowSuggestions(true);
                   setSelectedListing(null);
+                  setIsDefaultAddress(e.target.value === DEFAULT_ADDRESS);
                 }}
                 onFocus={() => {
                   if (suggestions.length > 0) setShowSuggestions(true);
                 }}
                 onBlur={() => {
-                  // Delay hiding to allow clicks
                   setTimeout(() => setShowSuggestions(false), 200);
                 }}
                 placeholder="Enter property address..."
@@ -304,8 +380,8 @@ export default function InteractiveDemo() {
             )}
           </div>
 
-          {/* Action button */}
-          {!showSignupPrompt && (
+          {/* Action button - only show for non-default addresses */}
+          {!showSignupPrompt && !isDefaultAddress && selectedListing && (
             <button
               onClick={fetchPhotos}
               disabled={!selectedListing || isLoading || isDetecting}
@@ -355,107 +431,111 @@ export default function InteractiveDemo() {
           )}
         </div>
 
-        {/* Middle: Photo preview grid */}
-        {photos.length > 0 && (
-          <div className="mb-6">
-            <div className="grid grid-cols-3 gap-2">
-              {photos.map((photo) => (
-                <div
-                  key={photo.id}
-                  className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-lg overflow-hidden"
-                >
-                  <img
-                    src={photo.url}
-                    alt="Property"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Bottom: Auto detected inventory and quote */}
-        {(detections.length > 0 || isDetecting) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Auto detected inventory */}
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto space-y-4">
+          {/* Photo preview grid - scrollable */}
+          {photos.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                Auto detected inventory
-              </h3>
-              {isDetecting ? (
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-accent border-t-transparent"></div>
-                    <span>AI analyzing photos...</span>
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Property Photos</h3>
+              <div className="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto">
+                {photos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded overflow-hidden"
+                  >
+                    <img
+                      src={photo.url}
+                      alt="Property"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-2 text-sm max-h-48 overflow-y-auto">
-                  {Object.entries(roomGroups).map(([room, items]) => {
-                    const itemCounts: { [key: string]: number } = {};
-                    items.forEach(item => {
-                      itemCounts[item.label] = (itemCounts[item.label] || 0) + (item.qty || 1);
-                    });
-                    const itemList = Object.entries(itemCounts)
-                      .map(([label, count]) => `${count} ${label}`)
-                      .join(', ');
-                    return (
-                      <div key={room} className="text-gray-700 dark:text-gray-300">
-                        <span className="font-medium">{room}:</span> {itemList}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                ))}
+              </div>
             </div>
+          )}
 
-            {/* Quote estimate */}
-            <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                Quote estimate
-              </h3>
-              {isDetecting ? (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Analyzing...</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">-</span>
+          {/* Auto detected inventory and quote */}
+          {(detections.length > 0 || isDetecting) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Auto detected inventory - scrollable */}
+              <div className="flex flex-col">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Auto detected inventory
+                </h3>
+                {isDetecting ? (
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-accent border-t-transparent"></div>
+                      <span>AI analyzing photos...</span>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Estimated hours:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">{estimatedHours.toFixed(1)} hrs</span>
+                ) : (
+                  <div className="space-y-1.5 text-xs max-h-32 overflow-y-auto">
+                    {Object.entries(roomGroups).map(([room, items]) => {
+                      const itemCounts: { [key: string]: number } = {};
+                      items.forEach(item => {
+                        itemCounts[item.label] = (itemCounts[item.label] || 0) + (item.qty || 1);
+                      });
+                      const itemList = Object.entries(itemCounts)
+                        .map(([label, count]) => `${count} ${label}`)
+                        .join(', ');
+                      return (
+                        <div key={room} className="text-gray-700 dark:text-gray-300">
+                          <span className="font-medium">{room}:</span> {itemList}
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Estimated cost:</span>
-                    <span className="font-semibold text-accent dark:text-accent-light">${estimatedCost}</span>
+                )}
+              </div>
+
+              {/* Quote estimate */}
+              <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-3">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Quote estimate
+                </h3>
+                {isDetecting ? (
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Analyzing...</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">-</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Items detected:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">{detections.length}</span>
+                ) : (
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Estimated hours:</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{estimatedHours.toFixed(1)} hrs</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Estimated cost:</span>
+                      <span className="font-semibold text-accent dark:text-accent-light">${estimatedCost}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Items detected:</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{detections.length}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Empty state */}
-        {photos.length === 0 && !isLoading && !error && !showSignupPrompt && (
-          <div className="text-center py-8">
-            <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter an address above to see AI detection in action
-            </p>
-          </div>
-        )}
+          {/* Empty state */}
+          {photos.length === 0 && !isLoading && !error && !showSignupPrompt && !isDetecting && (
+            <div className="text-center py-8">
+              <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Enter an address above to see AI detection in action
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Search counter */}
@@ -469,4 +549,3 @@ export default function InteractiveDemo() {
     </div>
   );
 }
-
