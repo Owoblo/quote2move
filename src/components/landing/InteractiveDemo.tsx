@@ -90,12 +90,19 @@ export default function InteractiveDemo() {
       
       const typeInterval = setInterval(() => {
         if (currentIndex < fullText.length) {
-          setDisplayAddress(fullText.slice(0, currentIndex + 1) + (showCursor ? '|' : ''));
+          const cursor = showCursor ? '|' : '';
+          setDisplayAddress(fullText.slice(0, currentIndex + 1) + cursor);
           currentIndex++;
         } else {
+          // Keep cursor at end when done
+          setDisplayAddress(fullText + '|');
           clearInterval(typeInterval);
-          clearInterval(cursorInterval);
-          setIsTyping(false);
+          // Remove cursor after a moment
+          setTimeout(() => {
+            clearInterval(cursorInterval);
+            setDisplayAddress(fullText);
+            setIsTyping(false);
+          }, 500);
         }
       }, 50); // Type speed
       
@@ -396,9 +403,6 @@ export default function InteractiveDemo() {
                 className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
                 disabled={isDetecting || showSignupPrompt}
               />
-              {isTyping && (
-                <span className="animate-pulse text-accent">|</span>
-              )}
             </div>
 
             {/* Autocomplete suggestions */}
@@ -546,12 +550,12 @@ export default function InteractiveDemo() {
                 {isDetecting ? (
                   <div className="text-xs text-gray-600 dark:text-gray-400">
                     <div className="flex items-center space-x-2">
-                      <div className="flex space-x-1">
-                        <span className="animate-pulse">●</span>
-                        <span className="animate-pulse" style={{ animationDelay: '0.2s' }}>●</span>
-                        <span className="animate-pulse" style={{ animationDelay: '0.4s' }}>●</span>
+                      <div className="flex space-x-0.5">
+                        <span className="inline-block w-1 h-1 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '1s' }}></span>
+                        <span className="inline-block w-1 h-1 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s', animationDuration: '1s' }}></span>
+                        <span className="inline-block w-1 h-1 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.4s', animationDuration: '1s' }}></span>
                       </div>
-                      <span className="italic">Detecting inventory...</span>
+                      <span className="italic animate-pulse">Detecting inventory...</span>
                     </div>
                   </div>
                 ) : (
