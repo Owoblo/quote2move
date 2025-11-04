@@ -127,8 +127,8 @@ export default function InteractiveDemo() {
             }
 
             if (photoUrls.length > 0) {
-              // Skip first 4 photos (exterior) and show up to 12 interior photos
-              const interiorPhotos = photoUrls.slice(4, 16); // Skip 4, take next 12
+              // Skip first 4 photos (exterior) and show all interior photos
+              const interiorPhotos = photoUrls.slice(4); // Skip 4, show all remaining
               
               const formattedPhotos: Photo[] = interiorPhotos.map((url, index) => ({
                 id: `photo-${index}`,
@@ -278,8 +278,9 @@ export default function InteractiveDemo() {
       }
 
       if (photoUrls.length > 0) {
-        // For non-default addresses, show all photos (first 12)
-        const photosToShow = isDefaultAddress ? photoUrls.slice(4, 16) : photoUrls.slice(0, 12);
+        // For non-default addresses, show all photos
+        // For default address, skip first 4 (exterior) and show all interior photos
+        const photosToShow = isDefaultAddress ? photoUrls.slice(4) : photoUrls;
         
         const formattedPhotos: Photo[] = photosToShow.map((url, index) => ({
           id: `photo-${index}`,
@@ -308,9 +309,9 @@ export default function InteractiveDemo() {
     }
   };
 
-  // Calculate estimated hours and cost
-  const estimatedHours = detections.length > 0 ? Math.max(2, Math.ceil(detections.length / 10) * 0.5) : 0;
-  const estimatedCost = Math.round(estimatedHours * 150);
+  // Demo quote estimate - hardcoded for demo purposes
+  const estimatedHours = 8;
+  const estimatedCost = 1950;
 
   // Group detections by room for display
   const roomGroups: { [key: string]: Detection[] } = {};
@@ -436,7 +437,9 @@ export default function InteractiveDemo() {
           {/* Photo preview grid - scrollable */}
           {photos.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Property Photos</h3>
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Property Photos ({photos.length})
+              </h3>
               <div className="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto">
                 {photos.map((photo) => (
                   <div
