@@ -39,6 +39,8 @@ export default function InteractiveDemo() {
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDefaultAddress, setIsDefaultAddress] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
+  const [displayAddress, setDisplayAddress] = useState('');
 
   // Load cached data for default address
   const loadCachedData = (): CachedData | null => {
@@ -72,11 +74,38 @@ export default function InteractiveDemo() {
     }
   };
 
+  // Typing animation for default address
+  useEffect(() => {
+    if (address === DEFAULT_ADDRESS && photos.length === 0 && !isTyping) {
+      setIsTyping(true);
+      setDisplayAddress('');
+      const fullText = DEFAULT_ADDRESS;
+      let currentIndex = 0;
+      
+      const typeInterval = setInterval(() => {
+        if (currentIndex < fullText.length) {
+          setDisplayAddress(fullText.slice(0, currentIndex + 1));
+          currentIndex++;
+        } else {
+          clearInterval(typeInterval);
+          setIsTyping(false);
+        }
+      }, 50); // Type speed
+      
+      return () => clearInterval(typeInterval);
+    } else if (address !== DEFAULT_ADDRESS) {
+      setDisplayAddress(address);
+    }
+  }, [address, photos.length]);
+
   // Auto-start for default address
   useEffect(() => {
     const autoStartDefault = async () => {
-      if (address === DEFAULT_ADDRESS && photos.length === 0) {
+      if (address === DEFAULT_ADDRESS && photos.length === 0 && !isTyping) {
         setIsDefaultAddress(true);
+        
+        // Wait for typing animation to complete
+        await new Promise(resolve => setTimeout(resolve, DEFAULT_ADDRESS.length * 50 + 500));
         
         // Check cache first
         const cached = loadCachedData();
@@ -338,12 +367,14 @@ export default function InteractiveDemo() {
               </svg>
               <input
                 type="text"
-                value={address}
+                value={isDefaultAddress && isTyping ? displayAddress : address}
                 onChange={(e) => {
                   setAddress(e.target.value);
+                  setDisplayAddress(e.target.value);
                   setShowSuggestions(true);
                   setSelectedListing(null);
                   setIsDefaultAddress(e.target.value === DEFAULT_ADDRESS);
+                  setIsTyping(false);
                 }}
                 onFocus={() => {
                   if (suggestions.length > 0) setShowSuggestions(true);
@@ -466,102 +497,98 @@ export default function InteractiveDemo() {
           )}
         </div>
 
-        {/* Scrollable content area - compact layout */}
-        <div className="flex-1 overflow-y-auto">
-          {(photos.length > 0 || detections.length > 0 || isDetecting) && (
-            <div className="space-y-3">
-              {/* Photo preview grid - compact */}
-              {photos.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Property Photos ({photos.length})
-                  </h3>
-                  <div className="grid grid-cols-4 gap-1">
-                    {photos.map((photo) => (
-                      <div
-                        key={photo.id}
-                        className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded overflow-hidden"
-                      >
-                        <img
-                          src={photo.url}
-                          alt="Property"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    ))}
+        {/* Scrollable content area - boxed sections */}
+        <div className="flex-1 overflow-y-auto space-y-3">
+          {/* Photo preview grid - boxed and scrollable */}
+          {photos.length > 0 && (
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Property Photos ({photos.length})
+              </h3>
+              <div className="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto">
+                {photos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded overflow-hidden"
+                  >
+                    <img
+                      src={photo.url}
+                      alt="Property"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
+            </div>
+          )}
 
-              {/* Auto detected inventory and quote - side by side */}
-              {(detections.length > 0 || isDetecting) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {/* Auto detected inventory - scrollable */}
-                  <div className="flex flex-col">
-                    <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
-                      Auto detected inventory
-                    </h3>
-                    {isDetecting ? (
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        <div className="flex items-center space-x-2">
-                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-accent border-t-transparent"></div>
-                          <span>AI analyzing photos...</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-1 text-xs max-h-40 overflow-y-auto pr-1">
-                        {Object.entries(roomGroups).map(([room, items]) => {
-                          const itemCounts: { [key: string]: number } = {};
-                          items.forEach(item => {
-                            itemCounts[item.label] = (itemCounts[item.label] || 0) + (item.qty || 1);
-                          });
-                          const itemList = Object.entries(itemCounts)
-                            .map(([label, count]) => `${count} ${label}`)
-                            .join(', ');
-                          return (
-                            <div key={room} className="text-gray-700 dark:text-gray-300">
-                              <span className="font-medium">{room}:</span> {itemList}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+          {/* Auto detected inventory and quote - boxed sections */}
+          {(detections.length > 0 || isDetecting) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Auto detected inventory - boxed and scrollable */}
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 flex flex-col">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Auto detected inventory
+                </h3>
+                {isDetecting ? (
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-accent border-t-transparent"></div>
+                      <span>AI analyzing photos...</span>
+                    </div>
                   </div>
+                ) : (
+                  <div className="space-y-1.5 text-xs max-h-48 overflow-y-auto pr-1">
+                    {Object.entries(roomGroups).map(([room, items]) => {
+                      const itemCounts: { [key: string]: number } = {};
+                      items.forEach(item => {
+                        itemCounts[item.label] = (itemCounts[item.label] || 0) + (item.qty || 1);
+                      });
+                      const itemList = Object.entries(itemCounts)
+                        .map(([label, count]) => `${count} ${label}`)
+                        .join(', ');
+                      return (
+                        <div key={room} className="text-gray-700 dark:text-gray-300">
+                          <span className="font-medium">{room}:</span> {itemList}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-                  {/* Quote estimate */}
-                  <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-2.5">
-                    <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
-                      Quote estimate
-                    </h3>
-                    {isDetecting ? (
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600 dark:text-gray-400">Analyzing...</span>
-                          <span className="font-semibold text-gray-900 dark:text-gray-100">-</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600 dark:text-gray-400">Estimated hours:</span>
-                          <span className="font-semibold text-gray-900 dark:text-gray-100">{estimatedHours} hrs</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600 dark:text-gray-400">Estimated cost:</span>
-                          <span className="font-semibold text-accent dark:text-accent-light">${estimatedCost.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-600 dark:text-gray-400">Items detected:</span>
-                          <span className="font-semibold text-gray-900 dark:text-gray-100">{detections.length}</span>
-                        </div>
-                      </div>
-                    )}
+              {/* Quote estimate - boxed */}
+              <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-3 border border-accent/20 dark:border-accent/30">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Quote estimate
+                </h3>
+                {isDetecting ? (
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Analyzing...</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">-</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Estimated hours:</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{estimatedHours} hrs</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Estimated cost:</span>
+                      <span className="font-semibold text-accent dark:text-accent-light">${estimatedCost.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400">Items detected:</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{detections.length}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
