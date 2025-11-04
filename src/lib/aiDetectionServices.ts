@@ -4,10 +4,35 @@ import { estimateCubicFeet, estimateWeight } from './cubicFeetEstimator';
 // OpenAI GPT-4 Vision - PRIMARY AND ONLY detection method for maximum accuracy
 export const detectFurniture = async (photoUrls: string[]): Promise<Detection[]> => {
   console.log('Starting OpenAI GPT-4 Vision detection for', photoUrls.length, 'photos');
-  console.log('OpenAI API Key configured:', !!process.env.REACT_APP_OPENAI_API_KEY);
   
-  if (!process.env.REACT_APP_OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
+  // Detailed OpenAI API key debugging
+  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+  console.log('🔑 OpenAI API Key Debug Info:');
+  console.log('  - Source: process.env.REACT_APP_OPENAI_API_KEY');
+  console.log('  - Key exists:', !!apiKey);
+  console.log('  - Key length:', apiKey ? apiKey.length : 0);
+  
+  if (apiKey) {
+    // Show first 15 and last 10 chars for debugging (not full key)
+    const preview = apiKey.length > 25 
+      ? `${apiKey.substring(0, 15)}...${apiKey.substring(apiKey.length - 10)}`
+      : '***masked***';
+    console.log('  - Key preview:', preview);
+    console.log('  - Key starts with:', apiKey.substring(0, 7));
+    
+    // Check for invalid format
+    if (apiKey.startsWith('sk-proj-')) {
+      console.warn('  ⚠️  WARNING: Key starts with "sk-proj-" - this may be invalid! OpenAI keys typically start with "sk-"');
+    } else if (!apiKey.startsWith('sk-')) {
+      console.warn('  ⚠️  WARNING: Key does not start with "sk-" - format may be incorrect');
+    } else {
+      console.log('  ✅ Key format appears correct (starts with "sk-")');
+    }
+  }
+  
+  if (!apiKey) {
+    console.error('❌ OpenAI API key not configured - check your .env file');
+    throw new Error('OpenAI API key not configured. Please add REACT_APP_OPENAI_API_KEY to your .env file');
   }
 
   const allDetections: Detection[] = [];
@@ -16,10 +41,14 @@ export const detectFurniture = async (photoUrls: string[]): Promise<Detection[]>
     try {
       console.log('Analyzing photo with OpenAI GPT-4 Vision:', photoUrl);
       
+      const authHeader = `Bearer ${apiKey}`;
+      console.log('🔐 Authorization header preview:', authHeader.substring(0, 20) + '...' + authHeader.substring(authHeader.length - 15));
+      console.log('📡 Sending request to OpenAI API...');
+      
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+          'Authorization': authHeader,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -175,8 +204,22 @@ Remember: Only detect items that professional movers can physically pick up and 
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenAI API error:', response.status, errorText);
+        let errorDetails;
+        try {
+          errorDetails = await response.json();
+        } catch {
+          errorDetails = await response.text();
+        }
+        
+        console.error('❌ OpenAI API Error Details:');
+        console.error('  - Status:', response.status, response.statusText);
+        console.error('  - Error response:', errorDetails);
+        if (errorDetails?.error) {
+          console.error('  - Error message:', errorDetails.error.message);
+          console.error('  - Error type:', errorDetails.error.type);
+          console.error('  - Error code:', errorDetails.error.code);
+        }
+        console.error('  - API Key being used (preview):', apiKey ? `${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 8)}` : 'MISSING');
         continue;
       }
       
