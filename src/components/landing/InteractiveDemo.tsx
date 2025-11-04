@@ -74,25 +74,35 @@ export default function InteractiveDemo() {
     }
   };
 
-  // Typing animation for default address
+  // Typing animation for default address with blinking cursor
   useEffect(() => {
     if (address === DEFAULT_ADDRESS && photos.length === 0 && !isTyping) {
       setIsTyping(true);
       setDisplayAddress('');
       const fullText = DEFAULT_ADDRESS;
       let currentIndex = 0;
+      let showCursor = true;
+      
+      // Blinking cursor animation
+      const cursorInterval = setInterval(() => {
+        showCursor = !showCursor;
+      }, 530); // Blink speed
       
       const typeInterval = setInterval(() => {
         if (currentIndex < fullText.length) {
-          setDisplayAddress(fullText.slice(0, currentIndex + 1));
+          setDisplayAddress(fullText.slice(0, currentIndex + 1) + (showCursor ? '|' : ''));
           currentIndex++;
         } else {
           clearInterval(typeInterval);
+          clearInterval(cursorInterval);
           setIsTyping(false);
         }
       }, 50); // Type speed
       
-      return () => clearInterval(typeInterval);
+      return () => {
+        clearInterval(typeInterval);
+        clearInterval(cursorInterval);
+      };
     } else if (address !== DEFAULT_ADDRESS) {
       setDisplayAddress(address);
     }
@@ -110,21 +120,18 @@ export default function InteractiveDemo() {
         // Check cache first
         const cached = loadCachedData();
         if (cached) {
-          // Simulate loading for better UX
-          setIsLoading(true);
-          await new Promise(resolve => setTimeout(resolve, 800)); // Show loading briefly
-          setPhotos(cached.photos);
+          // Show detecting animation briefly, then show cached results instantly
           setIsDetecting(true);
-          await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate detection
+          await new Promise(resolve => setTimeout(resolve, 1800)); // Brief detection animation
+          setPhotos(cached.photos);
           setDetections(cached.detections);
-          setIsLoading(false);
           setIsDetecting(false);
           return;
         }
 
         // If no cache, fetch and detect
         try {
-          setIsLoading(true);
+          setIsDetecting(true);
           
           // Find listing
           const [currentResult, soldResult] = await Promise.all([
@@ -156,8 +163,8 @@ export default function InteractiveDemo() {
             }
 
             if (photoUrls.length > 0) {
-              // Skip first 4 photos (exterior) and show all interior photos
-              const interiorPhotos = photoUrls.slice(4); // Skip 4, show all remaining
+              // Skip first 4 photos (exterior) and show ALL interior photos
+              const interiorPhotos = photoUrls.slice(4); // Skip 4, show all remaining (could be 40+)
               
               const formattedPhotos: Photo[] = interiorPhotos.map((url, index) => ({
                 id: `photo-${index}`,
@@ -167,23 +174,25 @@ export default function InteractiveDemo() {
                 uploadedAt: new Date()
               }));
 
+              // Show photos immediately (no loading)
               setPhotos(formattedPhotos);
-              setIsLoading(false);
 
-              // Start detection with simulated delay for better UX
-              setIsDetecting(true);
-              const detectedItems = await detectFurniture(interiorPhotos.slice(0, 6)); // Detect first 6 for speed
+              // Detect with ALL photos and store everything
+              const detectedItems = await detectFurniture(interiorPhotos); // Detect ALL photos
               
               setDetections(detectedItems);
               setIsDetecting(false);
 
-              // Cache the results
+              // Cache ALL photos and ALL detections for instant future loads
               saveToCache(formattedPhotos, detectedItems, DEFAULT_ADDRESS);
+            } else {
+              setIsDetecting(false);
             }
+          } else {
+            setIsDetecting(false);
           }
         } catch (error) {
           console.error('Error auto-starting default:', error);
-          setIsLoading(false);
           setIsDetecting(false);
         }
       }
@@ -319,12 +328,13 @@ export default function InteractiveDemo() {
           uploadedAt: new Date()
         }));
 
+        // Show photos immediately
         setPhotos(formattedPhotos);
         setSearchCount(prev => prev + 1);
 
-        // Start detection
+        // Start detection with all photos
         setIsDetecting(true);
-        const detectedItems = await detectFurniture(photosToShow.slice(0, 6));
+        const detectedItems = await detectFurniture(photosToShow); // Detect ALL photos
         setDetections(detectedItems);
         setIsDetecting(false);
       } else {
@@ -384,10 +394,10 @@ export default function InteractiveDemo() {
                 }}
                 placeholder="Enter property address..."
                 className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
-                disabled={isLoading || isDetecting || showSignupPrompt}
+                disabled={isDetecting || showSignupPrompt}
               />
-              {isLoading && (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-accent border-t-transparent"></div>
+              {isTyping && (
+                <span className="animate-pulse text-accent">|</span>
               )}
             </div>
 
@@ -536,8 +546,12 @@ export default function InteractiveDemo() {
                 {isDetecting ? (
                   <div className="text-xs text-gray-600 dark:text-gray-400">
                     <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-accent border-t-transparent"></div>
-                      <span>AI analyzing photos...</span>
+                      <div className="flex space-x-1">
+                        <span className="animate-pulse">●</span>
+                        <span className="animate-pulse" style={{ animationDelay: '0.2s' }}>●</span>
+                        <span className="animate-pulse" style={{ animationDelay: '0.4s' }}>●</span>
+                      </div>
+                      <span className="italic">Detecting inventory...</span>
                     </div>
                   </div>
                 ) : (
