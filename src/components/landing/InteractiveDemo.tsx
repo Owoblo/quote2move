@@ -339,7 +339,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
           searchQuery += `,addressstate.ilike.%${state}%`;
         }
 
-        const [currentResult, soldResult] = await Promise.all([
+                const [currentResult, soldResult] = await Promise.all([
           supabase
             .from('just_listed')
             .select('id, address, addresscity, addressstate, carousel_photos_composable')
@@ -352,19 +352,18 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
             .limit(3) // Limit to 3 for demo
         ]);
 
-          const allListings = [
-            ...(currentResult.data || []),
-            ...(soldResult.data || [])
-          ];
+        const allListings = [
+          ...(currentResult.data || []),
+          ...(soldResult.data || [])
+        ];
 
-          const listingWithCarousel = allListings.find(
-            (listing: any) => listing.carousel_photos_composable
-          );
+        const listingWithCarousel = allListings.find(
+          (listing: any) => listing.carousel_photos_composable
+        );
 
-          if (listingWithCarousel?.carousel_photos_composable) {
-            photoUrls = parseZillowPhotos(listingWithCarousel.carousel_photos_composable);
-            break;
-          }
+        if (listingWithCarousel?.carousel_photos_composable) {
+          photoUrls = parseZillowPhotos(listingWithCarousel.carousel_photos_composable);
+        }
       }
 
       if (photoUrls.length > 0) {
