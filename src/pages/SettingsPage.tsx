@@ -90,7 +90,7 @@ export default function SettingsPage() {
         .from('user_email_settings')
         .upsert({
           user_id: user.id,
-          from_email: emailSettings.fromEmail || 'MovSense <onboarding@resend.dev>',
+          from_email: emailSettings.fromEmail || 'MovSense <quotes@movsense.com>',
           from_name: emailSettings.fromName || 'MovSense',
           reply_to: emailSettings.replyTo || 'support@movsense.com',
           updated_at: new Date().toISOString()
