@@ -905,6 +905,12 @@ export default function DashboardPage() {
                         >
                           View Quote
                         </button>
+                        <button
+                          onClick={() => navigate(`/quote/${quote.id}/edit`)}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold"
+                        >
+                          Edit Quote
+                        </button>
                       </div>
                     </div>
                   ))}

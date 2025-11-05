@@ -256,6 +256,63 @@ export class QuoteService {
       });
   }
 
+  // Update quote details (for editing)
+  static async updateQuote(quoteId: string, updates: Partial<QuoteData>): Promise<QuoteData> {
+    // Verify user owns the quote
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      throw new Error('User must be authenticated to update quotes');
+    }
+
+    // Verify quote ownership
+    const { data: existingQuote } = await supabase
+      .from('quotes')
+      .select('user_id')
+      .eq('id', quoteId)
+      .single();
+
+    if (!existingQuote || existingQuote.user_id !== user.id) {
+      throw new Error('You can only edit your own quotes');
+    }
+
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Map QuoteData fields to database columns
+    if (updates.customerName !== undefined) updateData.customer_name = updates.customerName;
+    if (updates.customerEmail !== undefined) updateData.customer_email = updates.customerEmail;
+    if (updates.customerPhone !== undefined) updateData.customer_phone = updates.customerPhone;
+    if (updates.moveDate !== undefined) updateData.move_date = updates.moveDate;
+    if (updates.originAddress !== undefined) updateData.origin_address = updates.originAddress;
+    if (updates.destinationAddress !== undefined) updateData.destination_address = updates.destinationAddress;
+    if (updates.detections !== undefined) updateData.detections = updates.detections;
+    if (updates.estimate !== undefined) updateData.estimate = updates.estimate;
+    if (updates.upsells !== undefined) updateData.upsells = updates.upsells;
+    if (updates.totalAmount !== undefined) updateData.total_amount = updates.totalAmount;
+    if (updates.photos !== undefined) updateData.photos = updates.photos;
+    if (updates.status !== undefined) updateData.status = updates.status;
+    if (updates.questions !== undefined) updateData.questions = updates.questions;
+    if (updates.leadSource !== undefined) updateData.lead_source = updates.leadSource;
+    if (updates.moveTimeConfirmed !== undefined) updateData.move_time_confirmed = updates.moveTimeConfirmed;
+    if (updates.priceOverride !== undefined) updateData.price_override = updates.priceOverride;
+    if (updates.overrideAmount !== undefined) updateData.original_total_amount = updates.overrideAmount;
+    if (updates.overrideReason !== undefined) updateData.override_reason = updates.overrideReason;
+    if (updates.followUpDate !== undefined) updateData.follow_up_date = updates.followUpDate;
+    if (updates.salesRepNotes !== undefined) updateData.sales_rep_notes = updates.salesRepNotes;
+
+    const { data, error } = await supabase
+      .from('quotes')
+      .update(updateData)
+      .eq('id', quoteId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return this.mapQuoteData(data);
+  }
+
   static async getUserQuotes(): Promise<QuoteData[]> {
     const { data, error } = await supabase
       .from('quotes')

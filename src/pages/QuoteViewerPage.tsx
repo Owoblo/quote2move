@@ -16,6 +16,7 @@ export default function QuoteViewerPage() {
   const [declineReason, setDeclineReason] = useState('');
   const [customDeclineReason, setCustomDeclineReason] = useState('');
   const [isSalesRep, setIsSalesRep] = useState(false);
+  const [declineActionBy, setDeclineActionBy] = useState<'customer' | 'sales_rep'>('customer');
   const [isEditing, setIsEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
 
@@ -77,7 +78,7 @@ export default function QuoteViewerPage() {
     }
   };
 
-  const handleQuoteAction = async (action: 'accept' | 'decline', declineReason?: string) => {
+  const handleQuoteAction = async (action: 'accept' | 'decline', declineReason?: string, actionBy: 'customer' | 'sales_rep' = 'customer') => {
     if (!quote || !quoteId) return;
     
     setActionLoading(true);
@@ -85,7 +86,7 @@ export default function QuoteViewerPage() {
       await QuoteService.updateQuoteStatus(
         quoteId,
         action === 'accept' ? 'accepted' : 'declined',
-        'customer',
+        actionBy,
         declineReason
       );
       
@@ -330,24 +331,35 @@ export default function QuoteViewerPage() {
                 )}
 
                 {/* Sales Rep Actions */}
-                {quote.status === 'pending' && (
-                  <div className="space-y-2 mb-4">
-                    <button
-                      onClick={() => handleQuoteAction('accept')}
-                      disabled={actionLoading}
-                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-                    >
-                      Accept on Behalf
-                    </button>
-                    <button
-                      onClick={() => setShowDeclineModal(true)}
-                      disabled={actionLoading}
-                      className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-                    >
-                      Decline on Behalf
-                    </button>
-                  </div>
-                )}
+                <div className="space-y-2 mb-4">
+                  <button
+                    onClick={() => navigate(`/quote/${quoteId}/edit`)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                  >
+                    Edit Quote
+                  </button>
+                  {quote.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => handleQuoteAction('accept')}
+                        disabled={actionLoading}
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                      >
+                        Accept on Behalf
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeclineActionBy('sales_rep');
+                          setShowDeclineModal(true);
+                        }}
+                        disabled={actionLoading}
+                        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                      >
+                        Decline on Behalf
+                      </button>
+                    </>
+                  )}
+                </div>
 
                 {/* Quote Info */}
                 <div className="text-xs text-gray-600 space-y-1">
@@ -439,7 +451,10 @@ export default function QuoteViewerPage() {
                       </button>
                       
                       <button
-                        onClick={() => setShowDeclineModal(true)}
+                        onClick={() => {
+                          setDeclineActionBy('customer');
+                          setShowDeclineModal(true);
+                        }}
                         disabled={actionLoading}
                         className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
                       >
@@ -552,10 +567,11 @@ export default function QuoteViewerPage() {
                     <button
                       onClick={async () => {
                         const finalReason = declineReason === 'Other' ? customDeclineReason : declineReason;
-                        await handleQuoteAction('decline', finalReason || undefined);
+                        await handleQuoteAction('decline', finalReason || undefined, declineActionBy);
                         setShowDeclineModal(false);
                         setDeclineReason('');
                         setCustomDeclineReason('');
+                        setDeclineActionBy('customer');
                       }}
                       disabled={actionLoading}
                       className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg"

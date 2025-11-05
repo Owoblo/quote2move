@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import EstimatePage from './pages/EstimatePage';
 import QuoteViewerPage from './pages/QuoteViewerPage';
 import QuotePreviewPage from './pages/QuotePreviewPage';
+import EditQuotePage from './pages/EditQuotePage';
 import DemoPage from './pages/DemoPage';
 import DemoThankYouPage from './pages/DemoThankYouPage';
 import CrewCalendarPage from './pages/CrewCalendarPage';
@@ -47,6 +48,14 @@ function App() {
           <Route
             path="/quote/:quoteId"
             element={<QuoteViewerPage />}
+          />
+          <Route
+            path="/quote/:quoteId/edit"
+            element={
+              <ProtectedRoute>
+                <EditQuotePage />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/crew/calendar"
