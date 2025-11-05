@@ -175,6 +175,34 @@ export default function QuoteViewerPage() {
     }
   };
 
+  const handleSendQuote = async () => {
+    if (!quote || !quoteId) return;
+    
+    setIsSendingEmail(true);
+    try {
+      const quoteUrl = `${window.location.origin}/quote/${quoteId}`;
+      
+      await EmailBackendService.sendQuote({
+        quoteId: quoteId,
+        customerName: quote.customerName,
+        customerEmail: quote.customerEmail,
+        customerPhone: quote.customerPhone,
+        moveDate: quote.moveDate,
+        originAddress: quote.originAddress,
+        destinationAddress: quote.destinationAddress,
+        totalAmount: quote.totalAmount,
+        quoteUrl: quoteUrl
+      });
+      
+      alert(`Quote email sent successfully to ${quote.customerEmail}!`);
+    } catch (error: any) {
+      console.error('Error sending quote email:', error);
+      alert(`Failed to send email: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
