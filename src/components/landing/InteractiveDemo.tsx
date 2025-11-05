@@ -46,6 +46,14 @@ export default function InteractiveDemo({ initialAddress }: InteractiveDemoProps
   const [isTyping, setIsTyping] = useState(false);
   const [displayAddress, setDisplayAddress] = useState('');
 
+  // Update address when initialAddress prop changes
+  useEffect(() => {
+    if (initialAddress && initialAddress !== address) {
+      setAddress(initialAddress);
+      setIsDefaultAddress(initialAddress === DEFAULT_ADDRESS);
+    }
+  }, [initialAddress]);
+
   // Load cached data for default address
   const loadCachedData = (): CachedData | null => {
     try {
