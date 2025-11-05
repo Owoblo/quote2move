@@ -16,6 +16,7 @@ export default function QuoteViewerPage() {
   const [declineReason, setDeclineReason] = useState('');
   const [customDeclineReason, setCustomDeclineReason] = useState('');
   const [isSalesRep, setIsSalesRep] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
   const [declineActionBy, setDeclineActionBy] = useState<'customer' | 'sales_rep'>('customer');
   const [isEditing, setIsEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
@@ -25,12 +26,47 @@ export default function QuoteViewerPage() {
     checkUserRole();
   }, [quoteId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    checkEditPermission();
+  }, [quote]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const checkUserRole = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       setIsSalesRep(!!user); // If user is authenticated, they're a sales rep
     } catch (error) {
       setIsSalesRep(false);
+    }
+  };
+
+  const checkEditPermission = async () => {
+    if (!quote || !quote.id) {
+      setCanEdit(false);
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setCanEdit(false);
+        return;
+      }
+
+      // Check if quote belongs to the authenticated user
+      const { data: quoteData } = await supabase
+        .from('quotes')
+        .select('user_id')
+        .eq('id', quote.id)
+        .single();
+
+      if (quoteData && quoteData.user_id === user.id) {
+        setCanEdit(true);
+      } else {
+        setCanEdit(false);
+      }
+    } catch (error) {
+      console.error('Error checking edit permission:', error);
+      setCanEdit(false);
     }
   };
 
@@ -305,7 +341,7 @@ export default function QuoteViewerPage() {
             </div>
 
             {/* Sales Rep Section */}
-            {isSalesRep && (
+            {(isSalesRep || canEdit) && (
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl shadow-sm p-6 mb-6">
                 <h2 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,12 +368,14 @@ export default function QuoteViewerPage() {
 
                 {/* Sales Rep Actions */}
                 <div className="space-y-2 mb-4">
-                  <button
-                    onClick={() => navigate(`/quote/${quoteId}/edit`)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-                  >
-                    Edit Quote
-                  </button>
+                  {canEdit && (
+                    <button
+                      onClick={() => navigate(`/quote/${quoteId}/edit`)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                    >
+                      Edit Quote
+                    </button>
+                  )}
                   {quote.status === 'pending' && (
                     <>
                       <button
