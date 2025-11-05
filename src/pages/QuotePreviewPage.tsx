@@ -115,7 +115,28 @@ export default function QuotePreviewPage() {
       setEmailSent(true);
     } catch (error: any) {
       console.error('Error saving/sending quote:', error);
-      alert(`Failed to save and send quote: ${error.message || 'Unknown error. Check console for details.'}`);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        status: error.status,
+        statusText: error.statusText
+      });
+      
+      // More detailed error message
+      let errorMessage = 'Failed to save and send quote. ';
+      if (error.message) {
+        errorMessage += error.message;
+      } else if (error.code) {
+        errorMessage += `Error code: ${error.code}`;
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage += 'Network error - please check your internet connection and try again.';
+      } else {
+        errorMessage += 'Unknown error. Please check the browser console for details.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsSending(false);
     }

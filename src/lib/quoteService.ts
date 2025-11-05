@@ -58,27 +58,34 @@ export class QuoteService {
     // Get the current authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (authError || !user) {
+    if (authError) {
+      console.error('Auth error:', authError);
+      throw new Error(`Authentication error: ${authError.message || 'Please log in again.'}`);
+    }
+    
+    if (!user) {
       throw new Error('User must be authenticated to create quotes. Please log in.');
     }
+    
+    console.log('Creating quote for user:', user.id);
 
     // Calculate follow-up date (default: next day)
     const followUpDate = quoteData.followUpDate || this.getDefaultFollowUpDate();
     
     const insertData: any = {
       user_id: user.id, // Required for RLS policy
-      customer_name: quoteData.customerName,
-      customer_email: quoteData.customerEmail,
-      customer_phone: quoteData.customerPhone,
-      move_date: quoteData.moveDate,
-      origin_address: quoteData.originAddress,
-      destination_address: quoteData.destinationAddress,
-      detections: quoteData.detections,
-      estimate: quoteData.estimate,
-      upsells: quoteData.upsells,
-      total_amount: quoteData.totalAmount,
-      photos: quoteData.photos || [],
-      status: quoteData.status || 'pending',
+        customer_name: quoteData.customerName,
+        customer_email: quoteData.customerEmail,
+        customer_phone: quoteData.customerPhone,
+        move_date: quoteData.moveDate,
+        origin_address: quoteData.originAddress,
+        destination_address: quoteData.destinationAddress,
+        detections: quoteData.detections,
+        estimate: quoteData.estimate,
+        upsells: quoteData.upsells,
+        total_amount: quoteData.totalAmount,
+        photos: quoteData.photos || [],
+        status: quoteData.status || 'pending',
       questions: quoteData.questions || [],
       lead_source: quoteData.leadSource || null,
       move_time_confirmed: quoteData.moveTimeConfirmed || null,
@@ -100,7 +107,16 @@ export class QuoteService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase insert error:', error);
+      console.error('Insert data (excluding sensitive fields):', {
+        ...insertData,
+        detections: `[${insertData.detections?.length || 0} items]`,
+        estimate: '[estimate data]',
+        upsells: `[${insertData.upsells?.length || 0} items]`
+      });
+      throw error;
+    }
 
     const savedQuote = this.mapQuoteData(data);
     
