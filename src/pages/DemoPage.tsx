@@ -142,17 +142,61 @@ export default function DemoPage() {
 
           {/* Search Demo Box */}
           <div className="max-w-2xl mx-auto mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 relative">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Enter property address
               </label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => handleAddressChange(e.target.value)}
-                placeholder="e.g., 125 Links Dr, Amherstburg, ON"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => handleAddressChange(e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="e.g., 125 Links Dr, Amherstburg, ON"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+                
+                {/* Loading indicator */}
+                {isSearching && (
+                  <div className="absolute right-3 top-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-accent"></div>
+                  </div>
+                )}
+
+                {/* Suggestions dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {suggestions.map((listing) => {
+                      const fullAddress = `${listing.address}, ${listing.addresscity}, ${listing.addressstate}`;
+                      return (
+                        <button
+                          key={listing.id}
+                          type="button"
+                          onClick={() => handleSuggestionClick(listing)}
+                          className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors"
+                        >
+                          <div className="font-medium text-gray-900 dark:text-gray-100">
+                            {listing.address}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {listing.addresscity}, {listing.addressstate}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* No results message */}
+                {showSuggestions && suggestions.length === 0 && address.length >= 2 && !isSearching && (
+                  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No properties found. Try a different address.
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Active Regions List */}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -172,7 +216,7 @@ export default function DemoPage() {
               </div>
 
               {/* Region Status Message */}
-              {isActiveRegion === false && address.length > 3 && (
+              {isActiveRegion === false && address.length > 3 && selectedListing && (
                 <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
                     This region isn't live yet. You can still get early access — activate your company's city below.
@@ -180,7 +224,7 @@ export default function DemoPage() {
                 </div>
               )}
 
-              {isActiveRegion === true && (
+              {isActiveRegion === true && selectedListing && (
                 <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                   <p className="text-sm text-green-800 dark:text-green-200">
                     ✓ This region is active! Demo results will show below.
@@ -191,9 +235,9 @@ export default function DemoPage() {
           </div>
 
           {/* Demo Results */}
-          {showDemo && isActiveRegion && (
+          {showDemo && isActiveRegion && selectedListing && (
             <div className="max-w-6xl mx-auto mt-8">
-              <InteractiveDemo initialAddress={address} />
+              <InteractiveDemo initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`} />
             </div>
           )}
         </div>
