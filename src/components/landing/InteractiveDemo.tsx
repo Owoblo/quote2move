@@ -254,12 +254,12 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
             .from('just_listed')
             .select('*')
             .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
-            .limit(5),
+            .limit(3), // Limited to 3 for demo
           supabase
             .from('sold_listings')
             .select('*')
             .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
-            .limit(5)
+            .limit(3) // Limited to 3 for demo
         ]);
 
         const allSuggestions = [
