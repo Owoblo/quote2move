@@ -53,17 +53,28 @@ export default async function handler(
 
     // Process batch in parallel with timeout
     const batchPromises = batch.map(async (photoUrl: string) => {
-      try {
-        console.log('🔍 Server: Analyzing photo:', photoUrl);
+      const maxRetries = 2;
+      let lastError: any = null;
 
-        // Create timeout promise
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Photo processing timeout')), photoTimeout)
-        );
+      // Retry logic for transient errors (502, 503, 504, 429)
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          if (attempt > 0) {
+            console.log(`🔄 Retry ${attempt}/${maxRetries} for photo:`, photoUrl);
+            // Exponential backoff: 1s, 2s
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          } else {
+            console.log('🔍 Server: Analyzing photo:', photoUrl);
+          }
 
-        // Race between API call and timeout
-        const response = await Promise.race([
-          fetch('https://api.openai.com/v1/chat/completions', {
+          // Create timeout promise
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Photo processing timeout')), photoTimeout)
+          );
+
+          // Race between API call and timeout
+          const response = await Promise.race([
+            fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiKey}`,
@@ -137,43 +148,70 @@ Return ONLY a JSON array, no other text.`
               temperature: 0.1
             })
           }),
-          timeoutPromise as Promise<Response>
-        ]) as Response;
+                        timeoutPromise as Promise<Response>
+            ]) as Response;
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('❌ OpenAI API Error:', response.status, errorData);
-          return [];
-        }
+          // Handle retryable errors (502, 503, 504, 429)
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const status = response.status;
+            
+            // Retry on transient errors
+            if ((status === 502 || status === 503 || status === 504 || status === 429) && attempt < maxRetries) {
+              lastError = { status, errorData };
+              console.warn(`⚠️ Retryable error ${status} on attempt ${attempt + 1}/${maxRetries + 1}`);
+              continue; // Retry
+            }
+            
+            // Non-retryable error or max retries reached
+            console.error('❌ OpenAI API Error:', status, errorData);
+            return [];
+          }
 
-        const data = await response.json();
-        const content = data.choices[0]?.message?.content;
+          const data = await response.json();
+          const content = data.choices[0]?.message?.content;
 
-        if (!content) {
-          console.error('❌ No content in OpenAI response');
-          return [];
-        }
+          if (!content) {
+            console.error('❌ No content in OpenAI response');
+            return [];
+          }
 
-        // Parse JSON from response
-        let detections;
-        try {
-          const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s);
-          detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
-        } catch (parseError) {
-          console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
-          return [];
-        }
+          // Parse JSON from response
+          let detections;
+          try {
+            const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s);
+            detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
+          } catch (parseError) {
+            console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
+            return [];
+          }
 
-        return Array.isArray(detections) ? detections : [];
+          return Array.isArray(detections) ? detections : [];
 
-      } catch (error: any) {
-        if (error.message === 'Photo processing timeout') {
-          console.error('⏱️ Timeout processing photo:', photoUrl);
-        } else {
+        } catch (error: any) {
+          lastError = error;
+          
+          // Don't retry on timeout - it's likely a real issue
+          if (error.message === 'Photo processing timeout') {
+            console.error('⏱️ Timeout processing photo:', photoUrl);
+            return [];
+          }
+          
+          // Retry on network errors if we have retries left
+          if (attempt < maxRetries && (error.message.includes('fetch') || error.message.includes('network'))) {
+            console.warn(`⚠️ Network error on attempt ${attempt + 1}/${maxRetries + 1}, will retry`);
+            continue;
+          }
+          
+          // Final error - no more retries
           console.error('❌ Error processing photo:', photoUrl, error.message);
+          return [];
         }
-        return [];
       }
+
+      // If we get here, all retries failed
+      console.error('❌ All retries exhausted for photo:', photoUrl, lastError?.message || '');
+      return [];
     });
 
     // Wait for batch to complete
