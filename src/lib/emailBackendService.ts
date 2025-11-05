@@ -39,10 +39,21 @@ export class EmailBackendService {
         body: JSON.stringify(data)
       });
 
-      const result = await response.json();
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      let result: any;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        // If not JSON, read as text
+        const text = await response.text();
+        console.error('Non-JSON response from server:', text);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || result.message || 'Failed to send email');
+        throw new Error(result.error || result.message || `Failed to send email: ${response.status} ${response.statusText}`);
       }
 
       return {
@@ -52,7 +63,14 @@ export class EmailBackendService {
       };
     } catch (error: any) {
       console.error('Email sending failed:', error);
-      throw new Error(error.message || 'Failed to send email. Please try again.');
+      
+      // If it's already an Error with a message, throw it as-is
+      if (error instanceof Error) {
+        throw error;
+      }
+      
+      // Otherwise, create a user-friendly error message
+      throw new Error(error.message || 'Failed to send email. Please check your configuration and try again.');
     }
   }
 }

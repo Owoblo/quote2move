@@ -127,7 +127,20 @@ export default async function handler(
     });
 
     if (!emailResponse.ok) {
-      const errorData = await emailResponse.json();
+      let errorData: any;
+      const contentType = emailResponse.headers.get('content-type');
+      
+      try {
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await emailResponse.json();
+        } else {
+          const errorText = await emailResponse.text();
+          errorData = { message: errorText || `Resend API returned ${emailResponse.status}` };
+        }
+      } catch (parseError) {
+        errorData = { message: `Resend API error: ${emailResponse.status} ${emailResponse.statusText}` };
+      }
+      
       console.error('Resend API error:', errorData);
       return res.status(500).json({ 
         error: 'Failed to send email', 
