@@ -83,11 +83,15 @@ export default function DemoPage() {
     setIsActiveRegion(null);
   };
 
-  const handleFetchPhotos = () => {
+  const handleFetchPhotos = async () => {
     // When "Load Photos & Auto-Detect" is clicked, trigger photo fetch
-    if (selectedListing) {
-      setTriggerFetch(prev => !prev); // Toggle to trigger useEffect
+    if (!selectedListing) {
+      alert('Please select a property from the dropdown first');
+      return;
     }
+    
+    // Trigger fetch by toggling the trigger state
+    setTriggerFetch(prev => !prev);
   };
 
   const handleActivateAccount = async () => {
@@ -229,6 +233,7 @@ export default function DemoPage() {
                 initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`}
                 hideSearch={true}
                 triggerFetch={triggerFetch}
+                selectedListingData={selectedListing}
               />
             </div>
           )}

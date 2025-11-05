@@ -14,7 +14,7 @@ interface Listing {
   [key: string]: any;
 }
 
-const MAX_DEMO_SEARCHES = 2;
+const MAX_DEMO_SEARCHES = 3;
 const DEFAULT_ADDRESS = '125 Links Dr, Amherstburg, ON';
 const CACHE_KEY = 'movsense_demo_cache';
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
@@ -30,13 +30,14 @@ interface InteractiveDemoProps {
   initialAddress?: string;
   hideSearch?: boolean; // Hide the search input when controlled externally (e.g., from DemoPage)
   triggerFetch?: boolean; // Trigger photo fetching when this changes
+  selectedListingData?: any; // Pass the selected listing data directly
 }
 
-export default function InteractiveDemo({ initialAddress, hideSearch = false, triggerFetch = false }: InteractiveDemoProps = {}) {
+export default function InteractiveDemo({ initialAddress, hideSearch = false, triggerFetch = false, selectedListingData }: InteractiveDemoProps = {}) {
   const [address, setAddress] = useState(initialAddress || DEFAULT_ADDRESS);
   const [suggestions, setSuggestions] = useState<Listing[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(selectedListingData || null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [detections, setDetections] = useState<Detection[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,12 +57,20 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
     }
   }, [initialAddress]);
 
-  // Trigger photo fetch when triggerFetch prop changes to true
+  // Update selectedListing when selectedListingData prop changes
   useEffect(() => {
-    if (triggerFetch && initialAddress && !isLoading && !isDetecting && photos.length === 0) {
+    if (selectedListingData) {
+      setSelectedListing(selectedListingData);
+    }
+  }, [selectedListingData]);
+
+  // Trigger photo fetch when triggerFetch prop changes
+  useEffect(() => {
+    if (triggerFetch && selectedListing && !isLoading && !isDetecting) {
+      console.log('Triggering photo fetch from DemoPage button click', selectedListing);
       fetchPhotos();
     }
-  }, [triggerFetch]);
+  }, [triggerFetch, selectedListing]);
 
   // Load cached data for default address
   const loadCachedData = (): CachedData | null => {
@@ -319,12 +328,12 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
               .from('just_listed')
               .select('id, address, addresscity, addressstate, carousel_photos_composable')
               .ilike('address', `%${term}%`)
-              .limit(3),
+              .limit(3), // Limit to 3 for demo
             supabase
               .from('sold_listings')
               .select('id, address, addresscity, addressstate, carousel_photos_composable')
               .ilike('address', `%${term}%`)
-              .limit(3)
+              .limit(3) // Limit to 3 for demo
           ]);
 
           const allListings = [

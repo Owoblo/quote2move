@@ -56,12 +56,12 @@ export default function SearchPanel({
             .from('just_listed')
             .select('*')
             .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
-            .limit(10),
+            .limit(3), // Limited to 3 for demo
           supabase
             .from('sold_listings')
             .select('*')
             .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
-            .limit(10)
+            .limit(3) // Limited to 3 for demo
         ]);
 
         console.log('Current listings:', currentListings);
