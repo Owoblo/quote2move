@@ -16,6 +16,7 @@ const ACTIVE_REGIONS = [
   'Toronto',
   'GTA',
   'Amherstburg',
+  'Milwaukee'
 ];
 
 interface Listing {

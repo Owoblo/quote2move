@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface Listing {
@@ -36,6 +36,7 @@ export default function SearchPanel({
   const [suggestions, setSuggestions] = useState<Listing[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Search for listings as user types
   useEffect(() => {
@@ -103,13 +104,26 @@ export default function SearchPanel({
   }, [address]);
 
   const handleSuggestionClick = (listing: Listing) => {
+    // Clear any pending blur timeout
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
+    
     const fullAddress = `${listing.address}, ${listing.addresscity}, ${listing.addressstate}`;
     onAddressChange(fullAddress);
     setShowSuggestions(false);
+    setSuggestions([]); // Clear suggestions immediately
     
     // Store the selected listing for photo fetching
     if (onListingSelect) {
       onListingSelect(listing);
+    }
+    
+    // Blur the input to ensure dropdown closes
+    const input = document.getElementById('address');
+    if (input) {
+      (input as HTMLInputElement).blur();
     }
   };
 
@@ -127,8 +141,15 @@ export default function SearchPanel({
   };
 
   const handleInputBlur = () => {
+    // Clear any existing timeout
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    }
     // Delay hiding suggestions to allow clicks
-    setTimeout(() => setShowSuggestions(false), 200);
+    blurTimeoutRef.current = setTimeout(() => {
+      setShowSuggestions(false);
+      blurTimeoutRef.current = null;
+    }, 200);
   };
 
   return (
