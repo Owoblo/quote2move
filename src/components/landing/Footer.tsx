@@ -50,9 +50,20 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <button type="button" className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                <a 
+                  href="mailto:support@movsense.com" 
+                  className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                >
                   Contact
-                </button>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="mailto:support@movsense.com" 
+                  className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                >
+                  support@movsense.com
+                </a>
               </li>
             </ul>
           </div>

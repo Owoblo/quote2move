@@ -41,6 +41,16 @@ export default function FinalCTASection() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-6">
           We will reach out with a short intro call and a live demo.
         </p>
+        
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+          Questions? Email us at{' '}
+          <a 
+            href="mailto:support@movsense.com" 
+            className="text-accent hover:text-accent-dark font-medium underline"
+          >
+            support@movsense.com
+          </a>
+        </p>
       </div>
     </section>
   );

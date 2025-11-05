@@ -291,7 +291,7 @@ export default function DemoPage() {
           </p>
 
           {!leadSubmitted ? (
-            <form onSubmit={handleLeadSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <form onSubmit={handleLeadSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
               <input
                 type="email"
                 value={leadEmail}
@@ -308,12 +308,22 @@ export default function DemoPage() {
               </button>
             </form>
           ) : (
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-6">
               <p className="text-green-800 dark:text-green-200">
                 ✓ Thanks! We'll notify you when MoveSense is available in your area.
               </p>
             </div>
           )}
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Questions? Email us at{' '}
+            <a 
+              href="mailto:support@movsense.com" 
+              className="text-accent hover:text-accent-dark font-medium underline"
+            >
+              support@movsense.com
+            </a>
+          </p>
         </div>
       </section>
 
