@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/landing/Navigation';
 import Footer from '../components/landing/Footer';
 import InteractiveDemo from '../components/landing/InteractiveDemo';
 import SearchPanel from '../components/SearchPanel';
-import { loadStripe } from '@stripe/stripe-js';
 import MovSenseLogo from '../components/MovSenseLogo';
 
 // Active regions that have full demo functionality
@@ -28,18 +26,13 @@ interface Listing {
   [key: string]: any;
 }
 
-// Initialize Stripe
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '');
-
 export default function DemoPage() {
   const [address, setAddress] = useState('');
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [isActiveRegion, setIsActiveRegion] = useState<boolean | null>(null);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [leadEmail, setLeadEmail] = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [triggerFetch, setTriggerFetch] = useState(false);
-  const navigate = useNavigate();
 
   // Check if listing is in active region
   const checkActiveRegion = (listing: Listing | null) => {
@@ -95,46 +88,8 @@ export default function DemoPage() {
     setTriggerFetch(prev => !prev);
   };
 
-  const handleActivateAccount = async () => {
-    setIsProcessingPayment(true);
-    try {
-      // Create Stripe checkout session
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId: process.env.REACT_APP_STRIPE_ACTIVATION_PRICE_ID || 'price_activation_fee',
-          mode: 'payment',
-          successUrl: `${window.location.origin}/demo/thank-you?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/demo`,
-        }),
-      });
-
-      const { sessionId, error } = await response.json();
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      if (stripe) {
-        // Type assertion needed - redirectToCheckout exists at runtime
-        const { error: redirectError } = await (stripe as any).redirectToCheckout({
-          sessionId,
-        });
-
-        if (redirectError) {
-          throw redirectError;
-        }
-      }
-    } catch (error: any) {
-      console.error('Error processing payment:', error);
-      alert(`Failed to process payment: ${error.message}`);
-      setIsProcessingPayment(false);
-    }
+  const handleActivateAccount = () => {
+    window.location.href = 'https://buy.stripe.com/3cI5kw04pfsI2BD3Vp1Nu00';
   };
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
@@ -288,10 +243,9 @@ export default function DemoPage() {
 
               <button
                 onClick={handleActivateAccount}
-                disabled={isProcessingPayment}
-                className="w-full md:w-auto px-8 py-4 bg-accent hover:bg-accent-dark text-white font-semibold rounded-lg text-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full md:w-auto px-8 py-4 bg-accent hover:bg-accent-dark text-white font-semibold rounded-lg text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                {isProcessingPayment ? 'Processing...' : 'Activate My Account'}
+                Activate My Account
               </button>
             </div>
           </div>
