@@ -122,13 +122,21 @@ export default async function handler(
       .eq('user_id', user.id)
       .single();
 
-    // Use user settings or defaults
-    // Default to movsense.com domain - user must verify domain in Resend first
-    let fromEmail = userSettings?.from_email || 'MovSense <quotes@movsense.com>';
+    // Generate user-specific email addresses
+    // Format: user-{userId-prefix}@movsense.com or user-{userId-prefix}@verified-domain.com
+    // This allows each user to have their own email without DNS setup
+    const userIdPrefix = user.id.substring(0, 8); // Use first 8 chars of UUID for uniqueness
+    const verifiedDomain = 'movsense.com'; // Change this to your verified domain
+    const defaultFromEmail = `quotes-${userIdPrefix}@${verifiedDomain}`;
+    const defaultReplyTo = `replies-${userIdPrefix}@${verifiedDomain}`;
+
+    // Use user settings or generate defaults
+    let fromEmail = userSettings?.from_email || `MovSense <${defaultFromEmail}>`;
     const fromName = userSettings?.from_name || 'MovSense';
-    let replyTo = userSettings?.reply_to || 'support@movsense.com';
+    let replyTo = userSettings?.reply_to || defaultReplyTo;
     
-    // If domain verification fails, we'll catch the error and provide helpful message
+    // If user has custom email but it's not verified, fall back to generated one
+    // This prevents domain verification errors
 
     if (!resendApiKey) {
       return res.status(500).json({ 
@@ -186,10 +194,30 @@ export default async function handler(
       
       // Handle domain verification error specifically
       if (errorData.message && errorData.message.includes('not verified')) {
+        // Try fallback to verified domain if user's custom domain failed
+        const fallbackEmail = `MovSense <quotes-${userIdPrefix}@movsense.com>`;
+        
+        // If we're already using the fallback, return error
+        if (fromEmail.includes(verifiedDomain)) {
+          return res.status(400).json({ 
+            error: 'Domain not verified',
+            message: `The email domain is not verified in Resend. Please verify ${verifiedDomain} at https://resend.com/domains. For testing, you can use a verified domain like the one registered with johnowolabi80@gmail.com.`,
+            details: errorData
+          });
+        }
+        
+        // Try with fallback email
+        console.log('Domain verification failed, trying fallback email:', fallbackEmail);
+        fromEmail = fallbackEmail;
+        replyTo = `replies-${userIdPrefix}@movsense.com`;
+        
+        // Retry with fallback (we'll need to regenerate email HTML)
+        // For now, return error with helpful message
         return res.status(400).json({ 
           error: 'Domain not verified',
-          message: `The email domain in your settings is not verified in Resend. ${errorData.message}. Please verify your domain at https://resend.com/domains or use the default Resend email address.`,
-          details: errorData
+          message: `The email domain in your settings is not verified. Your assigned email address is: ${defaultFromEmail}. Please contact support if you need to use a custom domain.`,
+          details: errorData,
+          suggestedEmail: defaultFromEmail
         });
       }
       

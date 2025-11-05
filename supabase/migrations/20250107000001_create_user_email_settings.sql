@@ -3,9 +3,9 @@
 CREATE TABLE IF NOT EXISTS user_email_settings (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
-  from_email TEXT NOT NULL DEFAULT 'MovSense <quotes@movsense.com>',
+  from_email TEXT, -- NULL means use auto-generated user-specific email
   from_name TEXT NOT NULL DEFAULT 'MovSense',
-  reply_to TEXT NOT NULL DEFAULT 'support@movsense.com',
+  reply_to TEXT, -- NULL means use auto-generated user-specific email
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
