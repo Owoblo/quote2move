@@ -123,9 +123,12 @@ export default async function handler(
       .single();
 
     // Use user settings or defaults
-    const fromEmail = userSettings?.from_email || 'MovSense <onboarding@resend.dev>';
+    // Default to movsense.com domain - user must verify domain in Resend first
+    let fromEmail = userSettings?.from_email || 'MovSense <quotes@movsense.com>';
     const fromName = userSettings?.from_name || 'MovSense';
-    const replyTo = userSettings?.reply_to || 'support@movsense.com';
+    let replyTo = userSettings?.reply_to || 'support@movsense.com';
+    
+    // If domain verification fails, we'll catch the error and provide helpful message
 
     if (!resendApiKey) {
       return res.status(500).json({ 
@@ -180,9 +183,20 @@ export default async function handler(
       }
       
       console.error('Resend API error:', errorData);
+      
+      // Handle domain verification error specifically
+      if (errorData.message && errorData.message.includes('not verified')) {
+        return res.status(400).json({ 
+          error: 'Domain not verified',
+          message: `The email domain in your settings is not verified in Resend. ${errorData.message}. Please verify your domain at https://resend.com/domains or use the default Resend email address.`,
+          details: errorData
+        });
+      }
+      
       return res.status(500).json({ 
         error: 'Failed to send email', 
-        details: errorData.message || 'Unknown error'
+        message: errorData.message || 'Unknown error',
+        details: errorData
       });
     }
 
