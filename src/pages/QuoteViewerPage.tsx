@@ -376,10 +376,10 @@ export default function QuoteViewerPage() {
                       Edit Quote
                     </button>
                   )}
-                  {quote.status === 'pending' && (
+                  {quote.status === 'pending' && canEdit && (
                     <>
                       <button
-                        onClick={() => handleQuoteAction('accept')}
+                        onClick={() => handleQuoteAction('accept', undefined, 'sales_rep')}
                         disabled={actionLoading}
                         className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
                       >
