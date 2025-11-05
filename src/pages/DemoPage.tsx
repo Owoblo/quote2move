@@ -80,7 +80,8 @@ export default function DemoPage() {
       // Redirect to Stripe Checkout
       const stripe = await stripePromise;
       if (stripe) {
-        const { error: redirectError } = await stripe.redirectToCheckout({
+        // Type assertion needed - redirectToCheckout exists at runtime
+        const { error: redirectError } = await (stripe as any).redirectToCheckout({
           sessionId,
         });
 
