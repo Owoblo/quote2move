@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ResendService } from '../lib/resendService';
+import { QuoteService } from '../lib/quoteService';
 
 interface QuotePreviewData {
   customerName: string;
@@ -14,6 +15,18 @@ interface QuotePreviewData {
   upsells: any[];
   totalAmount: number;
   photos: any[];
+  // CRM fields
+  leadSource?: string;
+  moveTimeConfirmed?: string;
+  priceOverride?: boolean;
+  originalTotalAmount?: number;
+  overrideAmount?: number;
+  overrideReason?: string;
+  // Quote customization
+  customLogoUrl?: string;
+  brandColors?: { primary?: string; secondary?: string; accent?: string };
+  includeMLSPhotos?: boolean;
+  followUpDate?: string;
 }
 
 export default function QuotePreviewPage() {
@@ -54,9 +67,39 @@ export default function QuotePreviewPage() {
   const handleSendEmail = async () => {
     setIsSending(true);
     try {
-      const tempQuoteId = 'quote-' + Date.now();
-      const quoteUrl = `${window.location.origin}/quote/${tempQuoteId}`;
+      // First, save the quote to the database with all CRM fields
+      const savedQuote = await QuoteService.createQuote({
+        customerName: quoteData.customerName,
+        customerEmail: quoteData.customerEmail,
+        customerPhone: quoteData.customerPhone,
+        moveDate: quoteData.moveDate,
+        originAddress: quoteData.originAddress,
+        destinationAddress: quoteData.destinationAddress,
+        detections: quoteData.detections,
+        estimate: quoteData.estimate,
+        upsells: quoteData.upsells,
+        totalAmount: quoteData.totalAmount,
+        photos: quoteData.photos || [],
+        // CRM fields
+        leadSource: quoteData.leadSource,
+        moveTimeConfirmed: quoteData.moveTimeConfirmed,
+        priceOverride: quoteData.priceOverride || false,
+        originalTotalAmount: quoteData.originalTotalAmount || quoteData.totalAmount,
+        overrideReason: quoteData.overrideReason,
+        followUpDate: quoteData.followUpDate,
+        // Quote customization
+        customLogoUrl: quoteData.customLogoUrl,
+        brandColors: quoteData.brandColors,
+        status: 'pending'
+      });
 
+      if (!savedQuote.id) {
+        throw new Error('Failed to save quote');
+      }
+
+      const quoteUrl = `${window.location.origin}/quote/${savedQuote.id}`;
+
+      // Send email with the saved quote ID
       await ResendService.sendQuote({
         customerName: quoteData.customerName,
         customerEmail: quoteData.customerEmail,
@@ -65,15 +108,14 @@ export default function QuotePreviewPage() {
         originAddress: quoteData.originAddress,
         destinationAddress: quoteData.destinationAddress,
         totalAmount: quoteData.totalAmount,
-        quoteId: tempQuoteId,
+        quoteId: savedQuote.id,
         quoteUrl
       });
 
       setEmailSent(true);
     } catch (error: any) {
-      console.error('Error sending email:', error);
-      console.error('Full error object:', error);
-      alert(`Failed to send email: ${error.message || 'Unknown error. Check console for details.'}`);
+      console.error('Error saving/sending quote:', error);
+      alert(`Failed to save and send quote: ${error.message || 'Unknown error. Check console for details.'}`);
     } finally {
       setIsSending(false);
     }

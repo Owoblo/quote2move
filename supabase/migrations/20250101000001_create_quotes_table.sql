@@ -65,3 +65,4 @@ CREATE POLICY "Anyone can view quotes by ID"
 
 
 
+

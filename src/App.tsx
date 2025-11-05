@@ -10,6 +10,7 @@ import QuoteViewerPage from './pages/QuoteViewerPage';
 import QuotePreviewPage from './pages/QuotePreviewPage';
 import DemoPage from './pages/DemoPage';
 import DemoThankYouPage from './pages/DemoThankYouPage';
+import CrewCalendarPage from './pages/CrewCalendarPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -45,6 +46,10 @@ function App() {
           <Route
             path="/quote/:quoteId"
             element={<QuoteViewerPage />}
+          />
+          <Route
+            path="/crew/calendar"
+            element={<CrewCalendarPage />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

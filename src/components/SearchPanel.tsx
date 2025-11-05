@@ -37,6 +37,7 @@ export default function SearchPanel({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   // Search for listings as user types
   useEffect(() => {
@@ -104,26 +105,29 @@ export default function SearchPanel({
   }, [address]);
 
   const handleSuggestionClick = (listing: Listing) => {
-    // Clear any pending blur timeout
+    // Clear any pending blur timeout immediately
     if (blurTimeoutRef.current) {
       clearTimeout(blurTimeoutRef.current);
       blurTimeoutRef.current = null;
     }
     
+    // Fill the input with the complete address FIRST
     const fullAddress = `${listing.address}, ${listing.addresscity}, ${listing.addressstate}`;
     onAddressChange(fullAddress);
+    
+    // Close dropdown immediately - clear suggestions
     setShowSuggestions(false);
-    setSuggestions([]); // Clear suggestions immediately
+    setSuggestions([]);
     
     // Store the selected listing for photo fetching
     if (onListingSelect) {
       onListingSelect(listing);
     }
     
-    // Blur the input to ensure dropdown closes
-    const input = document.getElementById('address');
+    // Blur the input to remove focus
+    const input = document.getElementById('address') as HTMLInputElement;
     if (input) {
-      (input as HTMLInputElement).blur();
+      input.blur();
     }
   };
 
@@ -134,22 +138,50 @@ export default function SearchPanel({
   const handleInputFocus = () => {
     if (suggestions.length > 0) {
       setShowSuggestions(true);
+      // Reset dropdown display if it was hidden
+      if (dropdownRef.current) {
+        dropdownRef.current.style.display = '';
+        dropdownRef.current.style.pointerEvents = 'auto';
+      }
     } else if (address.length > 0) {
       // Trigger search if there's text but no suggestions yet
       setShowSuggestions(true);
+      if (dropdownRef.current) {
+        dropdownRef.current.style.display = '';
+        dropdownRef.current.style.pointerEvents = 'auto';
+      }
     }
   };
 
-  const handleInputBlur = () => {
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Check what element is receiving focus
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    
+    // If clicking on a suggestion item, don't close (click handler will handle it)
+    if (relatedTarget && relatedTarget.closest('.suggestion-item')) {
+      return;
+    }
+    
+    // If clicking on a button, close immediately
+    if (relatedTarget && relatedTarget.closest('button')) {
+      setShowSuggestions(false);
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+        blurTimeoutRef.current = null;
+      }
+      return;
+    }
+    
     // Clear any existing timeout
     if (blurTimeoutRef.current) {
       clearTimeout(blurTimeoutRef.current);
     }
-    // Delay hiding suggestions to allow clicks
+    
+    // Small delay to allow button clicks to register
     blurTimeoutRef.current = setTimeout(() => {
       setShowSuggestions(false);
       blurTimeoutRef.current = null;
-    }, 200);
+    }, 150);
   };
 
   return (
@@ -160,7 +192,7 @@ export default function SearchPanel({
       </div>
       
       {/* Address Input with Autocomplete */}
-      <div className="mb-6 relative">
+      <div className="mb-6 relative z-10">
         <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Address
         </label>
@@ -190,16 +222,19 @@ export default function SearchPanel({
         
         {/* Autocomplete Suggestions */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-64 overflow-y-auto">
+          <div 
+            ref={dropdownRef}
+            className="absolute z-30 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-64 overflow-y-auto"
+          >
             {suggestions.map((listing, index) => (
               <div
                 key={`${listing.id}-${index}`}
-                onMouseDown={(e) => {
-                  // Prevent blur from firing before click
+                onClick={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   handleSuggestionClick(listing);
                 }}
-                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors duration-150"
+                className="suggestion-item px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors duration-150"
               >
                 <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
                   {listing.address}

@@ -78,9 +78,64 @@ export class SimplePDFService {
             Total: $${quoteData.totalAmount.toFixed(2)}
           </div>
           
+          <div class="section">
+            <h3>Insurance Coverage</h3>
+            <p><strong>Basic Coverage (Included):</strong> $0.60 per pound per item</p>
+            <p>All items are covered under basic moving insurance. For additional coverage options, please contact us.</p>
+            <p><strong>Important:</strong> Items must be properly packed and inventoried. We recommend taking photos of valuable items before the move.</p>
+          </div>
+          
+          <div class="section">
+            <h3>Customer Agreement & Policies</h3>
+            <h4>Terms and Conditions:</h4>
+            <ul style="line-height: 1.8;">
+              <li><strong>Payment:</strong> Payment is due on the day of the move unless other arrangements have been made.</li>
+              <li><strong>Rescheduling:</strong> Changes to move date must be made at least 48 hours in advance. Late changes may incur a rescheduling fee.</li>
+              <li><strong>Cancellation:</strong> Cancellations made 24+ hours before move date: no charge. Cancellations within 24 hours: 25% cancellation fee.</li>
+              <li><strong>Liability:</strong> Our liability is limited to $0.60 per pound per item under basic coverage. Additional insurance options are available.</li>
+              <li><strong>Access:</strong> Customer must ensure access to both origin and destination locations. Delays due to access issues may result in additional charges.</li>
+              <li><strong>Packing:</strong> Customer is responsible for packing personal items unless packing service is included in this quote.</li>
+              <li><strong>Hazardous Materials:</strong> We cannot transport hazardous materials, firearms, or perishables unless specifically arranged.</li>
+              <li><strong>Disputes:</strong> Any disputes must be reported within 48 hours of move completion.</li>
+            </ul>
+          </div>
+          
+          <div class="section">
+            <h3>Customer Reviews</h3>
+            <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+              <p style="font-style: italic; margin: 5px 0;">"Professional, efficient, and careful with our belongings. Highly recommend!"</p>
+              <p style="color: #6b7280; font-size: 12px; margin: 5px 0;">- Sarah M., 5 stars</p>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+              <p style="font-style: italic; margin: 5px 0;">"The team was punctual and handled everything with care. Great experience!"</p>
+              <p style="color: #6b7280; font-size: 12px; margin: 5px 0;">- John D., 5 stars</p>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+              <p style="font-style: italic; margin: 5px 0;">"They made our move stress-free. Everything arrived in perfect condition."</p>
+              <p style="color: #6b7280; font-size: 12px; margin: 5px 0;">- Maria L., 5 stars</p>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h3>Acceptance of Quote</h3>
+            <p>By accepting this quote, you agree to the terms and conditions outlined above.</p>
+            <p>You can accept this quote by:</p>
+            <ul>
+              <li>Clicking "Accept Quote" in the email link provided</li>
+              <li>Calling us at the number listed above</li>
+              <li>Responding to this quote via email</li>
+            </ul>
+            <p style="margin-top: 15px; padding: 15px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+              <strong>Note:</strong> This quote is valid for 30 days from the date of generation. Prices are subject to change if move date or details change significantly.
+            </p>
+          </div>
+          
           <div class="footer">
             <p>This quote is valid for 30 days from the date of generation.</p>
-            <p>For support, contact us at support@instantquotebuilder.com</p>
+            <p>For questions or to accept this quote, contact us at support@movsense.com</p>
+            <p style="margin-top: 10px; font-size: 10px; color: #9ca3af;">
+              Licensed & Insured Moving Company | All Rights Reserved
+            </p>
           </div>
         </body>
         </html>

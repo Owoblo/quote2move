@@ -35,6 +35,19 @@ export default function EstimatePage() {
     moveDate: ''
   });
 
+  // CRM fields
+  const [leadSource, setLeadSource] = useState('');
+  const [moveTimeConfirmed, setMoveTimeConfirmed] = useState('');
+  const [priceOverride, setPriceOverride] = useState(false);
+  const [overrideAmount, setOverrideAmount] = useState<number | null>(null);
+  const [overrideReason, setOverrideReason] = useState('');
+  const [customFollowUpDate, setCustomFollowUpDate] = useState('');
+  
+  // Quote customization
+  const [customLogoUrl, setCustomLogoUrl] = useState('');
+  const [brandColors, setBrandColors] = useState({ primary: '', secondary: '', accent: '' });
+  const [includeMLSPhotos, setIncludeMLSPhotos] = useState(true);
+
   const [originAddress, setOriginAddress] = useState(state?.address || '');
   const [destinationAddress, setDestinationAddress] = useState('');
   const [detections] = useState<Detection[]>(state?.detections || []);
@@ -53,19 +66,39 @@ export default function EstimatePage() {
 
   // Generate upsells based on detected items - auto-select items that need special care
   const [upsells, setUpsells] = useState<Upsell[]>(() => {
+    const baseTotal = state?.estimate?.total || 0;
+    
     const initialUpsells: Upsell[] = [
+      // Insurance Tiers
       {
-        id: 'insurance',
-        name: 'Moving Insurance',
-        description: 'Protect your belongings during the move',
-        price: (state?.estimate?.total || 0) * 0.05, // 5% of total
-        recommended: true,
+        id: 'insurance-basic',
+        name: 'Basic Insurance (Included)',
+        description: '$0.60/lb per item coverage (included in quote)',
+        price: 0,
+        recommended: false,
+        selected: true // Default selected
+      },
+      {
+        id: 'insurance-premium',
+        name: 'Premium Insurance - $2,000 Coverage',
+        description: 'Up to $2,000 coverage for your belongings',
+        price: 100,
+        recommended: baseTotal > 1000,
         selected: false
       },
       {
+        id: 'insurance-deluxe',
+        name: 'Deluxe Insurance - $5,000 Coverage',
+        description: 'Up to $5,000 coverage for your belongings',
+        price: 200,
+        recommended: baseTotal > 3000,
+        selected: false
+      },
+      // Packing Services
+      {
         id: 'packing',
         name: 'Packing Service',
-        description: 'Professional packing of your items',
+        description: 'Professional packing of all your items',
         price: detections.reduce((sum, d) => sum + (d.qty * 25), 0), // $25 per item
         recommended: detections.length > 10,
         selected: false
@@ -77,18 +110,36 @@ export default function EstimatePage() {
         price: detections.reduce((sum, d) => sum + (d.qty * 15), 0), // $15 per item
         recommended: false,
         selected: false
+      },
+      // Boxes
+      {
+        id: 'boxes-standard',
+        name: 'Standard Moving Boxes',
+        description: 'Small (1.5 cu ft), Medium (3 cu ft), Large (4.5 cu ft) boxes',
+        price: Math.ceil(detections.length * 0.3) * 5, // ~$5 per box, estimate 0.3 boxes per item
+        recommended: detections.length > 20,
+        selected: false
       }
     ];
 
-    // Detect TVs - AUTO-SELECT TV boxes (they NEED special boxes)
+    // Detect TVs - AUTO-SELECT TV boxes, disassembly, and assembly
     const tvDetections = detections.filter(d => 
       d.label.toLowerCase().includes('tv') || 
       d.label.toLowerCase().includes('television') ||
       d.label.toLowerCase().includes('flat screen')
     );
     const tvCount = tvDetections.reduce((sum, d) => sum + d.qty, 0);
+    
+    // Check if TV is wall-mounted (common indicator)
+    const wallMountedTvs = tvDetections.filter(d => 
+      d.label.toLowerCase().includes('wall') || 
+      d.notes?.toLowerCase().includes('wall') ||
+      d.room?.toLowerCase().includes('wall')
+    );
+    const wallMountedCount = wallMountedTvs.reduce((sum, d) => sum + d.qty, 0);
 
     if (tvCount > 0) {
+      // TV Boxes - Required
       initialUpsells.push({
         id: 'tv-boxes',
         name: `TV Boxes (${tvCount} TV${tvCount > 1 ? 's' : ''})`,
@@ -97,6 +148,18 @@ export default function EstimatePage() {
         recommended: true,
         selected: true // AUTO-SELECTED - TVs need boxes!
       });
+      
+      // TV Disassembly & Assembly (if wall-mounted)
+      if (wallMountedCount > 0) {
+        initialUpsells.push({
+          id: 'tv-disassembly',
+          name: `TV Disassembly & Assembly (${wallMountedCount} TV${wallMountedCount > 1 ? 's' : ''})`,
+          description: 'Professional disassembly from wall mount and re-installation at new location',
+          price: wallMountedCount * 75, // $75 per TV
+          recommended: true,
+          selected: false
+        });
+      }
     }
 
     // Detect fragile items (art, pictures, mirrors) - recommend fragile packing
@@ -120,22 +183,72 @@ export default function EstimatePage() {
       });
     }
 
-    // Detect specialty items - recommend specialty handling
-    const specialtyDetections = detections.filter(d => 
-      d.label.toLowerCase().includes('piano') ||
-      d.label.toLowerCase().includes('treadmill') ||
-      d.label.toLowerCase().includes('pool table') ||
-      d.label.toLowerCase().includes('safe') ||
-      d.label.toLowerCase().includes('grandfather clock')
+    // Detect specialty items - recommend specialty handling with specific pricing
+    const pianoDetections = detections.filter(d => 
+      d.label.toLowerCase().includes('piano')
     );
-    const specialtyCount = specialtyDetections.reduce((sum, d) => sum + d.qty, 0);
+    const pianoCount = pianoDetections.reduce((sum, d) => sum + d.qty, 0);
+    
+    const poolTableDetections = detections.filter(d => 
+      d.label.toLowerCase().includes('pool table')
+    );
+    const poolTableCount = poolTableDetections.reduce((sum, d) => sum + d.qty, 0);
+    
+    const safeDetections = detections.filter(d => 
+      d.label.toLowerCase().includes('safe')
+    );
+    const safeCount = safeDetections.reduce((sum, d) => sum + d.qty, 0);
+    
+    const gymEquipmentDetections = detections.filter(d => 
+      d.label.toLowerCase().includes('treadmill') ||
+      d.label.toLowerCase().includes('exercise') ||
+      d.label.toLowerCase().includes('gym')
+    );
+    const gymCount = gymEquipmentDetections.reduce((sum, d) => sum + d.qty, 0);
 
-    if (specialtyCount > 0) {
+    // Piano handling
+    if (pianoCount > 0) {
       initialUpsells.push({
-        id: 'specialty-handling',
-        name: `Specialty Item Handling (${specialtyCount} item${specialtyCount > 1 ? 's' : ''})`,
-        description: 'Expert handling for heavy or delicate specialty items',
-        price: specialtyCount * 100,
+        id: 'piano-handling',
+        name: `Piano Handling (${pianoCount} piano${pianoCount > 1 ? 's' : ''})`,
+        description: 'Specialized piano moving with proper equipment and care',
+        price: pianoCount * 300, // $300 per piano
+        recommended: true,
+        selected: true // Required for pianos
+      });
+    }
+    
+    // Pool table handling
+    if (poolTableCount > 0) {
+      initialUpsells.push({
+        id: 'pool-table-handling',
+        name: `Pool Table Handling (${poolTableCount} table${poolTableCount > 1 ? 's' : ''})`,
+        description: 'Professional pool table disassembly, transport, and reassembly',
+        price: poolTableCount * 400, // $400 per pool table
+        recommended: true,
+        selected: false
+      });
+    }
+    
+    // Safe handling
+    if (safeCount > 0) {
+      initialUpsells.push({
+        id: 'safe-handling',
+        name: `Safe Handling (${safeCount} safe${safeCount > 1 ? 's' : ''})`,
+        description: 'Heavy-duty safe moving with specialized equipment',
+        price: safeCount * 250, // $250 per safe
+        recommended: true,
+        selected: false
+      });
+    }
+    
+    // Gym equipment handling
+    if (gymCount > 0) {
+      initialUpsells.push({
+        id: 'gym-equipment-handling',
+        name: `Gym Equipment Handling (${gymCount} item${gymCount > 1 ? 's' : ''})`,
+        description: 'Special handling for heavy gym equipment',
+        price: gymCount * 150, // $150 per item
         recommended: true,
         selected: false
       });
@@ -328,14 +441,27 @@ export default function EstimatePage() {
   }, [originAddress, destinationAddress, detections, mapping, baseEstimate, originType, destinationType, stairsDestination, elevatorDestination, floorOrigin, floorDestination, parkingOrigin, parkingDestination]);
 
   const handleUpsellToggle = (id: string) => {
-    setUpsells(prev => prev.map(u => 
-      u.id === id ? { ...u, selected: !u.selected } : u
-    ));
+    setUpsells(prev => {
+      // If toggling an insurance option, deselect all other insurance options
+      if (id.startsWith('insurance-')) {
+        return prev.map(u => {
+          if (u.id.startsWith('insurance-')) {
+            return { ...u, selected: u.id === id ? !u.selected : false };
+          }
+          return u;
+        });
+      }
+      // For other upsells, just toggle normally
+      return prev.map(u => 
+        u.id === id ? { ...u, selected: !u.selected } : u
+      );
+    });
   };
 
   const handleSendQuote = () => {
     const totalUpsells = upsells.filter(u => u.selected).reduce((sum, u) => sum + u.price, 0);
-    const finalTotal = finalEstimate.total + totalUpsells;
+    const calculatedTotal = finalEstimate.total + totalUpsells;
+    const finalTotal = priceOverride && overrideAmount !== null ? overrideAmount : calculatedTotal;
 
     navigate('/quote-preview', {
       state: {
@@ -349,7 +475,19 @@ export default function EstimatePage() {
         estimate: finalEstimate,
         upsells: upsells.filter(u => u.selected),
         totalAmount: finalTotal,
-        photos: [] // Add photos if available
+        photos: [], // Add photos if available
+        // CRM fields
+        leadSource,
+        moveTimeConfirmed,
+        priceOverride,
+        originalTotalAmount: calculatedTotal,
+        overrideAmount,
+        overrideReason,
+        followUpDate: customFollowUpDate || undefined,
+        // Quote customization
+        customLogoUrl,
+        brandColors,
+        includeMLSPhotos
       }
     });
   };
@@ -384,7 +522,8 @@ export default function EstimatePage() {
   };
 
   const totalUpsells = upsells.filter(u => u.selected).reduce((sum, u) => sum + u.price, 0);
-  const finalTotal = finalEstimate.total + totalUpsells;
+  const calculatedTotal = finalEstimate.total + totalUpsells;
+  const finalTotal = priceOverride && overrideAmount !== null ? overrideAmount : calculatedTotal;
 
   const totalItems = detections.reduce((sum, d) => sum + d.qty, 0);
   const totalCubicFeet = detections.reduce((sum, detection) => {
@@ -518,6 +657,171 @@ export default function EstimatePage() {
                     min={new Date().toISOString().split('T')[0]}
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Move Time Confirmed
+                  </label>
+                  <input
+                    type="time"
+                    value={moveTimeConfirmed}
+                    onChange={(e) => setMoveTimeConfirmed(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Lead Source
+                  </label>
+                  <select
+                    value={leadSource}
+                    onChange={(e) => setLeadSource(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">Select source...</option>
+                    <option value="Google Search">Google Search</option>
+                    <option value="Google Ads">Google Ads</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Referral">Referral</option>
+                    <option value="Yelp">Yelp</option>
+                    <option value="Nextdoor">Nextdoor</option>
+                    <option value="Craigslist">Craigslist</option>
+                    <option value="Direct Mail">Direct Mail</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              
+              {/* Price Override Section */}
+              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+                <div className="flex items-center space-x-3 mb-3">
+                  <input
+                    type="checkbox"
+                    checked={priceOverride}
+                    onChange={(e) => {
+                      setPriceOverride(e.target.checked);
+                      if (!e.target.checked) {
+                        setOverrideAmount(null);
+                        setOverrideReason('');
+                      }
+                    }}
+                    className="w-5 h-5 text-accent border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Override Price
+                  </label>
+                </div>
+                {priceOverride && (
+                  <div className="space-y-3 mt-3">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        New Total Amount
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={overrideAmount || ''}
+                        onChange={(e) => setOverrideAmount(e.target.value ? parseFloat(e.target.value) : null)}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        placeholder="Enter override amount"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Reason for Override
+                      </label>
+                      <textarea
+                        value={overrideReason}
+                        onChange={(e) => setOverrideReason(e.target.value)}
+                        rows={2}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        placeholder="Explain why you're overriding the price..."
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Quote Customization Section */}
+              <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Quote Customization (Optional)</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Logo URL
+                    </label>
+                    <input
+                      type="url"
+                      value={customLogoUrl}
+                      onChange={(e) => setCustomLogoUrl(e.target.value)}
+                      placeholder="https://example.com/logo.png"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                    {customLogoUrl && (
+                      <img src={customLogoUrl} alt="Logo Preview" className="mt-2 h-16 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Primary Color</label>
+                      <input
+                        type="color"
+                        value={brandColors.primary || '#3B82F6'}
+                        onChange={(e) => setBrandColors({ ...brandColors, primary: e.target.value })}
+                        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Secondary Color</label>
+                      <input
+                        type="color"
+                        value={brandColors.secondary || '#8B5CF6'}
+                        onChange={(e) => setBrandColors({ ...brandColors, secondary: e.target.value })}
+                        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Accent Color</label>
+                      <input
+                        type="color"
+                        value={brandColors.accent || '#10B981'}
+                        onChange={(e) => setBrandColors({ ...brandColors, accent: e.target.value })}
+                        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={includeMLSPhotos}
+                      onChange={(e) => setIncludeMLSPhotos(e.target.checked)}
+                      className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label className="text-sm text-gray-700 dark:text-gray-300">
+                      Include MLS photos in quote
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Custom Follow-up Date (Optional)
+                    </label>
+                    <input
+                      type="date"
+                      value={customFollowUpDate}
+                      onChange={(e) => setCustomFollowUpDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Leave empty to use default (next day)
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -957,13 +1261,30 @@ export default function EstimatePage() {
                   </div>
                 )}
 
+                {priceOverride && overrideAmount !== null && (
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                      <span>Calculated Total:</span>
+                      <span className="line-through">${calculatedTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-yellow-700 dark:text-yellow-400 mt-1">
+                      <span>Price Override:</span>
+                      <span className="font-semibold">${overrideAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
                 <div className="pt-4 border-t-2 border-gray-300 dark:border-gray-600">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-900 dark:text-gray-100">Total:</span>
-                    <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                    <span className={`text-3xl font-bold ${priceOverride ? 'text-yellow-600 dark:text-yellow-400' : 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent'}`}>
                       ${finalTotal.toFixed(2)}
                     </span>
                   </div>
+                  {priceOverride && (
+                    <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                      ⚠️ Price overridden: {overrideReason || 'No reason provided'}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-6 space-y-3">
