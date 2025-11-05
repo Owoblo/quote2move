@@ -136,12 +136,38 @@ export default async function handler(
     const defaultReplyTo = `replies-${userIdPrefix}@${verifiedDomain}`;
 
     // Use user settings or generate defaults
-    let fromEmail = userSettings?.from_email || `MovSense <${defaultFromEmail}>`;
-    const fromName = userSettings?.from_name || 'MovSense';
-    let replyTo = userSettings?.reply_to || defaultReplyTo;
+    // IMPORTANT: Only use custom email if it's from the verified domain
+    let fromEmail: string;
+    let replyTo: string;
     
-    // If user has custom email but it's not verified, fall back to generated one
-    // This prevents domain verification errors
+    if (userSettings?.from_email) {
+      // Check if user's custom email uses the verified domain
+      const customEmailDomain = userSettings.from_email.match(/@([^\s>]+)/)?.[1];
+      if (customEmailDomain === verifiedDomain) {
+        fromEmail = userSettings.from_email;
+      } else {
+        // User's custom domain is not verified, use auto-generated
+        console.log(`User's custom domain ${customEmailDomain} not verified, using auto-generated: ${defaultFromEmail}`);
+        fromEmail = `MovSense <${defaultFromEmail}>`;
+      }
+    } else {
+      // No custom email, use auto-generated
+      fromEmail = `MovSense <${defaultFromEmail}>`;
+    }
+    
+    // Same logic for reply-to
+    if (userSettings?.reply_to) {
+      const customReplyDomain = userSettings.reply_to.match(/@([^\s>]+)/)?.[1];
+      if (customReplyDomain === verifiedDomain) {
+        replyTo = userSettings.reply_to;
+      } else {
+        replyTo = defaultReplyTo;
+      }
+    } else {
+      replyTo = defaultReplyTo;
+    }
+    
+    const fromName = userSettings?.from_name || 'MovSense';
 
     if (!resendApiKey) {
       return res.status(500).json({ 
@@ -199,30 +225,15 @@ export default async function handler(
       
       // Handle domain verification error specifically
       if (errorData.message && errorData.message.includes('not verified')) {
-        // Try fallback to verified domain if user's custom domain failed
-        const fallbackEmail = `MovSense <quotes-${userIdPrefix}@movsense.com>`;
+        // Extract the domain that failed from the error or from email
+        const failedDomain = errorData.message.match(/The ([^\s]+) domain/)?.[1] || verifiedDomain;
         
-        // If we're already using the fallback, return error
-        if (fromEmail.includes(verifiedDomain)) {
-          return res.status(400).json({ 
-            error: 'Domain not verified',
-            message: `The email domain is not verified in Resend. Please verify ${verifiedDomain} at https://resend.com/domains. For testing, you can use a verified domain like the one registered with johnowolabi80@gmail.com.`,
-            details: errorData
-          });
-        }
-        
-        // Try with fallback email
-        console.log('Domain verification failed, trying fallback email:', fallbackEmail);
-        fromEmail = fallbackEmail;
-        replyTo = `replies-${userIdPrefix}@movsense.com`;
-        
-        // Retry with fallback (we'll need to regenerate email HTML)
-        // For now, return error with helpful message
         return res.status(400).json({ 
           error: 'Domain not verified',
-          message: `The email domain in your settings is not verified. Your assigned email address is: ${defaultFromEmail}. Please contact support if you need to use a custom domain.`,
+          message: `The domain "${failedDomain}" is not verified in Resend. Your assigned email address is: ${defaultFromEmail}. Please verify the domain in Resend Dashboard (https://resend.com/domains) or contact support.`,
           details: errorData,
-          suggestedEmail: defaultFromEmail
+          assignedEmail: defaultFromEmail,
+          verifiedDomain: verifiedDomain
         });
       }
       
