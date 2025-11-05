@@ -364,15 +364,17 @@ export default function DemoPage() {
         </div>
       </section>
 
-      {/* Activation CTA Section */}
-      {(isActiveRegion === false || isActiveRegion === null) && (
+      {/* Activation CTA Section - Show for all users, with different messaging for active vs inactive regions */}
+      {(isActiveRegion === false || isActiveRegion === null || isActiveRegion === true) && (
         <section className="py-16 px-6 bg-gradient-to-br from-accent/5 to-highlight/5 dark:from-gray-800 dark:to-gray-900">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-4">
-              Activate MoveSense in Your City
+                        <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-4">                                                                   
+              {isActiveRegion === true ? 'Get Full Access to MoveSense' : 'Activate MoveSense in Your City'}
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-              We're currently onboarding new moving companies city-by-city. Activate your account and get full access within 2 business days.
+              {isActiveRegion === true 
+                ? "Ready to start using MoveSense? Activate your account and get full access with 1-month free starter plan."
+                : "We're currently onboarding new moving companies city-by-city. Activate your account and get full access within 2 business days."}
             </p>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 mb-8">
