@@ -6,11 +6,11 @@
   "outputDirectory": "build",
   "rewrites": [
     {
-      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|ico|webp|pdf|css|js|woff|woff2|ttf|eot))",
-      "destination": "/$1"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
