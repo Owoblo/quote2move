@@ -128,9 +128,30 @@ export default async function handler(
     const userIdPrefix = user.id.substring(0, 8); // Use first 8 chars of UUID for uniqueness
     
     // Use verified domain from environment or default to movsense.com
-    // For testing: Use domain verified with johnowolabi80@gmail.com
+    // For testing: Use domain verified with johnowolabi80@gmail.com (e.g., "example.com")
     // For production: Use movsense.com (once verified)
-    const verifiedDomain = process.env.VERIFIED_EMAIL_DOMAIN || 'movsense.com';
+    let verifiedDomain = process.env.VERIFIED_EMAIL_DOMAIN || 'movsense.com';
+    
+    // Extract domain from email if someone accidentally put an email address
+    // Example: "user@example.com" -> "example.com"
+    if (verifiedDomain.includes('@')) {
+      const emailMatch = verifiedDomain.match(/@([^\s]+)/);
+      if (emailMatch) {
+        verifiedDomain = emailMatch[1];
+        console.warn(`VERIFIED_EMAIL_DOMAIN was set to an email address. Extracted domain: ${verifiedDomain}`);
+      }
+    }
+    
+    // Remove any trailing slashes or spaces
+    verifiedDomain = verifiedDomain.trim().replace(/\/+$/, '');
+    
+    if (!verifiedDomain || verifiedDomain.includes('@')) {
+      console.error('Invalid VERIFIED_EMAIL_DOMAIN:', process.env.VERIFIED_EMAIL_DOMAIN);
+      return res.status(500).json({
+        error: 'Server configuration error',
+        message: 'VERIFIED_EMAIL_DOMAIN is not a valid domain. Please set it to a domain like "example.com" (not an email address).'
+      });
+    }
     
     const defaultFromEmail = `quotes-${userIdPrefix}@${verifiedDomain}`;
     const defaultReplyTo = `replies-${userIdPrefix}@${verifiedDomain}`;

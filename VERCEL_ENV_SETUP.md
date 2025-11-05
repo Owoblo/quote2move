@@ -26,7 +26,9 @@ The email sending API requires the following environment variables to be set in 
    - The domain you've verified in Resend for sending emails
    - Default: `movsense.com`
    - For testing: Use the domain verified with `johnowolabi80@gmail.com`
-   - Example: `yourdomain.com` (the domain you verified in Resend)
+   - ⚠️ **IMPORTANT**: Set this to the DOMAIN only (e.g., `example.com`), NOT an email address!
+   - ✅ Correct: `example.com` or `yourdomain.com`
+   - ❌ Wrong: `johnowolabi80@gmail.com` or `user@example.com`
 
 ## How to Add Environment Variables in Vercel
 
