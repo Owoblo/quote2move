@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { QuoteService, QuoteData } from '../lib/quoteService';
+import { EmailBackendService } from '../lib/emailBackendService';
 
 export default function QuoteViewerPage() {
   const { quoteId } = useParams<{ quoteId: string }>();
@@ -20,6 +21,7 @@ export default function QuoteViewerPage() {
   const [declineActionBy, setDeclineActionBy] = useState<'customer' | 'sales_rep'>('customer');
   const [isEditing, setIsEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   useEffect(() => {
     fetchQuote();
@@ -369,12 +371,21 @@ export default function QuoteViewerPage() {
                 {/* Sales Rep Actions */}
                 <div className="space-y-2 mb-4">
                   {canEdit && (
-                    <button
-                      onClick={() => navigate(`/quote/${quoteId}/edit`)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-                    >
-                      Edit Quote
-                    </button>
+                    <>
+                      <button
+                        onClick={() => navigate(`/quote/${quoteId}/edit`)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                      >
+                        Edit Quote
+                      </button>
+                      <button
+                        onClick={handleSendQuote}
+                        disabled={isSendingEmail}
+                        className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                      >
+                        {isSendingEmail ? 'Sending...' : 'Send Quote via Email'}
+                      </button>
+                    </>
                   )}
                   {quote.status === 'pending' && canEdit && (
                     <>
