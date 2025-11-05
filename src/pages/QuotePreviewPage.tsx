@@ -37,6 +37,7 @@ export default function QuotePreviewPage() {
   const [isSending, setIsSending] = useState(false);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState(false);
   const [savedQuoteUrl, setSavedQuoteUrl] = useState<string>('');
 
   if (!quoteData) {
@@ -115,11 +116,12 @@ export default function QuotePreviewPage() {
           quoteUrl
         });
         console.log('Email sent successfully via backend');
+        setEmailSuccess(true);
       } catch (emailError: any) {
         // Email sending failed - show warning but don't fail the whole process
         console.warn('Email sending failed:', emailError);
-        // Still show success since quote was saved
-        alert(`Quote saved successfully, but email sending failed: ${emailError.message}\n\nYou can share the quote URL manually: ${quoteUrl}`);
+        setEmailSuccess(false);
+        // Still show success since quote was saved, but note email issue
       }
 
       setEmailSent(true);
@@ -161,10 +163,16 @@ export default function QuotePreviewPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Quote Sent Successfully!</h1>
-          <p className="text-gray-600 mb-4">
-            Your quote has been sent to <strong>{quoteData.customerEmail}</strong>
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Quote {emailSuccess ? 'Sent' : 'Saved'} Successfully!</h1>
+          {emailSuccess ? (
+            <p className="text-gray-600 mb-4">
+              Your quote has been sent to <strong>{quoteData.customerEmail}</strong>
+            </p>
+          ) : (
+            <p className="text-gray-600 mb-4">
+              Your quote has been saved. Email sending encountered an issue - you can share the quote URL manually.
+            </p>
+          )}
           {savedQuoteUrl && (
             <p className="text-sm text-gray-500 mb-6">
               Quote URL: <a href={savedQuoteUrl} className="text-blue-600 hover:underline break-all" target="_blank" rel="noopener noreferrer">{savedQuoteUrl}</a>
