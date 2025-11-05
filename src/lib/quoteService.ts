@@ -55,10 +55,18 @@ export interface QuoteData {
 
 export class QuoteService {
   static async createQuote(quoteData: QuoteData): Promise<QuoteData> {
-      // Calculate follow-up date (default: next day)
+    // Get the current authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error('User must be authenticated to create quotes. Please log in.');
+    }
+
+    // Calculate follow-up date (default: next day)
     const followUpDate = quoteData.followUpDate || this.getDefaultFollowUpDate();
     
     const insertData: any = {
+      user_id: user.id, // Required for RLS policy
       customer_name: quoteData.customerName,
       customer_email: quoteData.customerEmail,
       customer_phone: quoteData.customerPhone,
