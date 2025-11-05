@@ -6,6 +6,8 @@ import { GoogleMapsService } from '../lib/googleMapsService';
 import { SimplePDFService } from '../lib/simplePDFService';
 import { SaturnGPTService, SaturnMoveTimeResponse } from '../lib/saturnGPTService';
 import ThemeToggle from '../components/ThemeToggle';
+import { StatePersistence } from '../lib/statePersistence';
+import { getQuoteSettings } from '../pages/SettingsPage';
 
 interface LocationState {
   address: string;
@@ -28,28 +30,32 @@ export default function EstimatePage() {
   const location = useLocation();
   const state = location.state as LocationState;
 
+  // Load persisted state or use defaults
+  const persistedState = StatePersistence.loadState();
+  const settings = getQuoteSettings();
+
   const [customerInfo, setCustomerInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    moveDate: ''
+    name: persistedState?.customerInfo?.name || '',
+    email: persistedState?.customerInfo?.email || '',
+    phone: persistedState?.customerInfo?.phone || '',
+    moveDate: persistedState?.customerInfo?.moveDate || ''
   });
 
   // CRM fields
-  const [leadSource, setLeadSource] = useState('');
-  const [moveTimeConfirmed, setMoveTimeConfirmed] = useState('');
-  const [priceOverride, setPriceOverride] = useState(false);
-  const [overrideAmount, setOverrideAmount] = useState<number | null>(null);
-  const [overrideReason, setOverrideReason] = useState('');
-  const [customFollowUpDate, setCustomFollowUpDate] = useState('');
-  
-  // Quote customization
-  const [customLogoUrl, setCustomLogoUrl] = useState('');
-  const [brandColors, setBrandColors] = useState({ primary: '', secondary: '', accent: '' });
-  const [includeMLSPhotos, setIncludeMLSPhotos] = useState(true);
+  const [leadSource, setLeadSource] = useState(persistedState?.leadSource || '');
+  const [moveTimeConfirmed, setMoveTimeConfirmed] = useState(persistedState?.moveTimeConfirmed || '');
+  const [priceOverride, setPriceOverride] = useState(persistedState?.priceOverride || false);
+  const [overrideAmount, setOverrideAmount] = useState<number | null>(persistedState?.overrideAmount || null);
+  const [overrideReason, setOverrideReason] = useState(persistedState?.overrideReason || '');
+  const [customFollowUpDate, setCustomFollowUpDate] = useState(persistedState?.customFollowUpDate || '');
 
-  const [originAddress, setOriginAddress] = useState(state?.address || '');
-  const [destinationAddress, setDestinationAddress] = useState('');
+  const [originAddress, setOriginAddress] = useState(state?.address || persistedState?.originAddress || '');
+  const [destinationAddress, setDestinationAddress] = useState(persistedState?.destinationAddress || '');
+  
+  // Use settings from localStorage (not state)
+  const customLogoUrl = settings.customLogoUrl;
+  const brandColors = settings.brandColors;
+  const includeMLSPhotos = settings.includeMLSPhotos;
   const [detections] = useState<Detection[]>(state?.detections || []);
   const [mapping] = useState<MappingTable>(state?.mapping || {});
   const [baseEstimate] = useState<Estimate>(state?.estimate || {
@@ -276,6 +282,21 @@ export default function EstimatePage() {
   const [floorDestination, setFloorDestination] = useState<number | undefined>();
   const [parkingOrigin, setParkingOrigin] = useState<'driveway' | 'street' | 'parking_lot' | 'difficult'>('driveway');
   const [parkingDestination, setParkingDestination] = useState<'driveway' | 'street' | 'parking_lot' | 'difficult'>('driveway');
+
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    StatePersistence.saveEstimateState({
+      customerInfo,
+      originAddress,
+      destinationAddress,
+      leadSource,
+      moveTimeConfirmed,
+      priceOverride,
+      overrideAmount,
+      overrideReason,
+      customFollowUpDate
+    });
+  }, [customerInfo, originAddress, destinationAddress, leadSource, moveTimeConfirmed, priceOverride, overrideAmount, overrideReason, customFollowUpDate]);
 
   // Auto-calculate distance and GPT estimate when both addresses are provided
   useEffect(() => {
@@ -744,85 +765,21 @@ export default function EstimatePage() {
                 )}
               </div>
               
-              {/* Quote Customization Section */}
-              <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Quote Customization (Optional)</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Logo URL
-                    </label>
-                    <input
-                      type="url"
-                      value={customLogoUrl}
-                      onChange={(e) => setCustomLogoUrl(e.target.value)}
-                      placeholder="https://example.com/logo.png"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    />
-                    {customLogoUrl && (
-                      <img src={customLogoUrl} alt="Logo Preview" className="mt-2 h-16 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Primary Color</label>
-                      <input
-                        type="color"
-                        value={brandColors.primary || '#3B82F6'}
-                        onChange={(e) => setBrandColors({ ...brandColors, primary: e.target.value })}
-                        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Secondary Color</label>
-                      <input
-                        type="color"
-                        value={brandColors.secondary || '#8B5CF6'}
-                        onChange={(e) => setBrandColors({ ...brandColors, secondary: e.target.value })}
-                        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Accent Color</label>
-                      <input
-                        type="color"
-                        value={brandColors.accent || '#10B981'}
-                        onChange={(e) => setBrandColors({ ...brandColors, accent: e.target.value })}
-                        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={includeMLSPhotos}
-                      onChange={(e) => setIncludeMLSPhotos(e.target.checked)}
-                      className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label className="text-sm text-gray-700 dark:text-gray-300">
-                      Include MLS photos in quote
-                    </label>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Custom Follow-up Date (Optional)
-                    </label>
-                    <input
-                      type="date"
-                      value={customFollowUpDate}
-                      onChange={(e) => setCustomFollowUpDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Leave empty to use default (next day)
-                    </p>
-                  </div>
-                </div>
+              {/* Custom Follow-up Date */}
+              <div className="mt-6">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Custom Follow-up Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={customFollowUpDate}
+                  onChange={(e) => setCustomFollowUpDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Leave empty to use default (next day). Quote customization (logo, colors) can be set in <button onClick={() => navigate('/settings')} className="text-blue-600 dark:text-blue-400 hover:underline">Settings</button>.
+                </p>
               </div>
             </div>
 

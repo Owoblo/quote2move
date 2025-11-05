@@ -11,6 +11,7 @@ import QuotePreviewPage from './pages/QuotePreviewPage';
 import DemoPage from './pages/DemoPage';
 import DemoThankYouPage from './pages/DemoThankYouPage';
 import CrewCalendarPage from './pages/CrewCalendarPage';
+import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -50,6 +51,14 @@ function App() {
           <Route
             path="/crew/calendar"
             element={<CrewCalendarPage />}
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
