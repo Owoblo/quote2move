@@ -29,9 +29,10 @@ interface CachedData {
 interface InteractiveDemoProps {
   initialAddress?: string;
   hideSearch?: boolean; // Hide the search input when controlled externally (e.g., from DemoPage)
+  triggerFetch?: boolean; // Trigger photo fetching when this changes
 }
 
-export default function InteractiveDemo({ initialAddress, hideSearch = false }: InteractiveDemoProps = {}) {
+export default function InteractiveDemo({ initialAddress, hideSearch = false, triggerFetch = false }: InteractiveDemoProps = {}) {
   const [address, setAddress] = useState(initialAddress || DEFAULT_ADDRESS);
   const [suggestions, setSuggestions] = useState<Listing[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -54,6 +55,13 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false }: 
       setIsDefaultAddress(initialAddress === DEFAULT_ADDRESS);
     }
   }, [initialAddress]);
+
+  // Trigger photo fetch when triggerFetch prop changes to true
+  useEffect(() => {
+    if (triggerFetch && initialAddress && !isLoading && !isDetecting && photos.length === 0) {
+      fetchPhotos();
+    }
+  }, [triggerFetch]);
 
   // Load cached data for default address
   const loadCachedData = (): CachedData | null => {

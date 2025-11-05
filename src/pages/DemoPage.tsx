@@ -37,6 +37,7 @@ export default function DemoPage() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [leadEmail, setLeadEmail] = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [triggerFetch, setTriggerFetch] = useState(false);
   const navigate = useNavigate();
 
   // Check if listing is in active region
@@ -80,6 +81,13 @@ export default function DemoPage() {
     setAddress('');
     setSelectedListing(null);
     setIsActiveRegion(null);
+  };
+
+  const handleFetchPhotos = () => {
+    // When "Load Photos & Auto-Detect" is clicked, trigger photo fetch
+    if (selectedListing) {
+      setTriggerFetch(prev => !prev); // Toggle to trigger useEffect
+    }
   };
 
   const handleActivateAccount = async () => {
@@ -173,7 +181,7 @@ export default function DemoPage() {
             <SearchPanel
               address={address}
               onAddressChange={handleAddressChange}
-              onFetchPhotos={() => {}} // Not needed for demo page
+              onFetchPhotos={handleFetchPhotos}
               onClear={handleClear}
               recentSearches={[]}
               onListingSelect={handleListingSelect}
@@ -214,12 +222,13 @@ export default function DemoPage() {
             )}
           </div>
 
-          {/* Demo Results */}
-          {isActiveRegion === true && selectedListing && (
+          {/* Demo Results - Show when listing is selected */}
+          {selectedListing && (
             <div className="max-w-6xl mx-auto mt-8">
               <InteractiveDemo 
                 initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`}
                 hideSearch={true}
+                triggerFetch={triggerFetch}
               />
             </div>
           )}
