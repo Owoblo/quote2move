@@ -5,7 +5,20 @@ const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const resendApiKey = process.env.RESEND_API_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+// Validate environment variables
+if (!supabaseUrl) {
+  console.error('Missing SUPABASE_URL environment variable');
+}
+if (!supabaseServiceKey) {
+  console.error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
+}
+if (!resendApiKey) {
+  console.error('Missing RESEND_API_KEY environment variable');
+}
+
+const supabase = supabaseUrl && supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
 
 interface EmailRequest {
   quoteId: string;
@@ -38,6 +51,21 @@ export default async function handler(
   }
 
   try {
+    // Check environment variables
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return res.status(500).json({ 
+        error: 'Server configuration error',
+        message: 'Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.'
+      });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ 
+        error: 'Server configuration error',
+        message: 'Failed to initialize Supabase client. Please check your environment variables.'
+      });
+    }
+
     // Verify authentication
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -69,6 +97,13 @@ export default async function handler(
     }
 
     // Verify quote belongs to the authenticated user
+    if (!supabase) {
+      return res.status(500).json({ 
+        error: 'Server configuration error',
+        message: 'Supabase client not initialized'
+      });
+    }
+
     const { data: quote, error: quoteError } = await supabase
       .from('quotes')
       .select('id, user_id, custom_logo_url, brand_colors')
@@ -93,7 +128,10 @@ export default async function handler(
     const replyTo = userSettings?.reply_to || 'support@movsense.com';
 
     if (!resendApiKey) {
-      return res.status(500).json({ error: 'Resend API key not configured. Please add RESEND_API_KEY to your environment variables.' });
+      return res.status(500).json({ 
+        error: 'Email service not configured',
+        message: 'Resend API key not configured. Please add RESEND_API_KEY to your environment variables.'
+      });
     }
 
     // Generate email HTML
