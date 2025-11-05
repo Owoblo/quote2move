@@ -78,7 +78,6 @@ export default function EditQuotePage() {
         moveTimeConfirmed: formData.moveTimeConfirmed,
         priceOverride: formData.priceOverride,
         originalTotalAmount: formData.priceOverride ? formData.totalAmount : undefined,
-        overrideAmount: formData.priceOverride ? formData.overrideAmount : undefined,
         overrideReason: formData.priceOverride ? formData.overrideReason : '',
         salesRepNotes: formData.salesRepNotes
       };

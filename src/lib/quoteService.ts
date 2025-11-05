@@ -296,7 +296,7 @@ export class QuoteService {
     if (updates.leadSource !== undefined) updateData.lead_source = updates.leadSource;
     if (updates.moveTimeConfirmed !== undefined) updateData.move_time_confirmed = updates.moveTimeConfirmed;
     if (updates.priceOverride !== undefined) updateData.price_override = updates.priceOverride;
-    if (updates.overrideAmount !== undefined) updateData.original_total_amount = updates.overrideAmount;
+    if (updates.originalTotalAmount !== undefined) updateData.original_total_amount = updates.originalTotalAmount;
     if (updates.overrideReason !== undefined) updateData.override_reason = updates.overrideReason;
     if (updates.followUpDate !== undefined) updateData.follow_up_date = updates.followUpDate;
     if (updates.salesRepNotes !== undefined) updateData.sales_rep_notes = updates.salesRepNotes;
