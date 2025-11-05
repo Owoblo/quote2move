@@ -51,16 +51,31 @@ export default function SearchPanel({
       
       try {
         // Search both current and sold listings
+        // Extract search terms from address - use first few words for better matching
+        const addressParts = address.split(',').map(s => s.trim());
+        const searchTerm = addressParts[0] || address; // Use first part (street address) or full address
+        const cityTerm = addressParts[1] || ''; // City if available
+        const stateTerm = addressParts[2] || ''; // State if available
+        
+        // Build query with cleaner search terms
+        let query = `address.ilike.%${searchTerm}%`;
+        if (cityTerm) {
+          query += `,addresscity.ilike.%${cityTerm}%`;
+        }
+        if (stateTerm) {
+          query += `,addressstate.ilike.%${stateTerm}%`;
+        }
+        
         const [currentListings, soldListings] = await Promise.all([
           supabase
             .from('just_listed')
             .select('*')
-            .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
+            .or(query)
             .limit(3), // Limited to 3 for demo
           supabase
             .from('sold_listings')
             .select('*')
-            .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
+            .or(query)
             .limit(3) // Limited to 3 for demo
         ]);
 
