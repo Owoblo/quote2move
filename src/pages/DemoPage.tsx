@@ -199,7 +199,7 @@ export default function DemoPage() {
       </section>
 
       {/* Activation CTA Section */}
-      {(!isActiveRegion || isActiveRegion === false) && (
+      {(isActiveRegion === false || isActiveRegion === null) && (
         <section className="py-16 px-6 bg-gradient-to-br from-accent/5 to-highlight/5 dark:from-gray-800 dark:to-gray-900">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-4">
