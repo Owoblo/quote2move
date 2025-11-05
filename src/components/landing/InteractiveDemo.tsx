@@ -249,16 +249,30 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
       setIsDefaultAddress(false);
 
       try {
+        // Extract search terms from address for better query
+        const addressParts = address.split(',').map(s => s.trim());
+        const searchTerm = addressParts[0] || address;
+        const cityTerm = addressParts[1] || '';
+        const stateTerm = addressParts[2] || '';
+        
+        let query = `address.ilike.%${searchTerm}%`;
+        if (cityTerm) {
+          query += `,addresscity.ilike.%${cityTerm}%`;
+        }
+        if (stateTerm) {
+          query += `,addressstate.ilike.%${stateTerm}%`;
+        }
+        
         const [currentListings, soldListings] = await Promise.all([
           supabase
             .from('just_listed')
             .select('*')
-            .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
+            .or(query)
             .limit(3), // Limited to 3 for demo
           supabase
             .from('sold_listings')
             .select('*')
-            .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
+            .or(query)
             .limit(3) // Limited to 3 for demo
         ]);
 
@@ -311,30 +325,32 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         photoUrls = parseZillowPhotos(selectedListing.carousel_photos_composable);
       } else {
         // Try to fetch from database
-        const addressParts = selectedListing.address.split(' ');
-        const houseNumber = addressParts[0];
-        const streetName = addressParts.slice(1, 3).join(' ');
+        const addressParts = selectedListing.address.split(',').map(s => s.trim());
+        const streetAddress = addressParts[0] || selectedListing.address;
+        const city = addressParts[1] || selectedListing.addresscity || '';
+        const state = addressParts[2] || selectedListing.addressstate || '';
+        
+        // Build cleaner search query
+        let searchQuery = `address.ilike.%${streetAddress}%`;
+        if (city) {
+          searchQuery += `,addresscity.ilike.%${city}%`;
+        }
+        if (state) {
+          searchQuery += `,addressstate.ilike.%${state}%`;
+        }
 
-        const searchTerms = [
-          `${houseNumber} ${streetName}`,
-          selectedListing.address.split(',')[0],
-          houseNumber,
-          streetName
-        ];
-
-        for (const term of searchTerms) {
-          const [currentResult, soldResult] = await Promise.all([
-            supabase
-              .from('just_listed')
-              .select('id, address, addresscity, addressstate, carousel_photos_composable')
-              .ilike('address', `%${term}%`)
-              .limit(3), // Limit to 3 for demo
-            supabase
-              .from('sold_listings')
-              .select('id, address, addresscity, addressstate, carousel_photos_composable')
-              .ilike('address', `%${term}%`)
-              .limit(3) // Limit to 3 for demo
-          ]);
+        const [currentResult, soldResult] = await Promise.all([
+          supabase
+            .from('just_listed')
+            .select('id, address, addresscity, addressstate, carousel_photos_composable')
+            .or(searchQuery)
+            .limit(3), // Limit to 3 for demo
+          supabase
+            .from('sold_listings')
+            .select('id, address, addresscity, addressstate, carousel_photos_composable')
+            .or(searchQuery)
+            .limit(3) // Limit to 3 for demo
+        ]);
 
           const allListings = [
             ...(currentResult.data || []),
@@ -349,7 +365,6 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
             photoUrls = parseZillowPhotos(listingWithCarousel.carousel_photos_composable);
             break;
           }
-        }
       }
 
       if (photoUrls.length > 0) {

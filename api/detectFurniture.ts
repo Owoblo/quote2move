@@ -10,14 +10,20 @@ export default async function handler(
   }
 
   // Get API key from server environment (never exposed to browser)
-  const apiKey = process.env.OPENAI_API_KEY;
+  // Try multiple possible env variable names
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VERCEL_OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY;
   
   if (!apiKey) {
-    console.error('❌ OPENAI_API_KEY not found in server environment');
+    console.error('❌ OpenAI API key not found in server environment');
+    console.error('Checked: OPENAI_API_KEY, VERCEL_OPENAI_API_KEY, REACT_APP_OPENAI_API_KEY');
+    console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('OPENAI') || k.includes('API')));
     return res.status(500).json({ 
-      error: 'Server configuration error: OpenAI API key not configured' 
+      error: 'Server configuration error: OpenAI API key not configured. Please set OPENAI_API_KEY in Vercel environment variables.',
+      hint: 'Go to Vercel Dashboard → Settings → Environment Variables → Add OPENAI_API_KEY'
     });
   }
+  
+  console.log('✅ OpenAI API key found (length:', apiKey.length, ', starts with:', apiKey.substring(0, 7) + '...)');
 
   const { photoUrls } = req.body;
 

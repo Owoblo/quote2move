@@ -228,7 +228,7 @@ export default function DemoPage() {
 
           {/* Demo Results - Show when listing is selected */}
           {selectedListing && (
-            <div className="max-w-6xl mx-auto mt-8">
+            <div className="max-w-4xl mx-auto mt-8">
               <InteractiveDemo 
                 initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`}
                 hideSearch={true}
