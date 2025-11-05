@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ResendService } from '../lib/resendService';
+import { EmailBackendService } from '../lib/emailBackendService';
 import { QuoteService } from '../lib/quoteService';
 
 interface QuotePreviewData {
@@ -101,11 +101,10 @@ export default function QuotePreviewPage() {
       const quoteUrl = `${window.location.origin}/quote/${savedQuote.id}`;
       setSavedQuoteUrl(quoteUrl);
 
-      // Try to send email (non-blocking - won't fail if email doesn't send)
-      // Note: Resend API requires a backend endpoint due to CORS restrictions
-      // For now, we'll attempt to send but won't fail if it doesn't work
+      // Send email via backend API
       try {
-        await ResendService.sendQuote({
+        await EmailBackendService.sendQuote({
+          quoteId: savedQuote.id,
           customerName: quoteData.customerName,
           customerEmail: quoteData.customerEmail,
           customerPhone: quoteData.customerPhone,
@@ -113,14 +112,14 @@ export default function QuotePreviewPage() {
           originAddress: quoteData.originAddress,
           destinationAddress: quoteData.destinationAddress,
           totalAmount: quoteData.totalAmount,
-          quoteId: savedQuote.id,
           quoteUrl
         });
-        console.log('Email sent successfully');
+        console.log('Email sent successfully via backend');
       } catch (emailError: any) {
-        // Email sending failed, but quote was saved successfully
-        console.warn('Email sending failed (this is expected if using Resend from frontend due to CORS):', emailError);
-        // Don't throw - quote is already saved, email can be sent manually or via backend
+        // Email sending failed - show warning but don't fail the whole process
+        console.warn('Email sending failed:', emailError);
+        // Still show success since quote was saved
+        alert(`Quote saved successfully, but email sending failed: ${emailError.message}\n\nYou can share the quote URL manually: ${quoteUrl}`);
       }
 
       setEmailSent(true);
@@ -162,18 +161,15 @@ export default function QuotePreviewPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Quote Saved Successfully!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Quote Sent Successfully!</h1>
           <p className="text-gray-600 mb-4">
-            Your quote has been saved and is ready to share.
+            Your quote has been sent to <strong>{quoteData.customerEmail}</strong>
           </p>
           {savedQuoteUrl && (
             <p className="text-sm text-gray-500 mb-6">
               Quote URL: <a href={savedQuoteUrl} className="text-blue-600 hover:underline break-all" target="_blank" rel="noopener noreferrer">{savedQuoteUrl}</a>
             </p>
           )}
-          <p className="text-xs text-gray-400 mb-6 bg-yellow-50 p-3 rounded">
-            Note: Email sending requires a backend endpoint due to CORS restrictions. You can share the quote URL directly or set up a backend email service.
-          </p>
           <div className="space-y-3">
             <button
               onClick={() => navigate('/dashboard')}

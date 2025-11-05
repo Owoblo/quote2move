@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
+import { supabase } from '../lib/supabase';
 
 interface QuoteSettings {
   customLogoUrl: string;
@@ -26,9 +27,16 @@ export default function SettingsPage() {
     includeMLSPhotos: true
   });
   const [saved, setSaved] = useState(false);
+  const [emailSettings, setEmailSettings] = useState({
+    fromEmail: '',
+    fromName: '',
+    replyTo: ''
+  });
+  const [loadingEmailSettings, setLoadingEmailSettings] = useState(true);
+  const [savingEmailSettings, setSavingEmailSettings] = useState(false);
 
   useEffect(() => {
-    // Load saved settings
+    // Load saved quote settings
     const saved = localStorage.getItem(SETTINGS_KEY);
     if (saved) {
       try {
@@ -37,7 +45,70 @@ export default function SettingsPage() {
         console.error('Error loading settings:', error);
       }
     }
+
+    // Load email settings from database
+    loadEmailSettings();
   }, []);
+
+  const loadEmailSettings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_email_settings')
+        .select('from_email, from_name, reply_to')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+        console.error('Error loading email settings:', error);
+      } else if (data) {
+        setEmailSettings({
+          fromEmail: data.from_email || '',
+          fromName: data.from_name || '',
+          replyTo: data.reply_to || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading email settings:', error);
+    } finally {
+      setLoadingEmailSettings(false);
+    }
+  };
+
+  const handleSaveEmailSettings = async () => {
+    setSavingEmailSettings(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to save email settings');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_email_settings')
+        .upsert({
+          user_id: user.id,
+          from_email: emailSettings.fromEmail || 'MovSense <onboarding@resend.dev>',
+          from_name: emailSettings.fromName || 'MovSense',
+          reply_to: emailSettings.replyTo || 'support@movsense.com',
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error: any) {
+      console.error('Error saving email settings:', error);
+      alert(`Failed to save email settings: ${error.message}`);
+    } finally {
+      setSavingEmailSettings(false);
+    }
+  };
 
   const handleSave = () => {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -201,9 +272,99 @@ export default function SettingsPage() {
               When enabled, property photos from MLS listings will be included in the quote PDF.
             </p>
           </div>
+        </div>
 
-          {/* Save Button */}
-          <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+        {/* Email Settings Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Email Settings</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Configure how your quote emails appear to customers. These settings apply to all emails sent from your account.
+          </p>
+
+          {loadingEmailSettings ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <>
+              {/* From Email */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  From Email Address
+                </label>
+                <input
+                  type="email"
+                  value={emailSettings.fromEmail}
+                  onChange={(e) => setEmailSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
+                  placeholder="Your Company <noreply@yourcompany.com>"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Format: "Company Name &lt;email@domain.com&gt;" or just "email@domain.com"
+                </p>
+              </div>
+
+              {/* From Name */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  From Name (Display Name)
+                </label>
+                <input
+                  type="text"
+                  value={emailSettings.fromName}
+                  onChange={(e) => setEmailSettings(prev => ({ ...prev, fromName: e.target.value }))}
+                  placeholder="Your Company Name"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  The name that appears in the "From" field of your emails.
+                </p>
+              </div>
+
+              {/* Reply To */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Reply-To Email
+                </label>
+                <input
+                  type="email"
+                  value={emailSettings.replyTo}
+                  onChange={(e) => setEmailSettings(prev => ({ ...prev, replyTo: e.target.value }))}
+                  placeholder="support@yourcompany.com"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Where customer replies will be sent.
+                </p>
+              </div>
+
+              {/* Save Email Settings Button */}
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div>
+                  {saved && (
+                    <p className="text-sm text-green-600 dark:text-green-400 flex items-center space-x-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Email settings saved!</span>
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={handleSaveEmailSettings}
+                  disabled={savingEmailSettings}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-xl transition-colors duration-200 disabled:cursor-not-allowed"
+                >
+                  {savingEmailSettings ? 'Saving...' : 'Save Email Settings'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Quote Customization Save Button */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
+          <div className="flex items-center justify-between pt-6">
             <div>
               {saved && (
                 <p className="text-sm text-green-600 dark:text-green-400 flex items-center space-x-2">
@@ -218,7 +379,7 @@ export default function SettingsPage() {
               onClick={handleSave}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-200"
             >
-              Save Settings
+              Save Quote Customization
             </button>
           </div>
         </div>
