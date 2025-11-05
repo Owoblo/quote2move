@@ -104,10 +104,40 @@ export default function DemoPage() {
     return () => clearTimeout(timeoutId);
   }, [address]);
 
+  // Enable demo for active regions even if address not in database
+  useEffect(() => {
+    if (isActiveRegion === true && address.length > 10 && !selectedListing) {
+      // Check if address contains an active region
+      const addressLower = address.toLowerCase();
+      const cityMatch = ACTIVE_REGIONS.find(region => 
+        addressLower.includes(region.toLowerCase())
+      );
+      
+      if (cityMatch) {
+        // Create a mock listing to allow demo to proceed
+        const mockListing: Listing = {
+          id: 'manual-entry',
+          address: address.split(',')[0]?.trim() || address,
+          addresscity: cityMatch,
+          addressstate: address.includes('ON') ? 'ON' : 'ON',
+        };
+        setSelectedListing(mockListing);
+        setShowDemo(true);
+      }
+    } else if (!isActiveRegion || address.length <= 10) {
+      if (selectedListing?.id === 'manual-entry') {
+        setSelectedListing(null);
+        setShowDemo(false);
+      }
+    }
+  }, [isActiveRegion, address, selectedListing]);
+
   const handleAddressChange = (newAddress: string) => {
     setAddress(newAddress);
-    setSelectedListing(null);
-    setShowDemo(false);
+    if (!suggestions.find(s => `${s.address}, ${s.addresscity}, ${s.addressstate}` === newAddress)) {
+      setSelectedListing(null);
+      setShowDemo(false);
+    }
   };
 
   const handleSuggestionClick = (listing: Listing) => {
@@ -323,10 +353,10 @@ export default function DemoPage() {
           </div>
 
           {/* Demo Results */}
-          {showDemo && isActiveRegion && selectedListing && (
+          {showDemo && isActiveRegion && (selectedListing || address.length > 10) && (
             <div className="max-w-6xl mx-auto mt-8">
               <InteractiveDemo 
-                initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`}
+                initialAddress={selectedListing ? `${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}` : address}
                 hideSearch={true}
               />
             </div>
