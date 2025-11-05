@@ -26,8 +26,12 @@ interface CachedData {
   address: string;
 }
 
-export default function InteractiveDemo() {
-  const [address, setAddress] = useState(DEFAULT_ADDRESS);
+interface InteractiveDemoProps {
+  initialAddress?: string;
+}
+
+export default function InteractiveDemo({ initialAddress }: InteractiveDemoProps = {}) {
+  const [address, setAddress] = useState(initialAddress || DEFAULT_ADDRESS);
   const [suggestions, setSuggestions] = useState<Listing[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);

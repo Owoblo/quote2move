@@ -8,6 +8,8 @@ import DashboardPage from './pages/DashboardPage';
 import EstimatePage from './pages/EstimatePage';
 import QuoteViewerPage from './pages/QuoteViewerPage';
 import QuotePreviewPage from './pages/QuotePreviewPage';
+import DemoPage from './pages/DemoPage';
+import DemoThankYouPage from './pages/DemoThankYouPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/demo" element={<DemoPage />} />
+          <Route path="/demo/thank-you" element={<DemoThankYouPage />} />
           <Route 
             path="/dashboard" 
             element={
