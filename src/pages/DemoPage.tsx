@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/landing/Navigation';
 import Footer from '../components/landing/Footer';
 import InteractiveDemo from '../components/landing/InteractiveDemo';
 import { loadStripe } from '@stripe/stripe-js';
 import MovSenseLogo from '../components/MovSenseLogo';
+import { supabase } from '../lib/supabase';
 
 // Active regions that have full demo functionality
 const ACTIVE_REGIONS = [
@@ -17,41 +18,128 @@ const ACTIVE_REGIONS = [
   'Amherstburg',
 ];
 
+interface Listing {
+  id: string;
+  address: string;
+  addresscity: string;
+  addressstate: string;
+  carousel_photos_composable?: string;
+  [key: string]: any;
+}
+
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '');
 
 export default function DemoPage() {
   const [address, setAddress] = useState('');
+  const [suggestions, setSuggestions] = useState<Listing[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [isActiveRegion, setIsActiveRegion] = useState<boolean | null>(null);
   const [showDemo, setShowDemo] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [leadEmail, setLeadEmail] = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  // Check if address is in active region
-  const checkRegion = (addressInput: string) => {
-    if (!addressInput || addressInput.length < 3) {
-      setIsActiveRegion(null);
-      setShowDemo(false);
-      return;
-    }
+  // Search database for listings as user types
+  useEffect(() => {
+    const searchListings = async () => {
+      if (address.length < 2) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setIsActiveRegion(null);
+        setShowDemo(false);
+        return;
+      }
 
-    const addressLower = addressInput.toLowerCase();
+      setIsSearching(true);
+
+      try {
+        // Search both current and sold listings
+        const [currentListings, soldListings] = await Promise.all([
+          supabase
+            .from('just_listed')
+            .select('*')
+            .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
+            .limit(10),
+          supabase
+            .from('sold_listings')
+            .select('*')
+            .or(`address.ilike.%${address}%, addresscity.ilike.%${address}%, addressstate.ilike.%${address}%`)
+            .limit(10)
+        ]);
+
+        const allSuggestions = [
+          ...(currentListings.data || []),
+          ...(soldListings.data || [])
+        ];
+
+        setSuggestions(allSuggestions);
+        setShowSuggestions(true);
+
+        // Check if any suggestion is in an active region
+        const addressLower = address.toLowerCase();
+        const isActive = ACTIVE_REGIONS.some(region => 
+          addressLower.includes(region.toLowerCase())
+        ) || allSuggestions.some(listing => {
+          const listingAddress = `${listing.addresscity} ${listing.addressstate}`.toLowerCase();
+          return ACTIVE_REGIONS.some(region => listingAddress.includes(region.toLowerCase()));
+        });
+
+        setIsActiveRegion(isActive);
+        if (!isActive) {
+          setShowDemo(false);
+        }
+      } catch (error) {
+        console.error('Error searching listings:', error);
+        setSuggestions([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timeoutId = setTimeout(searchListings, 300);
+    return () => clearTimeout(timeoutId);
+  }, [address]);
+
+  const handleAddressChange = (newAddress: string) => {
+    setAddress(newAddress);
+    setSelectedListing(null);
+    setShowDemo(false);
+  };
+
+  const handleSuggestionClick = (listing: Listing) => {
+    const fullAddress = `${listing.address}, ${listing.addresscity}, ${listing.addressstate}`;
+    setAddress(fullAddress);
+    setSelectedListing(listing);
+    setShowSuggestions(false);
+
+    // Check if this listing is in an active region
+    const listingLocation = `${listing.addresscity} ${listing.addressstate}`.toLowerCase();
     const isActive = ACTIVE_REGIONS.some(region => 
-      addressLower.includes(region.toLowerCase())
+      listingLocation.includes(region.toLowerCase())
     );
 
     setIsActiveRegion(isActive);
     
     if (isActive) {
       setShowDemo(true);
+    } else {
+      setShowDemo(false);
     }
   };
 
-  const handleAddressChange = (newAddress: string) => {
-    setAddress(newAddress);
-    checkRegion(newAddress);
+  const handleInputFocus = () => {
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleInputBlur = () => {
+    // Delay hiding suggestions to allow clicks
+    setTimeout(() => setShowSuggestions(false), 200);
   };
 
   const handleActivateAccount = async () => {
