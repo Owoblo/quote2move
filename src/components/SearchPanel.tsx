@@ -194,7 +194,11 @@ export default function SearchPanel({
             {suggestions.map((listing, index) => (
               <div
                 key={`${listing.id}-${index}`}
-                onClick={() => handleSuggestionClick(listing)}
+                onMouseDown={(e) => {
+                  // Prevent blur from firing before click
+                  e.preventDefault();
+                  handleSuggestionClick(listing);
+                }}
                 className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors duration-150"
               >
                 <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
