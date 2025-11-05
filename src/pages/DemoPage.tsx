@@ -262,20 +262,16 @@ export default function DemoPage() {
             See MoveSense in action (2-min video)
           </p>
           
-          {/* Video Embed - Replace with actual Loom/YouTube embed */}
+          {/* Video Embed */}
           <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden shadow-xl">
             <iframe
               className="w-full h-full"
-              src="https://www.loom.com/embed/your-video-id-here"
+              src="https://www.loom.com/embed/1547a2753f084ffdba028531c1db49b2"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               title="MoveSense Demo Video"
             ></iframe>
-            {/* Fallback if no video ID */}
-            <div className="w-full h-full flex items-center justify-center">
-              <p className="text-gray-500">Video embed - Add your Loom or YouTube video ID</p>
-            </div>
           </div>
 
           <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
