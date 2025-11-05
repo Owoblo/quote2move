@@ -325,7 +325,10 @@ export default function DemoPage() {
           {/* Demo Results */}
           {showDemo && isActiveRegion && selectedListing && (
             <div className="max-w-6xl mx-auto mt-8">
-              <InteractiveDemo initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`} />
+              <InteractiveDemo 
+                initialAddress={`${selectedListing.address}, ${selectedListing.addresscity}, ${selectedListing.addressstate}`}
+                hideSearch={true}
+              />
             </div>
           )}
         </div>
