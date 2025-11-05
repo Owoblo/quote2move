@@ -123,10 +123,15 @@ export default async function handler(
       .single();
 
     // Generate user-specific email addresses
-    // Format: user-{userId-prefix}@movsense.com or user-{userId-prefix}@verified-domain.com
+    // Format: quotes-{userId-prefix}@verified-domain.com
     // This allows each user to have their own email without DNS setup
     const userIdPrefix = user.id.substring(0, 8); // Use first 8 chars of UUID for uniqueness
-    const verifiedDomain = 'movsense.com'; // Change this to your verified domain
+    
+    // Use verified domain from environment or default to movsense.com
+    // For testing: Use domain verified with johnowolabi80@gmail.com
+    // For production: Use movsense.com (once verified)
+    const verifiedDomain = process.env.VERIFIED_EMAIL_DOMAIN || 'movsense.com';
+    
     const defaultFromEmail = `quotes-${userIdPrefix}@${verifiedDomain}`;
     const defaultReplyTo = `replies-${userIdPrefix}@${verifiedDomain}`;
 
