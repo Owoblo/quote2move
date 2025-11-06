@@ -96,21 +96,24 @@ export default function QuoteViewerPage() {
       }
 
       // Check if quote belongs to the authenticated user
+      // Use maybeSingle() to avoid errors if quote doesn't exist or RLS blocks access
       const { data: quoteData, error: quoteError } = await supabase
         .from('quotes')
         .select('user_id')
         .eq('id', quote.id)
-        .single();
+        .maybeSingle();
 
+      // If there's an error, quote doesn't exist, or user doesn't have access, canEdit stays false
       if (quoteError || !quoteData) {
         setCanEdit(false);
         return;
       }
 
-      // Only allow edit if user owns the quote
-      if (quoteData.user_id === user.id) {
+      // Only allow edit if user owns the quote - explicit check
+      if (quoteData.user_id && quoteData.user_id === user.id) {
         setCanEdit(true);
       } else {
+        // Explicitly set to false if user doesn't own it
         setCanEdit(false);
       }
     } catch (error) {
