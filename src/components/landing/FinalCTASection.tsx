@@ -10,8 +10,8 @@ export default function FinalCTASection() {
   };
 
   return (
-    <section className="py-24 bg-background dark:bg-primary">
-      <div className="max-w-4xl mx-auto px-6 text-center">
+    <section className="py-24 bg-[#F3F4F6]">
+      <div className="container-max mx-auto px-6 text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
           See MovSense in action.
         </h2>

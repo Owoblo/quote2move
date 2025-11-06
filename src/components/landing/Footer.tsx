@@ -5,8 +5,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-background dark:bg-primary border-t border-gray-200 dark:border-gray-700 py-16">
-      <div className="max-w-7xl mx-auto px-6">
+    <footer className="bg-[#F3F4F6] border-t border-gray-200 dark:border-gray-700 py-16">
+      <div className="container-max mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Left: Logo and description */}
           <div>

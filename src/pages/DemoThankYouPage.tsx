@@ -37,7 +37,7 @@ export default function DemoThankYouPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-primary transition-colors duration-200">
+    <div className="min-h-screen bg-[#F3F4F6] transition-colors duration-200">
       <Navigation />
 
       <div className="max-w-3xl mx-auto px-6 py-20">

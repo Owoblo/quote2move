@@ -17,15 +17,15 @@ export default function ResultsSection() {
   ];
 
   return (
-    <section className="py-24 bg-background dark:bg-primary">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-24 bg-[#F3F4F6]">
+      <div className="container-max mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             Quote faster, close more, waste less time.
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 container-max mx-auto">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
               <div className="text-5xl font-bold text-accent dark:text-accent-light mb-2">

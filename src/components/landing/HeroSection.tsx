@@ -4,8 +4,8 @@ import InteractiveDemo from './InteractiveDemo';
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden pt-20 pb-32 px-6 bg-background dark:bg-primary">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative overflow-hidden pt-20 pb-32 px-6 bg-[#F3F4F6]">
+      <div className="container-max">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left side */}
           <div>
