@@ -496,8 +496,9 @@ export default function QuoteViewerPage() {
               </div>
             </div>
 
-            {/* Sales Rep Section - Only visible to authenticated users who own the quote */}
-            {canEdit && (
+            {/* Sales Rep Section - ONLY visible to authenticated users who own the quote */}
+            {/* This section is HIDDEN from customers - they should never see this */}
+            {canEdit === true && (
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl shadow-sm p-6 mb-6">
                 <h2 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -637,8 +638,9 @@ export default function QuoteViewerPage() {
               </div>
             )}
 
-            {/* Actions - Customer View (only show for non-authenticated users) */}
-            {!canEdit && (
+            {/* Actions - Customer View (ONLY for customers - hidden from sales reps) */}
+            {/* This section is shown when canEdit is false (not authenticated or doesn't own quote) */}
+            {canEdit !== true && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quote Actions</h2>
               
@@ -653,14 +655,14 @@ export default function QuoteViewerPage() {
                   </button>
                   
                   <button
-                      onClick={() => {
-                        setDeclineActionBy('customer');
-                        setShowDeclineModal(true);
-                      }}
+                    onClick={() => {
+                      setDeclineActionBy('customer');
+                      setShowDeclineModal(true);
+                    }}
                     disabled={actionLoading}
                     className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
                   >
-                      Decline Quote
+                    Decline Quote
                   </button>
                   
                   <button
