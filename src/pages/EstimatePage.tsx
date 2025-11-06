@@ -583,9 +583,9 @@ export default function EstimatePage() {
   const estimatedTrucks = needsMultipleTrucks ? Math.ceil(totalCubicFeet / TRUCK_CAPACITY) : 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-[#FAFBFC] dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 transition-all duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -614,7 +614,7 @@ export default function EstimatePage() {
           {/* Left Column: Form */}
           <div className="lg:col-span-2 space-y-6">
             {/* Customer Information */}
-            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-6 lg:p-8 hover:shadow-xl transition-all duration-300">
+            <div className="card card-hover p-6">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -635,7 +635,7 @@ export default function EstimatePage() {
                     type="text"
                     value={customerInfo.name}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                    className="input"
                     placeholder="John Doe"
                     required
                   />
@@ -648,7 +648,7 @@ export default function EstimatePage() {
                     type="email"
                     value={customerInfo.email}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                    className="input"
                     placeholder="john@example.com"
                     required
                   />
@@ -661,7 +661,7 @@ export default function EstimatePage() {
                     type="tel"
                     value={customerInfo.phone}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                    className="input"
                     placeholder="(555) 123-4567"
                     required
                   />
@@ -806,7 +806,7 @@ export default function EstimatePage() {
                     type="text"
                     value={originAddress}
                     onChange={(e) => setOriginAddress(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                    className="input"
                     placeholder="123 Main St, City, State"
                   />
                 </div>
@@ -835,7 +835,7 @@ export default function EstimatePage() {
                       min="1"
                       value={floorOrigin || ''}
                       onChange={(e) => setFloorOrigin(e.target.value ? parseInt(e.target.value) : undefined)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                      className="input"
                       placeholder="e.g. 3"
                     />
                   </div>
@@ -885,7 +885,7 @@ export default function EstimatePage() {
                       type="text"
                       value={destinationAddress}
                       onChange={(e) => setDestinationAddress(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                      className="input"
                       placeholder="456 Oak Ave, City, State"
                       required
                     />
@@ -915,7 +915,7 @@ export default function EstimatePage() {
                         min="1"
                         value={floorDestination || ''}
                         onChange={(e) => setFloorDestination(e.target.value ? parseInt(e.target.value) : undefined)}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                        className="input"
                         placeholder="e.g. 5"
                       />
                     </div>
@@ -1054,7 +1054,7 @@ export default function EstimatePage() {
             </div>
 
             {/* Additional Services / Upsells */}
-            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-6 lg:p-8 hover:shadow-xl transition-all duration-300">
+            <div className="card card-hover p-6">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
