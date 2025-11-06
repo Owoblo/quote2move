@@ -52,8 +52,28 @@ export default function SettingsPage() {
   const [loadingCompanySettings, setLoadingCompanySettings] = useState(true);
   const [savingCompanySettings, setSavingCompanySettings] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  
+  // Custom Upsells state
+  const [customUpsells, setCustomUpsells] = useState<any[]>([]);
+  const [loadingUpsells, setLoadingUpsells] = useState(true);
+  const [showUpsellModal, setShowUpsellModal] = useState(false);
+  const [editingUpsell, setEditingUpsell] = useState<any>(null);
+  const [upsellForm, setUpsellForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: 'other',
+    recommended_by_default: false,
+    auto_select: false
+  });
 
   useEffect(() => {
+    // Check URL for tab parameter
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab && ['quote', 'email', 'company', 'upsells'].includes(tab)) {
+      setActiveTab(tab as any);
+    }
     // Load saved quote settings
     const saved = localStorage.getItem(SETTINGS_KEY);
     if (saved) {
@@ -67,7 +87,8 @@ export default function SettingsPage() {
     // Load email settings from database
     loadEmailSettings();
     loadCompanySettings();
-  }, []);
+    loadCustomUpsells();
+  }, [location.search]);
 
   const loadEmailSettings = async () => {
     try {
@@ -245,6 +266,113 @@ export default function SettingsPage() {
     }
   };
 
+  const loadCustomUpsells = async () => {
+    setLoadingUpsells(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('custom_upsells')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      setCustomUpsells(data || []);
+    } catch (error) {
+      console.error('Error loading custom upsells:', error);
+    } finally {
+      setLoadingUpsells(false);
+    }
+  };
+
+  const handleSaveUpsell = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to save upsells');
+        return;
+      }
+
+      if (!upsellForm.name || !upsellForm.price) {
+        alert('Please fill in name and price');
+        return;
+      }
+
+      const upsellData = {
+        user_id: user.id,
+        name: upsellForm.name,
+        description: upsellForm.description || null,
+        price: parseFloat(upsellForm.price),
+        category: upsellForm.category || 'other',
+        recommended_by_default: upsellForm.recommended_by_default,
+        auto_select: upsellForm.auto_select,
+        is_active: true,
+        display_order: customUpsells.length,
+        updated_at: new Date().toISOString()
+      };
+
+      if (editingUpsell) {
+        const { error } = await supabase
+          .from('custom_upsells')
+          .update(upsellData)
+          .eq('id', editingUpsell.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('custom_upsells')
+          .insert(upsellData);
+        if (error) throw error;
+      }
+
+      await loadCustomUpsells();
+      setShowUpsellModal(false);
+      setEditingUpsell(null);
+      setUpsellForm({
+        name: '',
+        description: '',
+        price: '',
+        category: 'other',
+        recommended_by_default: false,
+        auto_select: false
+      });
+    } catch (error: any) {
+      console.error('Error saving upsell:', error);
+      alert(`Failed to save upsell: ${error.message}`);
+    }
+  };
+
+  const handleDeleteUpsell = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this upsell?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('custom_upsells')
+        .update({ is_active: false })
+        .eq('id', id);
+      if (error) throw error;
+      await loadCustomUpsells();
+    } catch (error: any) {
+      console.error('Error deleting upsell:', error);
+      alert(`Failed to delete upsell: ${error.message}`);
+    }
+  };
+
+  const handleEditUpsell = (upsell: any) => {
+    setEditingUpsell(upsell);
+    setUpsellForm({
+      name: upsell.name,
+      description: upsell.description || '',
+      price: upsell.price.toString(),
+      category: upsell.category || 'other',
+      recommended_by_default: upsell.recommended_by_default || false,
+      auto_select: upsell.auto_select || false
+    });
+    setShowUpsellModal(true);
+  };
+
   const handleSaveEmailSettings = async () => {
     setSavingEmailSettings(true);
     try {
@@ -324,8 +452,35 @@ export default function SettingsPage() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Quote Customization</h2>
+        {/* Tab Navigation */}
+        <div className="mb-8 border-b border-gray-200 dark:border-gray-700">
+          <nav className="flex space-x-8">
+            {(['quote', 'email', 'company', 'upsells'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActiveTab(tab);
+                  navigate(`/settings?tab=${tab}`);
+                }}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === tab
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {tab === 'quote' && 'Quote Customization'}
+                {tab === 'email' && 'Email Settings'}
+                {tab === 'company' && 'Company Information'}
+                {tab === 'upsells' && 'Custom Upsells'}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'quote' && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Quote Customization</h2>
 
           {/* Logo URL */}
           <div className="mb-8">
@@ -440,10 +595,11 @@ export default function SettingsPage() {
               When enabled, property photos from MLS listings will be included in the quote PDF.
             </p>
           </div>
-        </div>
+          </div>
+        )}
 
-        {/* Email Settings Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
+        {activeTab === 'email' && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Email Settings</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             Configure how your quote emails appear to customers. These settings apply to all emails sent from your account.
@@ -548,10 +704,11 @@ export default function SettingsPage() {
               </div>
             </>
           )}
-        </div>
+          </div>
+        )}
 
-        {/* Company Settings Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
+        {activeTab === 'company' && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Company Information</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             Configure your company details. This will appear in quotes, emails, and customer communications.
