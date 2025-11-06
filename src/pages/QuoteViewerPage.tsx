@@ -18,6 +18,7 @@ export default function QuoteViewerPage() {
   const [customDeclineReason, setCustomDeclineReason] = useState('');
   const [isSalesRep, setIsSalesRep] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
+  const [permissionChecked, setPermissionChecked] = useState(false); // Track if we've checked permissions
   const [declineActionBy, setDeclineActionBy] = useState<'customer' | 'sales_rep'>('customer');
   const [isEditing, setIsEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
@@ -81,8 +82,10 @@ export default function QuoteViewerPage() {
   const checkEditPermission = async () => {
     // Always start with false - only set to true if user is authenticated AND owns the quote
     setCanEdit(false);
+    setPermissionChecked(false);
     
     if (!quote || !quote.id) {
+      setPermissionChecked(true);
       return;
     }
 
@@ -92,6 +95,7 @@ export default function QuoteViewerPage() {
       // If user is not authenticated, canEdit stays false
       if (authError || !user) {
         setCanEdit(false);
+        setPermissionChecked(true);
         return;
       }
 
@@ -106,6 +110,7 @@ export default function QuoteViewerPage() {
       // If there's an error, quote doesn't exist, or user doesn't have access, canEdit stays false
       if (quoteError || !quoteData) {
         setCanEdit(false);
+        setPermissionChecked(true);
         return;
       }
 
@@ -116,9 +121,11 @@ export default function QuoteViewerPage() {
         // Explicitly set to false if user doesn't own it
         setCanEdit(false);
       }
+      setPermissionChecked(true);
     } catch (error) {
       console.error('Error checking edit permission:', error);
       setCanEdit(false);
+      setPermissionChecked(true);
     }
   };
 
@@ -254,7 +261,8 @@ export default function QuoteViewerPage() {
     }
   };
 
-  if (loading) {
+  // Wait for both quote loading AND permission check before rendering
+  if (loading || !permissionChecked) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
