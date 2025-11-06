@@ -264,6 +264,47 @@ export default function EstimatePage() {
     return initialUpsells;
   });
 
+  // Load and merge custom upsells
+  useEffect(() => {
+    const loadCustomUpsells = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: customUpsells, error } = await supabase
+          .from('custom_upsells')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+
+        if (error) {
+          console.error('Error loading custom upsells:', error);
+          return;
+        }
+
+        if (customUpsells && customUpsells.length > 0) {
+          // Convert custom upsells to Upsell format and merge with defaults
+          const customUpsellsFormatted: Upsell[] = customUpsells.map((cu: any) => ({
+            id: `custom-${cu.id}`,
+            name: cu.name,
+            description: cu.description || '',
+            price: parseFloat(cu.price),
+            recommended: cu.recommended_by_default,
+            selected: cu.auto_select || false
+          }));
+
+          // Merge: add custom upsells to the existing list
+          setUpsells(prev => [...prev, ...customUpsellsFormatted]);
+        }
+      } catch (error) {
+        console.error('Error loading custom upsells:', error);
+      }
+    };
+
+    loadCustomUpsells();
+  }, []);
+
   const [travelDistance, setTravelDistance] = useState(0);
   const [travelTime, setTravelTime] = useState(0);
   const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
