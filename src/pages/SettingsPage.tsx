@@ -901,9 +901,224 @@ export default function SettingsPage() {
               </div>
             </>
           )}
-        </div>
+          </div>
+        )}
 
-        {/* Quote Customization Save Button */}
+        {activeTab === 'upsells' && (
+          <>
+            {/* Custom Upsells Section */}
+            <div className="card card-hover p-6 mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Custom Upsells</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Create and manage your own upsell service templates that will appear in quotes
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setEditingUpsell(null);
+                    setUpsellForm({
+                      name: '',
+                      description: '',
+                      price: '',
+                      category: 'other',
+                      recommended_by_default: false,
+                      auto_select: false
+                    });
+                    setShowUpsellModal(true);
+                  }}
+                  className="btn btn-primary"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Add Upsell
+                </button>
+              </div>
+
+              {loadingUpsells ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : customUpsells.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">No custom upsells yet</p>
+                  <button
+                    onClick={() => {
+                      setEditingUpsell(null);
+                      setUpsellForm({
+                        name: '',
+                        description: '',
+                        price: '',
+                        category: 'other',
+                        recommended_by_default: false,
+                        auto_select: false
+                      });
+                      setShowUpsellModal(true);
+                    }}
+                    className="btn btn-primary"
+                  >
+                    Create Your First Upsell
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {customUpsells.map((upsell) => (
+                    <div
+                      key={upsell.id}
+                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{upsell.name}</h3>
+                          {upsell.recommended_by_default && (
+                            <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full">
+                              Recommended
+                            </span>
+                          )}
+                          {upsell.auto_select && (
+                            <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">
+                              Auto-select
+                            </span>
+                          )}
+                        </div>
+                        {upsell.description && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{upsell.description}</p>
+                        )}
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-1">
+                          ${parseFloat(upsell.price).toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2 ml-4">
+                        <button
+                          onClick={() => handleEditUpsell(upsell)}
+                          className="btn btn-ghost text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUpsell(upsell.id)}
+                          className="btn btn-danger text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Upsell Modal */}
+            {showUpsellModal && (
+              <div className="modal-overlay" onClick={() => setShowUpsellModal(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    {editingUpsell ? 'Edit Upsell' : 'Add New Upsell'}
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={upsellForm.name}
+                        onChange={(e) => setUpsellForm(prev => ({ ...prev, name: e.target.value }))}
+                        className="input"
+                        placeholder="e.g., Premium Packing Service"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Description
+                      </label>
+                      <textarea
+                        value={upsellForm.description}
+                        onChange={(e) => setUpsellForm(prev => ({ ...prev, description: e.target.value }))}
+                        className="input"
+                        rows={3}
+                        placeholder="Describe what this service includes..."
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Price <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={upsellForm.price}
+                          onChange={(e) => setUpsellForm(prev => ({ ...prev, price: e.target.value }))}
+                          className="input"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Category
+                        </label>
+                        <select
+                          value={upsellForm.category}
+                          onChange={(e) => setUpsellForm(prev => ({ ...prev, category: e.target.value }))}
+                          className="input"
+                        >
+                          <option value="insurance">Insurance</option>
+                          <option value="packing">Packing</option>
+                          <option value="specialty">Specialty</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={upsellForm.recommended_by_default}
+                          onChange={(e) => setUpsellForm(prev => ({ ...prev, recommended_by_default: e.target.checked }))}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Mark as recommended by default</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={upsellForm.auto_select}
+                          onChange={(e) => setUpsellForm(prev => ({ ...prev, auto_select: e.target.checked }))}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Auto-select when conditions are met</span>
+                      </label>
+                    </div>
+                    <div className="flex justify-end space-x-3 pt-4">
+                      <button
+                        onClick={() => {
+                          setShowUpsellModal(false);
+                          setEditingUpsell(null);
+                        }}
+                        className="btn btn-ghost"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSaveUpsell}
+                        className="btn btn-primary"
+                      >
+                        {editingUpsell ? 'Update' : 'Create'} Upsell
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Quote Customization Save Button - Only show for quote tab */}
+        {activeTab === 'quote' && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
           <div className="flex items-center justify-between pt-6">
             <div>

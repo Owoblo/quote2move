@@ -8,6 +8,7 @@ import { SaturnGPTService, SaturnMoveTimeResponse } from '../lib/saturnGPTServic
 import ThemeToggle from '../components/ThemeToggle';
 import { StatePersistence } from '../lib/statePersistence';
 import { getQuoteSettings } from '../pages/SettingsPage';
+import { supabase } from '../lib/supabase';
 
 interface LocationState {
   address: string;
