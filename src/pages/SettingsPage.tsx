@@ -446,6 +446,26 @@ export default function SettingsPage() {
             Configure how your quote emails appear to customers. These settings apply to all emails sent from your account.
           </p>
 
+          {/* Assigned Email Addresses */}
+          {assignedEmails && (
+            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Your Assigned Email Addresses</h3>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="text-gray-600 dark:text-gray-400">Sending Address:</span>
+                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{assignedEmails.fromEmail}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600 dark:text-gray-400">Reply Address:</span>
+                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{assignedEmails.replyToEmail}</span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                  Replies to your quotes will be sent to {assignedEmails.replyToEmail} and forwarded to your company email.
+                </p>
+              </div>
+            </div>
+          )}
+
           {loadingEmailSettings ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
