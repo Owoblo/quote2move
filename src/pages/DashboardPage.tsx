@@ -686,23 +686,23 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-[#FAFBFC] dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
+      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 transition-all duration-200">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-purple-600 rounded-md flex items-center justify-center shadow-sm">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">MovSense</h1>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 tracking-tight">MovSense</h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate('/settings')}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center space-x-1"
+                className="btn btn-ghost text-sm"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -712,34 +712,34 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setShowProjectHistory(true)}
-                className="text-sm font-medium text-accent dark:text-accent-light hover:text-accent-dark dark:hover:text-accent-light transition-colors flex items-center space-x-1"
+                className="btn btn-ghost text-sm"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Project History</span>
+                <span>History</span>
               </button>
               <button
                 onClick={handleSaveProject}
                 disabled={isSaving || (!state.address && state.detections.length === 0)}
-                className="text-sm font-medium bg-accent hover:bg-accent-dark disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-1 disabled:cursor-not-allowed"
+                className="btn btn-primary text-sm disabled:opacity-50"
               >
                 {isSaving ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div>
                     <span>Saving...</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
-                    <span>{currentProjectId ? 'Update Project' : 'Save Project'}</span>
+                    <span>{currentProjectId ? 'Update' : 'Save'}</span>
                   </>
                 )}
               </button>
-              <div className="w-px h-6 bg-gray-200 dark:bg-gray-700"></div>
-              <select className="text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none cursor-pointer">
+              <div className="w-px h-5 bg-gray-200 dark:bg-gray-700"></div>
+              <select className="text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 <option>San Francisco, CA</option>
                 <option>Los Angeles, CA</option>
                 <option>New York, NY</option>
@@ -752,47 +752,47 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+      <main className="min-h-screen transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Tabs */}
-          <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex space-x-8">
+          <div className="mb-8 border-b border-gray-200/60 dark:border-gray-700/60">
+            <div className="flex gap-6">
               <button
                 onClick={() => setActiveTab('create')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'create'
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 Create Quote
               </button>
               <button
                 onClick={() => setActiveTab('analytics')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'analytics'
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 Analytics
               </button>
               <button
                 onClick={() => setActiveTab('quotes')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'quotes'
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 All Quotes
               </button>
               <button
                 onClick={() => setActiveTab('calendar')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'calendar'
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 Calendar & Reminders
@@ -809,41 +809,41 @@ export default function DashboardPage() {
                 </div>
               ) : analytics ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Quotes</p>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white">{analytics.totalQuotes}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="card card-hover p-5">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Total Quotes</p>
+                      <p className="text-2xl font-semibold text-gray-900 dark:text-white">{analytics.totalQuotes}</p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Pending</p>
-                      <p className="text-3xl font-bold text-yellow-600">{analytics.pendingQuotes}</p>
+                    <div className="card card-hover p-5">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Pending</p>
+                      <p className="text-2xl font-semibold text-yellow-600">{analytics.pendingQuotes}</p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Accepted</p>
-                      <p className="text-3xl font-bold text-green-600">{analytics.acceptedQuotes}</p>
+                    <div className="card card-hover p-5">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Accepted</p>
+                      <p className="text-2xl font-semibold text-green-600">{analytics.acceptedQuotes}</p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Declined</p>
-                      <p className="text-3xl font-bold text-red-600">{analytics.declinedQuotes}</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Revenue</h3>
-                      <p className="text-3xl font-bold text-green-600 mb-2">${analytics.totalRevenue.toFixed(2)}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">From accepted quotes</p>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Performance</h3>
-                      <p className="text-3xl font-bold text-blue-600 mb-2">{analytics.conversionRate.toFixed(1)}%</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Conversion rate</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Avg: ${analytics.averageQuoteValue.toFixed(2)}</p>
+                    <div className="card card-hover p-5">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Declined</p>
+                      <p className="text-2xl font-semibold text-red-600">{analytics.declinedQuotes}</p>
                     </div>
                   </div>
 
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quotes by Price Range</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="card card-hover p-6">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Revenue</h3>
+                      <p className="text-3xl font-semibold text-green-600 mb-1.5">${analytics.totalRevenue.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">From accepted quotes</p>
+                    </div>
+                    <div className="card card-hover p-6">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Performance</h3>
+                      <p className="text-3xl font-semibold text-accent mb-1.5">{analytics.conversionRate.toFixed(1)}%</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Conversion rate</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Avg: ${analytics.averageQuoteValue.toFixed(2)}</p>
+                    </div>
+                  </div>
+
+                  <div className="card card-hover p-6">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Quotes by Price Range</h3>
                     <div className="space-y-3">
                       {analytics.quotesByPriceRange.map((range: any) => (
                         <div key={range.range} className="flex items-center justify-between">
@@ -880,36 +880,36 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {quotes.map((quote) => (
-                    <div key={quote.id} className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{quote.customerName}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{quote.customerEmail}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Move Date: {quote.moveDate}</p>
+                    <div key={quote.id} className="card card-hover p-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{quote.customerName}</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{quote.customerEmail}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Move Date: {quote.moveDate}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900 dark:text-white">${quote.totalAmount.toFixed(2)}</p>
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            quote.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                            quote.status === 'declined' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800'
+                        <div className="text-right ml-4">
+                          <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">${quote.totalAmount.toFixed(2)}</p>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
+                            quote.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                            quote.status === 'declined' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                           }`}>
                             {quote.status}
                           </span>
                         </div>
                       </div>
-                      <div className="mt-4 flex space-x-3">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => navigate(`/quote/${quote.id}`)}
-                          className="px-4 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg text-sm font-semibold"
+                          className="btn btn-primary text-xs px-3 py-1.5"
                         >
-                          View Quote
+                          View
                         </button>
                         <button
                           onClick={() => navigate(`/quote/${quote.id}/edit`)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold"
+                          className="btn btn-secondary text-xs px-3 py-1.5"
                         >
-                          Edit Quote
+                          Edit
                         </button>
                       </div>
                     </div>
@@ -924,14 +924,14 @@ export default function DashboardPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Follow-ups Due */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Follow-ups Due</h3>
+                <div className="card card-hover p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Follow-ups Due</h3>
                   {followUps.length === 0 ? (
                     <p className="text-gray-600 dark:text-gray-400 text-sm">No follow-ups scheduled</p>
                   ) : (
                     <div className="space-y-3">
                       {followUps.map((followUp) => (
-                        <div key={followUp.id} className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <div key={followUp.id} className="p-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-800/50 rounded-md">
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-semibold text-gray-900 dark:text-white text-sm">
@@ -949,7 +949,7 @@ export default function DashboardPage() {
                                   addToast('Failed to complete follow-up', 'error');
                                 }
                               }}
-                              className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg"
+                              className="btn btn-success text-xs px-2.5 py-1"
                             >
                               Complete
                             </button>
@@ -961,14 +961,14 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Upcoming Moves */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Moves (Next 30 Days)</h3>
+                <div className="card card-hover p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Upcoming Moves (Next 30 Days)</h3>
                   {calendarEvents.length === 0 ? (
                     <p className="text-gray-600 dark:text-gray-400 text-sm">No upcoming moves</p>
                   ) : (
                     <div className="space-y-3">
                       {calendarEvents.slice(0, 5).map((event) => (
-                        <div key={event.id} className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div key={event.id} className="p-3 bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/50 rounded-md">
                           <p className="font-semibold text-gray-900 dark:text-white text-sm">{event.title}</p>
                           <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                             {new Date(event.startDate).toLocaleDateString()} at {event.startTime}
@@ -990,8 +990,8 @@ export default function DashboardPage() {
 
               {/* Export Calendar */}
               {calendarEvents.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Export Calendar</h3>
+                <div className="card card-hover p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Export Calendar</h3>
                   <button
                     onClick={() => {
                       const icsContent = CalendarService.exportToICS(calendarEvents);
@@ -1006,9 +1006,12 @@ export default function DashboardPage() {
                       URL.revokeObjectURL(url);
                       addToast('Calendar exported successfully', 'success');
                     }}
-                    className="px-4 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg text-sm font-semibold"
+                    className="btn btn-primary text-sm"
                   >
-                    Download Calendar (ICS)
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Download Calendar (ICS)</span>
                   </button>
                 </div>
               )}
@@ -1018,9 +1021,9 @@ export default function DashboardPage() {
           {/* Create Quote View */}
           {activeTab === 'create' && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Left Column: Search + Photos */}
-                <div className="space-y-6">
+                <div className="space-y-5">
                   <SearchPanel
                     address={state.address}
                     onAddressChange={handleAddressChange}
