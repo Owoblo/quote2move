@@ -702,6 +702,23 @@ export default function SettingsPage() {
                 </div>
               </div>
 
+              {/* Email Forwarding */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Forward Replies To <span className="text-gray-500 text-xs font-normal">(Optional)</span>
+                </label>
+                <input
+                  type="email"
+                  value={companySettings.forwardingEmail}
+                  onChange={(e) => setCompanySettings(prev => ({ ...prev, forwardingEmail: e.target.value }))}
+                  placeholder="your-company-email@example.com"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  When customers reply to your quotes, emails will be forwarded here. If not set, replies will forward to your Company Email above.
+                </p>
+              </div>
+
               {/* Save Company Settings Button */}
               <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div>
