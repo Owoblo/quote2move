@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 import { supabase } from '../lib/supabase';
 
@@ -17,6 +17,8 @@ const SETTINGS_KEY = 'movsense_quote_settings';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'quote' | 'email' | 'company' | 'upsells'>('quote');
   const [settings, setSettings] = useState<QuoteSettings>({
     customLogoUrl: '',
     brandColors: {

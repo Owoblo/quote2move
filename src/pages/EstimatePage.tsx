@@ -1055,16 +1055,27 @@ export default function EstimatePage() {
 
             {/* Additional Services / Upsells */}
             <div className="card card-hover p-6">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Additional Services</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Enhance your move with these services</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/settings?tab=upsells')}
+                  className="btn btn-ghost text-xs"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Additional Services</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Enhance your move with these services</p>
-                </div>
+                  Customize
+                </button>
               </div>
               <div className="space-y-3">
                 {upsells.map((upsell) => (
