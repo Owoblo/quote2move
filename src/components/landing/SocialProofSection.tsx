@@ -4,12 +4,12 @@ export default function SocialProofSection() {
   const companies = [
     {
       name: 'Lets Get Moving',
-      logo: '/Lets Get Moving Logo.webp',
+      logo: '/Lets%20Get%20Moving%20Logo.webp',
       alt: 'Lets Get Moving Logo'
     },
     {
       name: 'Central Coast Moving',
-      logo: '/Central Coast Moving logo.webp',
+      logo: '/Central%20Coast%20Moving%20logo.webp',
       alt: 'Central Coast Moving Logo'
     },
     {
