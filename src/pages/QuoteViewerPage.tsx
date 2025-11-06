@@ -37,6 +37,8 @@ export default function QuoteViewerPage() {
   }, [quoteId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    // Always check edit permission when quote loads or changes
+    // This ensures canEdit is properly set for both authenticated and unauthenticated users
     checkEditPermission();
   }, [quote]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -77,26 +79,36 @@ export default function QuoteViewerPage() {
   };
 
   const checkEditPermission = async () => {
+    // Always start with false - only set to true if user is authenticated AND owns the quote
+    setCanEdit(false);
+    
     if (!quote || !quote.id) {
-      setCanEdit(false);
       return;
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      // If user is not authenticated, canEdit stays false
+      if (authError || !user) {
         setCanEdit(false);
         return;
       }
 
       // Check if quote belongs to the authenticated user
-      const { data: quoteData } = await supabase
+      const { data: quoteData, error: quoteError } = await supabase
         .from('quotes')
         .select('user_id')
         .eq('id', quote.id)
         .single();
 
-      if (quoteData && quoteData.user_id === user.id) {
+      if (quoteError || !quoteData) {
+        setCanEdit(false);
+        return;
+      }
+
+      // Only allow edit if user owns the quote
+      if (quoteData.user_id === user.id) {
         setCanEdit(true);
       } else {
         setCanEdit(false);
@@ -107,9 +119,10 @@ export default function QuoteViewerPage() {
     }
   };
 
-  // Track email open when quote is loaded
+  // Track email open when quote is loaded (only for customers, not sales reps viewing their own quotes)
   useEffect(() => {
-    if (quote && quoteId) {
+    if (quote && quoteId && !canEdit) {
+      // Only track opens for customers (non-authenticated users or users who don't own the quote)
       // Get IP address and user agent for tracking
       const trackEmailOpen = async () => {
         try {
