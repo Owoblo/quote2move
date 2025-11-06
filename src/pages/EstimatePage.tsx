@@ -625,10 +625,10 @@ export default function EstimatePage() {
   const estimatedTrucks = needsMultipleTrucks ? Math.ceil(totalCubicFeet / TRUCK_CAPACITY) : 1;
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-[#F3F4F6]">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 transition-all duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <header className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
+        <div className="container-max px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
@@ -651,12 +651,12 @@ export default function EstimatePage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <main className="container-max px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Left Column: Form */}
           <div className="lg:col-span-2 space-y-6">
             {/* Customer Information */}
-            <div className="card card-hover p-6">
+            <div className="card card-hover section-padding">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1096,7 +1096,7 @@ export default function EstimatePage() {
             </div>
 
             {/* Additional Services / Upsells */}
-            <div className="card card-hover p-6">
+            <div className="card card-hover section-padding">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">

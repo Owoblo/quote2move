@@ -686,10 +686,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-[#F3F4F6]">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 transition-all duration-200">
-        <div className="max-w-7xl mx-auto px-6">
+      <header className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
+        <div className="container-max px-6">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
               <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-purple-600 rounded-md flex items-center justify-center shadow-sm">

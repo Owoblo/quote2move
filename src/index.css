@@ -1,19 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-primary: #0D1321;
-  --color-accent: #00C2FF;
-  --color-highlight: #FF6B3D;
-  --color-background: #FAFBFC;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-background: #F3F4F6;
   --color-surface: #FFFFFF;
   --color-border: #E5E7EB;
   --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-text-tertiary: #9CA3AF;
+  --color-text-secondary: #374151;
+  --color-text-muted: #9CA3AF;
+  --color-chip-bg: #EFF6FF;
+  --color-chip-text: #1D4ED8;
+  --color-chip-border: #BFDBFE;
+  --color-card-bg: #F9FAFB;
 }
 
 @layer base {
@@ -22,88 +25,139 @@
   }
   
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 400;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--color-background);
     color: var(--color-text-primary);
-    line-height: 1.5;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    letter-spacing: -0.02em;
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
     line-height: 1.2;
+    color: var(--color-text-primary);
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--color-text-primary);
+  }
+
+  .text-small,
+  .text-meta {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
   }
 }
 
 @layer components {
-  /* Premium Button Styles */
+  /* Button Styles */
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB];
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply bg-accent text-white hover:bg-accent-dark focus:ring-accent;
-    @apply shadow-sm hover:shadow;
+    @apply bg-[#2563EB] text-white hover:bg-[#1D4ED8] focus:ring-[#2563EB];
   }
 
   .btn-secondary {
-    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500;
-    @apply shadow-sm hover:shadow;
+    @apply bg-white text-[#374151] border border-[#E5E7EB] hover:bg-[#F9FAFB] focus:ring-[#2563EB];
   }
 
   .btn-ghost {
-    @apply bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500;
+    @apply bg-transparent text-[#374151] hover:bg-[#F9FAFB] focus:ring-[#2563EB];
   }
 
   .btn-danger {
     @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-    @apply shadow-sm hover:shadow;
   }
 
   .btn-success {
     @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
-    @apply shadow-sm hover:shadow;
   }
 
-  /* Premium Input Styles */
+  /* Input Styles */
   .input {
-    @apply w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md;
-    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent;
+    @apply w-full px-4 py-2 text-base bg-white border border-[#E5E7EB] rounded-xl;
+    @apply focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB];
     @apply transition-all duration-200;
-    @apply placeholder:text-gray-400;
+    @apply placeholder:text-[#9CA3AF];
+    @apply text-[#111827];
   }
 
-  /* Premium Card Styles */
+  /* Card Styles */
   .card {
-    @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+    @apply bg-white rounded-[24px] border border-[#E5E7EB];
+    @apply shadow-[0_12px_40px_rgba(15,23,42,0.08)];
     @apply transition-shadow duration-200;
   }
 
   .card-hover {
-    @apply hover:shadow-md;
+    @apply hover:shadow-[0_16px_48px_rgba(15,23,42,0.12)];
   }
 
-  /* Premium Modal Styles */
+  /* Metric/Card Styles */
+  .metric-card {
+    @apply bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB] p-6;
+  }
+
+  /* Chip/Tag Styles */
+  .chip {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full;
+    @apply text-[13px] font-medium;
+    @apply bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE];
+  }
+
+  /* Link Styles */
+  .link {
+    @apply text-[#2563EB] hover:underline transition-colors;
+  }
+
+  /* Modal Styles */
   .modal-overlay {
     @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-50;
     @apply flex items-center justify-center p-4;
   }
 
   .modal-content {
-    @apply bg-white rounded-lg shadow-xl max-w-lg w-full p-6;
-    @apply border border-gray-200;
+    @apply bg-white rounded-[24px] shadow-[0_12px_40px_rgba(15,23,42,0.08)] max-w-lg w-full p-6;
+    @apply border border-[#E5E7EB];
+  }
+
+  /* Container Styles */
+  .container-max {
+    @apply max-w-[900px] mx-auto;
+  }
+
+  /* Section Padding */
+  .section-padding {
+    @apply px-10 py-12;
   }
 }
 
 .logo-font {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
 }

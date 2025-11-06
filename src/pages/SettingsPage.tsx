@@ -423,10 +423,10 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-[#F3F4F6]">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-6">
+      <header className="bg-white border-b border-[#E5E7EB]">
+        <div className="container-max px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <button
@@ -451,7 +451,7 @@ export default function SettingsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="container-max px-6 py-12">
         {/* Tab Navigation */}
         <div className="mb-8 border-b border-gray-200 dark:border-gray-700">
           <nav className="flex space-x-8">
@@ -479,7 +479,7 @@ export default function SettingsPage() {
 
         {/* Tab Content */}
         {activeTab === 'quote' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+          <div className="card section-padding">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Quote Customization</h2>
 
           {/* Logo URL */}
@@ -599,7 +599,7 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'email' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+          <div className="card section-padding">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Email Settings</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             Configure how your quote emails appear to customers. These settings apply to all emails sent from your account.
@@ -708,7 +708,7 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'company' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+          <div className="card section-padding">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Company Information</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             Configure your company details. This will appear in quotes, emails, and customer communications.
@@ -907,7 +907,7 @@ export default function SettingsPage() {
         {activeTab === 'upsells' && (
           <>
             {/* Custom Upsells Section */}
-            <div className="card card-hover p-6 mb-8">
+            <div className="card section-padding mb-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Custom Upsells</h2>
@@ -1119,7 +1119,7 @@ export default function SettingsPage() {
 
         {/* Quote Customization Save Button - Only show for quote tab */}
         {activeTab === 'quote' && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
+        <div className="card section-padding mt-8">
           <div className="flex items-center justify-between pt-6">
             <div>
               {saved && (
