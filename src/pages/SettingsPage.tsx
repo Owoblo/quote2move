@@ -40,8 +40,13 @@ export default function SettingsPage() {
     companyAddress: '',
     companyPhone: '',
     companyEmail: '',
-    companyWebsite: ''
+    companyWebsite: '',
+    forwardingEmail: ''
   });
+  const [assignedEmails, setAssignedEmails] = useState<{
+    fromEmail: string;
+    replyToEmail: string;
+  } | null>(null);
   const [loadingCompanySettings, setLoadingCompanySettings] = useState(true);
   const [savingCompanySettings, setSavingCompanySettings] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -96,7 +101,7 @@ export default function SettingsPage() {
 
       const { data, error } = await supabase
         .from('company_settings')
-        .select('company_name, company_logo_url, company_address, company_phone, company_email, company_website')
+        .select('company_name, company_logo_url, company_address, company_phone, company_email, company_website, forwarding_email')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -109,7 +114,18 @@ export default function SettingsPage() {
           companyAddress: data.company_address || '',
           companyPhone: data.company_phone || '',
           companyEmail: data.company_email || '',
-          companyWebsite: data.company_website || ''
+          companyWebsite: data.company_website || '',
+          forwardingEmail: data.forwarding_email || ''
+        });
+      }
+
+      // Generate assigned email addresses
+      if (user) {
+        const userIdPrefix = user.id.substring(0, 8);
+        const verifiedDomain = 'movsense.com'; // This should match VERIFIED_EMAIL_DOMAIN
+        setAssignedEmails({
+          fromEmail: `quotes-${userIdPrefix}@${verifiedDomain}`,
+          replyToEmail: `replies-${userIdPrefix}@${verifiedDomain}`
         });
       }
     } catch (error) {
@@ -208,6 +224,7 @@ export default function SettingsPage() {
           company_phone: companySettings.companyPhone || null,
           company_email: companySettings.companyEmail || null,
           company_website: companySettings.companyWebsite || null,
+          forwarding_email: companySettings.forwardingEmail || null,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id'

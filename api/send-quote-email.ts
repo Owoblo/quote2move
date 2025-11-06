@@ -317,10 +317,15 @@ function generateEmailHTML(data: {
   quoteUrl: string;
   logoUrl?: string | null;
   brandColors?: any;
+  companyName?: string;
+  companyPhone?: string | null;
+  companyEmail?: string | null;
+  companyWebsite?: string | null;
 }): string {
   const primaryColor = data.brandColors?.primary || '#2563eb';
   const secondaryColor = data.brandColors?.secondary || '#1e40af';
   const accentColor = data.brandColors?.accent || '#10b981';
+  const companyName = data.companyName || 'Saturn Star Movers';
 
   return `
     <!DOCTYPE html>
