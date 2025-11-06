@@ -119,7 +119,77 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveCompanySettings = async () => {
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to upload logo');
+        return;
+      }
+
+      // Create storage bucket if it doesn't exist (this will be handled by Supabase)
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      const filePath = `company-logos/${fileName}`;
+
+      // Upload file to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('company-assets')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        // If bucket doesn't exist, try to create it or use a different approach
+        if (uploadError.message.includes('bucket') || uploadError.message.includes('not found')) {
+          // Fallback: use a public URL from a data URL or allow manual URL entry
+          alert('Storage bucket not configured. Please enter a logo URL manually or contact support to set up storage.');
+          return;
+        }
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('company-assets')
+        .getPublicUrl(filePath);
+
+      // Update company settings with the new logo URL
+      setCompanySettings(prev => ({
+        ...prev,
+        companyLogoUrl: publicUrl
+      }));
+
+      // Save immediately
+      await handleSaveCompanySettings(publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading logo:', error);
+      alert(`Failed to upload logo: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingLogo(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+
+  const handleSaveCompanySettings = async (logoUrl?: string) => {
     setSavingCompanySettings(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
