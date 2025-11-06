@@ -4,17 +4,17 @@ export default function SocialProofSection() {
   const companies = [
     {
       name: 'Lets Get Moving',
-      logo: '/Lets%20Get%20Moving%20Logo.webp',
+      logo: process.env.PUBLIC_URL + '/Lets Get Moving Logo.webp',
       alt: 'Lets Get Moving Logo'
     },
     {
       name: 'Central Coast Moving',
-      logo: '/Central%20Coast%20Moving%20logo.webp',
+      logo: process.env.PUBLIC_URL + '/Central Coast Moving logo.webp',
       alt: 'Central Coast Moving Logo'
     },
     {
       name: 'United Van Lines',
-      logo: '/United-Van-Lines-Company-Logo.gif',
+      logo: process.env.PUBLIC_URL + '/United-Van-Lines-Company-Logo.gif',
       alt: 'United Van Lines Logo'
     }
   ];
@@ -30,13 +30,21 @@ export default function SocialProofSection() {
             {companies.map((company, index) => (
               <div 
                 key={index}
-                className="flex items-center justify-center h-12 max-w-[180px] grayscale hover:grayscale-0 transition-all duration-300"
+                className="flex items-center justify-center h-16 max-w-[200px] grayscale hover:grayscale-0 transition-all duration-300"
               >
                 <img 
                   src={company.logo} 
                   alt={company.name}
                   className="max-h-full max-w-full object-contain"
                   loading="lazy"
+                  onError={(e) => {
+                    console.error('Failed to load logo:', company.logo);
+                    // Try with URL encoding as fallback
+                    const encodedPath = company.logo.replace(/ /g, '%20');
+                    if (e.currentTarget.src !== encodedPath) {
+                      e.currentTarget.src = encodedPath;
+                    }
+                  }}
                 />
               </div>
             ))}
