@@ -122,6 +122,13 @@ export default async function handler(
       .eq('user_id', user.id)
       .single();
 
+    // Get company settings (company name, logo, etc.)
+    const { data: companySettings } = await supabase
+      .from('company_settings')
+      .select('company_name, company_logo_url, company_phone, company_email, company_website')
+      .eq('user_id', user.id)
+      .single();
+
     // Generate user-specific email addresses
     // Format: quotes-{userId-prefix}@verified-domain.com
     // This allows each user to have their own email without DNS setup
@@ -207,8 +214,12 @@ export default async function handler(
       destinationAddress,
       totalAmount,
       quoteUrl,
-      logoUrl: quote.custom_logo_url,
-      brandColors: quote.brand_colors
+      logoUrl: companySettings?.company_logo_url || quote.custom_logo_url || null,
+      brandColors: quote.brand_colors,
+      companyName: companySettings?.company_name || 'Saturn Star Movers',
+      companyPhone: companySettings?.company_phone,
+      companyEmail: companySettings?.company_email,
+      companyWebsite: companySettings?.company_website
     });
 
     // Send email via Resend API
@@ -336,8 +347,8 @@ function generateEmailHTML(data: {
     <body>
       <div class="container">
         <div class="header">
-          ${data.logoUrl ? `<img src="${data.logoUrl}" alt="Logo" class="logo" />` : ''}
-          <h1>MOVSENSE</h1>
+          ${data.logoUrl ? `<img src="${data.logoUrl}" alt="${companyName}" class="logo" />` : ''}
+          <h1>${companyName}</h1>
           <p>Professional Moving Services</p>
         </div>
         
@@ -376,13 +387,16 @@ function generateEmailHTML(data: {
           
           <p style="margin-top: 30px;">
             Best regards,<br>
-            <strong>MovSense Team</strong>
+            <strong>${companyName} Team</strong>
           </p>
+          ${data.companyPhone ? `<p style="margin-top: 10px; font-size: 14px; color: #6b7280;">Phone: ${data.companyPhone}</p>` : ''}
+          ${data.companyEmail ? `<p style="font-size: 14px; color: #6b7280;">Email: ${data.companyEmail}</p>` : ''}
+          ${data.companyWebsite ? `<p style="font-size: 14px; color: #6b7280;">Website: <a href="${data.companyWebsite}" style="color: ${primaryColor};">${data.companyWebsite}</a></p>` : ''}
         </div>
         
         <div class="footer">
           <p>This quote is valid for 30 days from the date of generation.</p>
-          <p>For support, contact us at support@movsense.com</p>
+          <p>For support, contact us at ${data.companyEmail || 'support@movsense.com'}</p>
         </div>
       </div>
     </body>

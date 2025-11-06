@@ -22,15 +22,48 @@ export default function QuoteViewerPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [companySettings, setCompanySettings] = useState<{
+    companyName: string;
+    companyLogoUrl: string | null;
+    companyPhone: string | null;
+    companyEmail: string | null;
+    companyWebsite: string | null;
+  } | null>(null);
 
   useEffect(() => {
     fetchQuote();
     checkUserRole();
+    loadCompanySettings();
   }, [quoteId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     checkEditPermission();
   }, [quote]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadCompanySettings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('company_settings')
+        .select('company_name, company_logo_url, company_phone, company_email, company_website')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) {
+        setCompanySettings({
+          companyName: data.company_name || 'Saturn Star Movers',
+          companyLogoUrl: data.company_logo_url,
+          companyPhone: data.company_phone,
+          companyEmail: data.company_email,
+          companyWebsite: data.company_website
+        });
+      }
+    } catch (error) {
+      console.error('Error loading company settings:', error);
+    }
+  };
 
   const checkUserRole = async () => {
     try {
@@ -239,28 +272,95 @@ export default function QuoteViewerPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Your Moving Quote</h1>
-              <p className="text-gray-600">Quote #{quote.id}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Generated on</p>
-              <p className="text-sm font-medium text-gray-900">
-                {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : 'N/A'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Company Header with Logo */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  {(companySettings?.companyLogoUrl || quote.customLogoUrl) && (
+                    <img
+                      src={companySettings?.companyLogoUrl || quote.customLogoUrl || ''}
+                      alt={companySettings?.companyName || 'Company Logo'}
+                      className="h-16 object-contain bg-white rounded-lg p-2"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <div>
+                    <h1 className="text-2xl font-bold">{companySettings?.companyName || 'Saturn Star Movers'}</h1>
+                    <p className="text-blue-100 text-sm">Professional Moving Services</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-blue-100">Quote #{quote.id?.slice(0, 8)}</p>
+                  <p className="text-sm text-blue-100">
+                    {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Photos */}
+            {quote.photos && quote.photos.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Property Photos</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {quote.photos.slice(0, 6).map((photo: any, index: number) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                      <img
+                        src={photo.url || photo}
+                        alt={`Property photo ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Map Illustration */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Move Route</h2>
+              <div className="bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gray-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <p className="text-sm font-medium text-gray-700">Origin</p>
+                    </div>
+                    <p className="text-xs text-gray-600 ml-5">{quote.originAddress}</p>
+                  </div>
+                  <div className="px-4">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 text-right">
+                    <div className="flex items-center justify-end space-x-2 mb-2">
+                      <p className="text-sm font-medium text-gray-700">Destination</p>
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    </div>
+                    <p className="text-xs text-gray-600 mr-5">{quote.destinationAddress}</p>
+                  </div>
+                </div>
+                {quote.estimate?.distance && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Distance:</span> {quote.estimate.distance} miles
+                      {quote.estimate.travelTime && <span className="ml-4"><span className="font-medium">Travel Time:</span> {quote.estimate.travelTime} minutes</span>}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Customer Info */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
@@ -370,8 +470,8 @@ export default function QuoteViewerPage() {
               </div>
             </div>
 
-            {/* Sales Rep Section */}
-            {(isSalesRep || canEdit) && (
+            {/* Sales Rep Section - Only visible to authenticated users who own the quote */}
+            {canEdit && (
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl shadow-sm p-6 mb-6">
                 <h2 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -511,51 +611,40 @@ export default function QuoteViewerPage() {
               </div>
             )}
 
-            {/* Actions - Customer View */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Quote Actions</h2>
-              
-              {quote.status === 'pending' && (
-                <div className="space-y-3">
-                  {!isSalesRep && (
-                    <>
-                      <button
-                        onClick={() => handleQuoteAction('accept')}
-                        disabled={actionLoading}
-                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                      >
-                        {actionLoading ? 'Processing...' : 'Accept Quote'}
-                      </button>
-                      
-                      <button
-                        onClick={() => {
-                          setDeclineActionBy('customer');
-                          setShowDeclineModal(true);
-                        }}
-                        disabled={actionLoading}
-                        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                      >
-                        Decline Quote
-                      </button>
-                      
-                      <button
-                        onClick={() => setShowQuestions(true)}
-                        className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                      >
-                        Ask Questions
-                      </button>
-                    </>
-                  )}
-                  {isSalesRep && (
+            {/* Actions - Customer View (only show for non-authenticated users) */}
+            {!canEdit && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Quote Actions</h2>
+                
+                {quote.status === 'pending' && (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => handleQuoteAction('accept')}
+                      disabled={actionLoading}
+                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                    >
+                      {actionLoading ? 'Processing...' : 'Accept Quote'}
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        setDeclineActionBy('customer');
+                        setShowDeclineModal(true);
+                      }}
+                      disabled={actionLoading}
+                      className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                    >
+                      Decline Quote
+                    </button>
+                    
                     <button
                       onClick={() => setShowQuestions(true)}
                       className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors"
                     >
-                      View Customer Questions
+                      Ask Questions
                     </button>
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
 
               {quote.status === 'accepted' && (
                 <div className="text-center">

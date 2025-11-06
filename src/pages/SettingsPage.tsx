@@ -34,6 +34,16 @@ export default function SettingsPage() {
   });
   const [loadingEmailSettings, setLoadingEmailSettings] = useState(true);
   const [savingEmailSettings, setSavingEmailSettings] = useState(false);
+  const [companySettings, setCompanySettings] = useState({
+    companyName: 'Saturn Star Movers',
+    companyLogoUrl: '',
+    companyAddress: '',
+    companyPhone: '',
+    companyEmail: '',
+    companyWebsite: ''
+  });
+  const [loadingCompanySettings, setLoadingCompanySettings] = useState(true);
+  const [savingCompanySettings, setSavingCompanySettings] = useState(false);
 
   useEffect(() => {
     // Load saved quote settings
@@ -48,6 +58,7 @@ export default function SettingsPage() {
 
     // Load email settings from database
     loadEmailSettings();
+    loadCompanySettings();
   }, []);
 
   const loadEmailSettings = async () => {
@@ -74,6 +85,72 @@ export default function SettingsPage() {
       console.error('Error loading email settings:', error);
     } finally {
       setLoadingEmailSettings(false);
+    }
+  };
+
+  const loadCompanySettings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('company_settings')
+        .select('company_name, company_logo_url, company_address, company_phone, company_email, company_website')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading company settings:', error);
+      } else if (data) {
+        setCompanySettings({
+          companyName: data.company_name || 'Saturn Star Movers',
+          companyLogoUrl: data.company_logo_url || '',
+          companyAddress: data.company_address || '',
+          companyPhone: data.company_phone || '',
+          companyEmail: data.company_email || '',
+          companyWebsite: data.company_website || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading company settings:', error);
+    } finally {
+      setLoadingCompanySettings(false);
+    }
+  };
+
+  const handleSaveCompanySettings = async () => {
+    setSavingCompanySettings(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to save company settings');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('company_settings')
+        .upsert({
+          user_id: user.id,
+          company_name: companySettings.companyName || 'Saturn Star Movers',
+          company_logo_url: companySettings.companyLogoUrl || null,
+          company_address: companySettings.companyAddress || null,
+          company_phone: companySettings.companyPhone || null,
+          company_email: companySettings.companyEmail || null,
+          company_website: companySettings.companyWebsite || null,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error: any) {
+      console.error('Error saving company settings:', error);
+      alert(`Failed to save company settings: ${error.message}`);
+    } finally {
+      setSavingCompanySettings(false);
     }
   };
 
