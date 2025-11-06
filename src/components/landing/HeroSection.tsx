@@ -20,7 +20,7 @@ export default function HeroSection() {
             </h1>
 
             {/* Subtext */}
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-xl">
+            <p className="text-xl text-[#374151] mb-8 leading-relaxed max-w-xl">
               MovSense uses AI to analyze property addresses, fetch photos automatically, detect furniture and items, build an inventory, and generate accurate moving quotes in seconds. No walkthroughs, no spreadsheets, no guesswork.
             </p>
 
@@ -33,7 +33,7 @@ export default function HeroSection() {
                 Get early access
               </Link>
               <button 
-                className="inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 hover:border-accent/50 dark:hover:border-accent/50 text-gray-700 dark:text-gray-300 font-semibold rounded-lg text-base transition-all duration-200"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-900 border-2 border-[#E5E7EB] hover:border-accent/50 dark:hover:border-accent/50 text-[#374151] font-semibold rounded-lg text-base transition-all duration-200"
               >
                 Watch product demo
               </button>

@@ -51,19 +51,19 @@ export default function DemoThankYouPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4">
               Thanks for activating MoveSense!
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <p className="text-xl text-[#374151]">
               Your city setup is now in queue.
             </p>
           </div>
         </div>
 
         {isVerifying ? (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#E5E7EB] p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Verifying your payment...</p>
+            <p className="text-[#374151]">Verifying your payment...</p>
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#E5E7EB] p-8">
             <div className="space-y-6">
               <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                 <p className="text-green-800 dark:text-green-200">
@@ -81,10 +81,10 @@ export default function DemoThankYouPage() {
                       <span className="text-accent font-semibold">1</span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <p className="font-medium text-[#111827]">
                         City Setup (Within 2 Business Days)
                       </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="text-[#374151] text-sm">
                         We'll configure MLS integration and data setup for your city.
                       </p>
                     </div>
@@ -94,10 +94,10 @@ export default function DemoThankYouPage() {
                       <span className="text-accent font-semibold">2</span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <p className="font-medium text-[#111827]">
                         Account Activation Email
                       </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="text-[#374151] text-sm">
                         You'll receive an email with login credentials once setup is complete.
                       </p>
                     </div>
@@ -107,10 +107,10 @@ export default function DemoThankYouPage() {
                       <span className="text-accent font-semibold">3</span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <p className="font-medium text-[#111827]">
                         Start Your Free Month
                       </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="text-[#374151] text-sm">
                         Your 1-month free Starter plan starts automatically once your city is live.
                       </p>
                     </div>
@@ -118,8 +118,8 @@ export default function DemoThankYouPage() {
                 </ul>
               </div>
 
-              <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <div className="pt-6 border-t border-[#E5E7EB]">
+                <p className="text-sm text-[#374151] mb-4">
                   Questions? Contact us at{' '}
                   <a href="mailto:support@movsense.com" className="text-accent hover:underline">
                     support@movsense.com
@@ -134,7 +134,7 @@ export default function DemoThankYouPage() {
                   </Link>
                   <Link
                     to="/login"
-                    className="flex-1 text-center px-6 py-3 border-2 border-gray-300 dark:border-gray-600 hover:border-accent text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all duration-200"
+                    className="flex-1 text-center px-6 py-3 border-2 border-gray-300 dark:border-gray-600 hover:border-accent text-[#374151] font-semibold rounded-lg transition-all duration-200"
                   >
                     Go to Login
                   </Link>

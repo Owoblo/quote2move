@@ -419,11 +419,11 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         {/* Top: Address search field - Hidden if hideSearch prop is true */}
         {!hideSearch && (
           <div className="mb-4 flex-shrink-0">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[#374151] mb-2">
               Property Address
             </label>
             <div className="relative">
-              <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-[#E5E7EB]">
                 <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
@@ -445,24 +445,24 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
                     setTimeout(() => setShowSuggestions(false), 200);
                   }}
                   placeholder="Enter property address..."
-                  className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
+                  className="flex-1 bg-transparent text-sm text-[#111827] placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
                   disabled={isDetecting || showSignupPrompt}
                 />
               </div>
 
               {/* Autocomplete suggestions */}
               {showSuggestions && suggestions.length > 0 && !selectedListing && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-white border border-[#E5E7EB] rounded-lg shadow-xl max-h-48 overflow-y-auto">
                   {suggestions.map((listing, index) => (
                     <div
                       key={`${listing.id}-${index}`}
                       onClick={() => handleSuggestionClick(listing)}
                       className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                     >
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <div className="text-sm font-medium text-[#111827]">
                         {listing.address}
                       </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                      <div className="text-xs text-[#374151]">
                         {listing.addresscity}, {listing.addressstate}
                       </div>
                     </div>
@@ -477,7 +477,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
                 {/* Help text for default address */}
                 {isDefaultAddress && photos.length > 0 && (
                   <div className="p-2 bg-accent/5 dark:bg-accent/10 border border-accent/20 dark:border-accent/30 rounded-lg">
-                    <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
+                    <p className="text-xs text-[#374151] mb-2">
                       💡 <span className="font-medium">Try searching any address!</span> See how MovSense works with any property.
                     </p>
                     <button
@@ -543,7 +543,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
             {/* Signup prompt */}
             {showSignupPrompt && (
               <div className="mt-3 p-4 bg-accent/10 dark:bg-accent/20 border border-accent/30 dark:border-accent/40 rounded-lg">
-                <p className="text-sm text-gray-900 dark:text-gray-100 mb-3">
+                <p className="text-sm text-[#111827] mb-3">
                   You've used {MAX_DEMO_SEARCHES} free searches! Sign up to get unlimited access.
                 </p>
                 <Link
@@ -561,8 +561,8 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         <div className="flex-1 overflow-y-auto space-y-3">
           {/* Photo preview grid - boxed and scrollable */}
           {photos.length > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-[#E5E7EB]">
+              <h3 className="text-xs font-semibold text-[#111827] mb-2">
                 Property Photos ({photos.length})
               </h3>
               <div className="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto">
@@ -589,12 +589,12 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
           {(detections.length > 0 || isDetecting) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* Auto detected inventory - boxed and scrollable */}
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 flex flex-col">
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-[#E5E7EB] flex flex-col">
+                <h3 className="text-xs font-semibold text-[#111827] mb-2">
                   Auto detected inventory
                 </h3>
                 {isDetecting ? (
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="text-xs text-[#374151]">
                     <div className="flex items-center space-x-2">
                       <div className="flex space-x-0.5">
                         <span className="inline-block w-1 h-1 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '1s' }}></span>
@@ -615,7 +615,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
                         .map(([label, count]) => `${count} ${label}`)
                         .join(', ');
                       return (
-                        <div key={room} className="text-gray-700 dark:text-gray-300">
+                        <div key={room} className="text-[#374151]">
                           <span className="font-medium">{room}:</span> {itemList}
                         </div>
                       );
@@ -626,29 +626,29 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
 
               {/* Quote estimate - boxed */}
               <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-3 border border-accent/20 dark:border-accent/30">
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="text-xs font-semibold text-[#111827] mb-2">
                   Quote estimate
                 </h3>
                 {isDetecting ? (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-400">Analyzing...</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">-</span>
+                      <span className="text-[#374151]">Analyzing...</span>
+                      <span className="font-semibold text-[#111827]">-</span>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-400">Estimated hours:</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{estimatedHours} hrs</span>
+                      <span className="text-[#374151]">Estimated hours:</span>
+                      <span className="font-semibold text-[#111827]">{estimatedHours} hrs</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-400">Estimated cost:</span>
+                      <span className="text-[#374151]">Estimated cost:</span>
                       <span className="font-semibold text-accent dark:text-accent-light">${estimatedCost.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-400">Items detected:</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{detections.length}</span>
+                      <span className="text-[#374151]">Items detected:</span>
+                      <span className="font-semibold text-[#111827]">{detections.length}</span>
                     </div>
                   </div>
                 )}

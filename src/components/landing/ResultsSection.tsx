@@ -31,7 +31,7 @@ export default function ResultsSection() {
               <div className="text-5xl font-bold text-accent dark:text-accent-light mb-2">
                 {stat.value}
               </div>
-              <div className="text-lg text-gray-600 dark:text-gray-400">
+              <div className="text-lg text-[#374151]">
                 {stat.label}
               </div>
             </div>
@@ -40,10 +40,10 @@ export default function ResultsSection() {
 
         {/* Testimonial */}
         <div className="max-w-3xl mx-auto text-center">
-          <blockquote className="text-xl text-gray-700 dark:text-gray-300 italic mb-4">
+          <blockquote className="text-xl text-[#374151] italic mb-4">
             "MovSense lets our reps send professional quotes without ever stepping into the house."
           </blockquote>
-          <div className="text-gray-600 dark:text-gray-400">
+          <div className="text-[#374151]">
             <span className="font-semibold">John Smith</span>, CEO at ABC Moving
           </div>
         </div>

@@ -52,14 +52,14 @@ export default function InventoryTable({
 
   if (detections.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-colors duration-200">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-colors duration-200">
         <div className="text-center py-8">
           {isDetecting ? (
             <>
               <div className="mx-auto w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-3">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400"></div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">AI Analyzing Photos...</h3>
+              <h3 className="text-lg font-medium text-[#111827] mb-2">AI Analyzing Photos...</h3>
               <p className="text-sm text-blue-600 dark:text-blue-400 mb-4">Detecting furniture in real-time</p>
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
@@ -74,7 +74,7 @@ export default function InventoryTable({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">No detections yet</h3>
+              <h3 className="text-sm font-medium text-[#111827] mb-1">No detections yet</h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">AI will detect furniture automatically</p>
             </>
           )}
@@ -84,12 +84,12 @@ export default function InventoryTable({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
       <div className="p-8 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Detected Inventory</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <h2 className="text-lg font-semibold text-[#111827] mb-2">Detected Inventory</h2>
+            <p className="text-sm text-[#374151]">
               {isDetecting ? 'AI is analyzing photos and detecting furniture...' : 'Furniture and items found by AI analysis'}
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function InventoryTable({
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+          <tbody className="bg-white divide-y divide-gray-100 dark:divide-gray-700">
             {roomNames.map((roomName) => (
               <React.Fragment key={roomName}>
                 {/* Room Header */}
@@ -175,7 +175,7 @@ export default function InventoryTable({
                   
                   return (
                     <tr key={`${roomName}-${roomItemIndex}`} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
-                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 text-sm text-[#111827]">
                         <div className="font-medium">{detection.label}</div>
                         {detection.size && (
                           <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
@@ -192,9 +192,9 @@ export default function InventoryTable({
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 text-sm text-[#111827]">
                         <div className="flex items-center space-x-2">
-                          <span className="font-medium text-gray-900 dark:text-gray-100">{detection.qty}</span>
+                          <span className="font-medium text-[#111827]">{detection.qty}</span>
                           <button
                             onClick={() => {
                               const newQty = prompt(`Edit quantity for ${detection.label}:`, detection.qty.toString());
@@ -214,13 +214,13 @@ export default function InventoryTable({
                           </button>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 text-sm text-[#111827]">
                           <textarea
                             value={detection.notes || ''}
                           onChange={(e) => onNotesChange(detectionIndex, e.target.value)}
                             placeholder="Add notes about this item..."
                             rows={2}
-                          className="w-full border-0 bg-transparent px-0 py-2 text-sm focus:outline-none resize-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                          className="w-full border-0 bg-transparent px-0 py-2 text-sm focus:outline-none resize-none text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
                         />
                       </td>
                       <td className="px-6 py-4 text-sm text-center">
@@ -245,11 +245,11 @@ export default function InventoryTable({
       
       {/* Totals */}
       <div className="p-8 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Total Items: <span className="font-semibold text-gray-900 dark:text-gray-100">{totalItems}</span>
+        <div className="text-sm font-medium text-[#374151]">
+          Total Items: <span className="font-semibold text-[#111827]">{totalItems}</span>
         </div>
-        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Total Cubic Feet: <span className="font-semibold text-gray-900 dark:text-gray-100">{totalCubicFeet.toFixed(2)} cf</span>
+        <div className="text-sm font-medium text-[#374151]">
+          Total Cubic Feet: <span className="font-semibold text-[#111827]">{totalCubicFeet.toFixed(2)} cf</span>
         </div>
       </div>
     </div>

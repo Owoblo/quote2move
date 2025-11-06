@@ -664,13 +664,13 @@ export default function EstimatePage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Customer Information</h2>
+                  <h2 className="text-xl font-bold text-[#111827]">Customer Information</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Enter customer details for the quote</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -683,7 +683,7 @@ export default function EstimatePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -696,7 +696,7 @@ export default function EstimatePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -709,37 +709,37 @@ export default function EstimatePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Move Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
                     value={customerInfo.moveDate}
                     onChange={(e) => setCustomerInfo(prev => ({ ...prev, moveDate: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                     min={new Date().toISOString().split('T')[0]}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Move Time Confirmed
                   </label>
                   <input
                     type="time"
                     value={moveTimeConfirmed}
                     onChange={(e) => setMoveTimeConfirmed(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Lead Source
                   </label>
                   <select
                     value={leadSource}
                     onChange={(e) => setLeadSource(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                   >
                     <option value="">Select source...</option>
                     <option value="Google Search">Google Search</option>
@@ -771,14 +771,14 @@ export default function EstimatePage() {
                     }}
                     className="w-5 h-5 text-accent border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  <label className="text-sm font-semibold text-[#374151]">
                     Override Price
                   </label>
                 </div>
                 {priceOverride && (
                   <div className="space-y-3 mt-3">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-[#374151] mb-2">
                         New Total Amount
                       </label>
                       <input
@@ -787,19 +787,19 @@ export default function EstimatePage() {
                         min="0"
                         value={overrideAmount || ''}
                         onChange={(e) => setOverrideAmount(e.target.value ? parseFloat(e.target.value) : null)}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-[#111827]"
                         placeholder="Enter override amount"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-[#374151] mb-2">
                         Reason for Override
                       </label>
                       <textarea
                         value={overrideReason}
                         onChange={(e) => setOverrideReason(e.target.value)}
                         rows={2}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-[#111827]"
                         placeholder="Explain why you're overriding the price..."
                       />
                     </div>
@@ -809,7 +809,7 @@ export default function EstimatePage() {
               
               {/* Custom Follow-up Date */}
               <div className="mt-6">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-[#374151] mb-2">
                   Custom Follow-up Date (Optional)
                 </label>
                 <input
@@ -817,7 +817,7 @@ export default function EstimatePage() {
                   value={customFollowUpDate}
                   onChange={(e) => setCustomFollowUpDate(e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-[#111827]"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Leave empty to use default (next day). Quote customization (logo, colors) can be set in <button onClick={() => navigate('/settings')} className="text-blue-600 dark:text-blue-400 hover:underline">Settings</button>.
@@ -835,13 +835,13 @@ export default function EstimatePage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Origin & Destination</h2>
+                  <h2 className="text-xl font-bold text-[#111827]">Origin & Destination</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Moving from and to locations</p>
                 </div>
               </div>
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Origin Address
                   </label>
                   <input
@@ -854,13 +854,13 @@ export default function EstimatePage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-semibold text-[#374151] mb-2">
                       Origin Type
                     </label>
                     <select
                       value={originType}
                       onChange={(e) => setOriginType(e.target.value as any)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                     >
                       <option value="house">House</option>
                       <option value="apartment">Apartment</option>
@@ -869,7 +869,7 @@ export default function EstimatePage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-semibold text-[#374151] mb-2">
                       Origin Floor (if applicable)
                     </label>
                     <input
@@ -890,7 +890,7 @@ export default function EstimatePage() {
                       disabled
                       className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Origin has stairs</span>
+                    <span className="text-sm text-[#374151]">Origin has stairs</span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -899,17 +899,17 @@ export default function EstimatePage() {
                       disabled
                       className="w-4 h-4 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Origin has elevator</span>
+                    <span className="text-sm text-[#374151]">Origin has elevator</span>
                   </label>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">
                     Origin Parking
                   </label>
                   <select
                     value={parkingOrigin}
                     onChange={(e) => setParkingOrigin(e.target.value as any)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                   >
                     <option value="driveway">Driveway</option>
                     <option value="street">Street Parking</option>
@@ -918,9 +918,9 @@ export default function EstimatePage() {
                   </select>
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-5 mt-5">
+                <div className="border-t border-[#E5E7EB] pt-5 mt-5">
                   <div className="mb-5">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-semibold text-[#374151] mb-2">
                       Destination Address <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -934,13 +934,13 @@ export default function EstimatePage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-[#374151] mb-2">
                         Destination Type
                       </label>
                       <select
                         value={destinationType}
                         onChange={(e) => setDestinationType(e.target.value as any)}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                       >
                         <option value="house">House</option>
                         <option value="apartment">Apartment</option>
@@ -949,7 +949,7 @@ export default function EstimatePage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-[#374151] mb-2">
                         Destination Floor (if applicable)
                       </label>
                       <input
@@ -970,7 +970,7 @@ export default function EstimatePage() {
                         onChange={(e) => setStairsDestination(e.target.checked)}
                         className="w-4 h-4 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Destination has stairs</span>
+                      <span className="text-sm text-[#374151]">Destination has stairs</span>
                     </label>
                     <label className="flex items-center space-x-2 cursor-pointer">
                       <input
@@ -979,17 +979,17 @@ export default function EstimatePage() {
                         onChange={(e) => setElevatorDestination(e.target.checked)}
                         className="w-4 h-4 text-accent border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Destination has elevator</span>
+                      <span className="text-sm text-[#374151]">Destination has elevator</span>
                     </label>
                   </div>
                   <div className="mt-4">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-semibold text-[#374151] mb-2">
                       Destination Parking
                     </label>
                     <select
                       value={parkingDestination}
                       onChange={(e) => setParkingDestination(e.target.value as any)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-[#111827]"
                     >
                       <option value="driveway">Driveway</option>
                       <option value="street">Street Parking</option>
@@ -1003,22 +1003,22 @@ export default function EstimatePage() {
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mt-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">Travel Distance</div>
+                      <div className="text-sm font-semibold text-[#374151]">Travel Distance</div>
                       {isCalculatingDistance ? (
                         <div className="flex items-center space-x-2 mt-1">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400"></div>
-                          <span className="text-xs text-gray-600 dark:text-gray-400">Calculating...</span>
+                          <span className="text-xs text-[#374151]">Calculating...</span>
                         </div>
                       ) : travelDistance > 0 ? (
-                        <div className="text-lg font-bold text-gray-900 dark:text-gray-100 mt-1">{travelDistance} miles</div>
+                        <div className="text-lg font-bold text-[#111827] mt-1">{travelDistance} miles</div>
                       ) : (
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter addresses to calculate</div>
                       )}
                     </div>
                     {travelTime > 0 && (
                       <div className="text-right">
-                        <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">Travel Time</div>
-                        <div className="text-lg font-bold text-gray-900 dark:text-gray-100 mt-1">{travelTime} min</div>
+                        <div className="text-sm font-semibold text-[#374151]">Travel Time</div>
+                        <div className="text-lg font-bold text-[#111827] mt-1">{travelTime} min</div>
                       </div>
                     )}
                   </div>
@@ -1038,7 +1038,7 @@ export default function EstimatePage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Detected Inventory</h2>
+                  <h2 className="text-xl font-bold text-[#111827]">Detected Inventory</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{totalItems} items • {totalCubicFeet.toFixed(0)} cu ft • {totalWeight.toFixed(0)} lbs</p>
                 </div>
               </div>
@@ -1105,7 +1105,7 @@ export default function EstimatePage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Additional Services</h2>
+                    <h2 className="text-xl font-bold text-[#111827]">Additional Services</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Enhance your move with these services</p>
                   </div>
                 </div>
@@ -1128,7 +1128,7 @@ export default function EstimatePage() {
                         ? 'border-green-500 dark:border-green-600 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 shadow-md'
                         : upsell.recommended
                         ? 'border-yellow-300 dark:border-yellow-600 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 hover:border-yellow-400 dark:hover:border-yellow-500'
-                        : 'border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-white dark:hover:bg-gray-800'
+                        : 'border-[#E5E7EB] bg-white/50 dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-white dark:hover:bg-gray-800'
                     }`}
                   >
                     <input
@@ -1141,7 +1141,7 @@ export default function EstimatePage() {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 flex-wrap">
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">{upsell.name}</span>
+                            <span className="font-semibold text-[#111827]">{upsell.name}</span>
                             {upsell.selected && (
                               <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full font-medium">
                                 ✓ Selected
@@ -1153,9 +1153,9 @@ export default function EstimatePage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{upsell.description}</p>
+                          <p className="text-sm text-[#374151] mt-1">{upsell.description}</p>
                         </div>
-                        <span className="font-bold text-gray-900 dark:text-gray-100 ml-4 text-lg">
+                        <span className="font-bold text-[#111827] ml-4 text-lg">
                           ${upsell.price.toFixed(2)}
                         </span>
                       </div>
@@ -1176,7 +1176,7 @@ export default function EstimatePage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Quote Summary</h2>
+                  <h2 className="text-xl font-bold text-[#111827]">Quote Summary</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Final pricing breakdown</p>
                 </div>
               </div>
@@ -1213,24 +1213,24 @@ export default function EstimatePage() {
                     </div>
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Loading:</span>
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">{gptBreakdown.loadingHours.toFixed(1)}h</span>
+                        <span className="text-[#374151]">Loading:</span>
+                        <span className="font-semibold text-[#111827]">{gptBreakdown.loadingHours.toFixed(1)}h</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Travel:</span>
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">{gptBreakdown.travelHours.toFixed(1)}h</span>
+                        <span className="text-[#374151]">Travel:</span>
+                        <span className="font-semibold text-[#111827]">{gptBreakdown.travelHours.toFixed(1)}h</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Unloading:</span>
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">{gptBreakdown.unloadingHours.toFixed(1)}h</span>
+                        <span className="text-[#374151]">Unloading:</span>
+                        <span className="font-semibold text-[#111827]">{gptBreakdown.unloadingHours.toFixed(1)}h</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Setup:</span>
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">{gptBreakdown.setupHours.toFixed(1)}h</span>
+                        <span className="text-[#374151]">Setup:</span>
+                        <span className="font-semibold text-[#111827]">{gptBreakdown.setupHours.toFixed(1)}h</span>
                       </div>
                       <div className="flex justify-between border-t border-gray-300 dark:border-gray-600 pt-1 mt-1">
-                        <span className="text-gray-600 dark:text-gray-400">Buffer:</span>
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">{gptBreakdown.bufferHours.toFixed(1)}h</span>
+                        <span className="text-[#374151]">Buffer:</span>
+                        <span className="font-semibold text-[#111827]">{gptBreakdown.bufferHours.toFixed(1)}h</span>
                       </div>
                     </div>
                   </div>
@@ -1245,35 +1245,35 @@ export default function EstimatePage() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Base Moving Cost:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">${finalEstimate.total.toFixed(2)}</span>
+                    <span className="text-[#374151]">Base Moving Cost:</span>
+                    <span className="font-semibold text-[#111827]">${finalEstimate.total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Estimated Time:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">{finalEstimate.hours.toFixed(1)} hours</span>
+                    <span className="text-[#374151]">Estimated Time:</span>
+                    <span className="font-semibold text-[#111827]">{finalEstimate.hours.toFixed(1)} hours</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Crew Size:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">{finalEstimate.crew} people</span>
+                    <span className="text-[#374151]">Crew Size:</span>
+                    <span className="font-semibold text-[#111827]">{finalEstimate.crew} people</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Travel Time:</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">{finalEstimate.travelMins} min</span>
+                    <span className="text-[#374151]">Travel Time:</span>
+                    <span className="font-semibold text-[#111827]">{finalEstimate.travelMins} min</span>
                   </div>
                 </div>
 
                 {totalUpsells > 0 && (
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="pt-4 border-t border-[#E5E7EB]">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Additional Services:</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">${totalUpsells.toFixed(2)}</span>
+                      <span className="text-[#374151]">Additional Services:</span>
+                      <span className="font-semibold text-[#111827]">${totalUpsells.toFixed(2)}</span>
                     </div>
                   </div>
                 )}
 
                 {priceOverride && overrideAmount !== null && (
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <div className="pt-4 border-t border-[#E5E7EB]">
+                    <div className="flex justify-between text-sm text-[#374151]">
                       <span>Calculated Total:</span>
                       <span className="line-through">${calculatedTotal.toFixed(2)}</span>
                     </div>
@@ -1285,7 +1285,7 @@ export default function EstimatePage() {
                 )}
                 <div className="pt-4 border-t-2 border-gray-300 dark:border-gray-600">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">Total:</span>
+                    <span className="text-lg font-bold text-[#111827]">Total:</span>
                     <span className={`text-3xl font-bold ${priceOverride ? 'text-yellow-600 dark:text-yellow-400' : 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent'}`}>
                       ${finalTotal.toFixed(2)}
                     </span>
@@ -1332,7 +1332,7 @@ export default function EstimatePage() {
                   <button
                     onClick={handleContinue}
                     disabled={!destinationAddress || !customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.moveDate}
-                    className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-xl transition-colors duration-200 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600"
+                    className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-700 text-[#374151] font-semibold py-3 px-4 rounded-xl transition-colors duration-200 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600"
                   >
                     Save & Continue Later
                   </button>

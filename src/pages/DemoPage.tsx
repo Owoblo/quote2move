@@ -131,7 +131,7 @@ export default function DemoPage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary dark:text-white mb-4 tracking-tight">
               Get Instant Moving Quotes from Just a Property Address.
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-[#374151] max-w-3xl mx-auto mb-8">
               Type any address in the activated cities below and watch MoveSense pull furniture and room data automatically from MLS photos.
             </p>
           </div>
@@ -148,8 +148,8 @@ export default function DemoPage() {
             />
             
             {/* Active Regions List */}
-            <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <div className="mt-6 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-6">
+              <p className="text-sm font-medium text-[#374151] mb-3">
                 Currently active regions:
               </p>
               <div className="flex flex-wrap gap-2">
@@ -203,23 +203,23 @@ export default function DemoPage() {
                         <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-4">                                                                   
               {isActiveRegion === true ? 'Get Full Access to MoveSense' : 'Activate MoveSense in Your City'}
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-[#374151] mb-8 max-w-2xl mx-auto">
               {isActiveRegion === true 
                 ? "Ready to start using MoveSense? Activate your account and get full access with 1-month free starter plan."
                 : "We're currently onboarding new moving companies city-by-city. Activate your account and get full access within 2 business days."}
             </p>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 mb-8">
+            <div className="bg-white rounded-2xl shadow-xl border border-[#E5E7EB] p-8 mb-8">
               <div className="mb-6">
                 <span className="text-5xl font-bold text-primary dark:text-white">$249</span>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">One-time setup fee</p>
+                <p className="text-[#374151] mt-2">One-time setup fee</p>
               </div>
 
               <div className="text-left max-w-md mx-auto mb-8">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-[#374151] mb-4">
                   Includes your city data setup, MLS integration, and 1-month free starter plan.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <ul className="space-y-2 text-sm text-[#374151]">
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -258,7 +258,7 @@ export default function DemoPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-primary dark:text-white mb-4">
             Watch how it works
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+          <p className="text-lg text-[#374151] mb-8">
             See MoveSense in action (2-min video)
           </p>
           
@@ -286,7 +286,7 @@ export default function DemoPage() {
           <h2 className="text-2xl md:text-3xl font-bold text-primary dark:text-white mb-4">
             Your city not listed yet?
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-[#374151] mb-6">
             Get notified when MoveSense activates in your area.
           </p>
 
@@ -315,7 +315,7 @@ export default function DemoPage() {
             </div>
           )}
           
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-[#374151]">
             Questions? Email us at{' '}
             <a 
               href="mailto:support@movsense.com" 

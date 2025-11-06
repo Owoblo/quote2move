@@ -58,10 +58,10 @@ export default function KeyFeaturesSection() {
               <div className="w-12 h-12 bg-accent/10 dark:bg-accent/20 rounded-lg flex items-center justify-center mb-6 text-accent dark:text-accent-light">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              <h3 className="text-xl font-semibold text-[#111827] mb-3">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-[#374151] leading-relaxed">
                 {feature.description}
               </p>
             </div>

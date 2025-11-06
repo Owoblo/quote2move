@@ -15,7 +15,7 @@ export default function FinalCTASection() {
         <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
           See MovSense in action.
         </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
+        <p className="text-lg text-[#374151] mb-10 max-w-2xl mx-auto">
           Give your team AI powered quotes from listing photos.
         </p>
         
@@ -27,7 +27,7 @@ export default function FinalCTASection() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+              className="flex-1 px-4 py-3 rounded-lg border border-[#E5E7EB] bg-white dark:bg-gray-900 text-[#111827] placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
             />
             <button
               type="submit"

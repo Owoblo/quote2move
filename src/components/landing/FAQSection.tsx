@@ -54,7 +54,7 @@ export default function FAQSection() {
                 onClick={() => toggleFAQ(index)}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                <span className="font-semibold text-gray-900 dark:text-gray-100 pr-8">
+                <span className="font-semibold text-[#111827] pr-8">
                   {faq.question}
                 </span>
                 <svg 
@@ -69,7 +69,7 @@ export default function FAQSection() {
                 </svg>
               </button>
               {openIndex === index && (
-                <div className="px-6 py-4 pt-0 text-gray-600 dark:text-gray-400">
+                <div className="px-6 py-4 pt-0 text-[#374151]">
                   {faq.answer}
                 </div>
               )}

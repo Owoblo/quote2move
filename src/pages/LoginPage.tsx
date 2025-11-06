@@ -73,16 +73,16 @@ export default function LoginPage() {
           <Link to="/" className="flex items-center justify-center mb-8">
             <MovSenseLogo size="lg" />
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h2 className="text-3xl font-bold text-[#111827] mb-2">
             {isSignUp ? 'Create your account' : 'Welcome back'}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-[#374151]">
             {isSignUp ? 'Start your free trial today' : 'Sign in to your account'}
           </p>
         </div>
 
         {/* Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-200">
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 transition-colors duration-200">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className={`${error.startsWith('success:') 
@@ -110,7 +110,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[#374151] mb-2">
                 Email address
               </label>
               <input
@@ -121,13 +121,13 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="Enter your email"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[#374151] mb-2">
                 Password
               </label>
               <input
@@ -138,7 +138,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder={isSignUp ? 'Create a password (min. 6 characters)' : 'Enter your password'}
               />
             </div>
@@ -152,7 +152,7 @@ export default function LoginPage() {
                     type="checkbox"
                     className="h-4 w-4 text-accent focus:ring-accent border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-[#374151]">
                     Remember me
                   </label>
                 </div>
@@ -190,7 +190,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500 dark:text-gray-400">Or continue with</span>
               </div>
             </div>
 
@@ -214,7 +214,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-[#374151]">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
                 type="button"
@@ -234,7 +234,7 @@ export default function LoginPage() {
 
         {/* Back to Home */}
         <div className="text-center">
-          <Link to="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+          <Link to="/" className="text-sm text-[#374151] hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
             ← Back to home
           </Link>
         </div>

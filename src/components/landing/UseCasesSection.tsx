@@ -31,10 +31,10 @@ export default function UseCasesSection() {
               key={index} 
               className="p-8 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
             >
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-2xl font-semibold text-[#111827] mb-4">
                 {useCase.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-[#374151] leading-relaxed">
                 {useCase.description}
               </p>
             </div>

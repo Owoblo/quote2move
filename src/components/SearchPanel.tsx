@@ -187,13 +187,13 @@ export default function SearchPanel({
   return (
     <div className="card p-6">
       <div className="mb-5">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1.5">Property Search</h2>
+        <h2 className="text-sm font-semibold text-[#111827] mb-1.5">Property Search</h2>
         <p className="text-xs text-gray-500 dark:text-gray-400">Enter an address to automatically detect furniture and generate moving estimates</p>
       </div>
       
       {/* Address Input with Autocomplete */}
       <div className="mb-6 relative z-10">
-        <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+        <label htmlFor="address" className="block text-sm font-medium text-[#374151] mb-3">
           Address
         </label>
         <div className="relative">
@@ -224,7 +224,7 @@ export default function SearchPanel({
         {showSuggestions && suggestions.length > 0 && (
           <div 
             ref={dropdownRef}
-            className="absolute z-30 w-full mt-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-premium-lg max-h-64 overflow-y-auto"
+            className="absolute z-30 w-full mt-1.5 bg-white border border-[#E5E7EB] rounded-md shadow-premium-lg max-h-64 overflow-y-auto"
           >
             {suggestions.map((listing, index) => (
               <div
@@ -236,10 +236,10 @@ export default function SearchPanel({
                 }}
                 className="suggestion-item px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors duration-150"
               >
-                <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                <div className="font-medium text-[#111827] text-sm">
                   {listing.address}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div className="text-xs text-[#374151] mt-1">
                   {listing.addresscity}, {listing.addressstate}
                   {listing.unformattedprice && (
                     <span className="ml-2 text-green-600 dark:text-green-400 font-medium">
@@ -260,7 +260,7 @@ export default function SearchPanel({
         
         {/* Loading indicator */}
         {showSuggestions && loading && (
-          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
+          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400 mr-2"></div>
               <span className="text-sm text-gray-500 dark:text-gray-400">Searching...</span>

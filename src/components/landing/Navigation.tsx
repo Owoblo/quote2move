@@ -18,16 +18,16 @@ export default function Navigation() {
             <a href="#product" className="text-[#374151] hover:text-[#2563EB] font-medium text-sm transition-colors">
               Product
             </a>
-            <a href="#how-it-works" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
+            <a href="#how-it-works" className="text-[#374151] hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
               How it works
             </a>
-            <a href="#pricing" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
+            <a href="#pricing" className="text-[#374151] hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
               Pricing
             </a>
-            <a href="#faq" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
+            <a href="#faq" className="text-[#374151] hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
               FAQ
             </a>
-            <Link to="/login" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
+            <Link to="/login" className="text-[#374151] hover:text-primary dark:hover:text-white font-medium text-sm transition-colors">
               Login
             </Link>
             <ThemeToggle />
@@ -42,7 +42,7 @@ export default function Navigation() {
           {/* Mobile menu */}
           <div className="md:hidden flex items-center space-x-4">
             <ThemeToggle />
-            <Link to="/login" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white font-medium text-sm">
+            <Link to="/login" className="text-[#374151] hover:text-primary dark:hover:text-white font-medium text-sm">
               Login
             </Link>
             <Link 

@@ -697,7 +697,7 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 tracking-tight">MovSense</h1>
+              <h1 className="text-lg font-semibold text-[#111827] tracking-tight">MovSense</h1>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -739,7 +739,7 @@ export default function DashboardPage() {
                 )}
               </button>
               <div className="w-px h-5 bg-gray-200 dark:bg-gray-700"></div>
-              <select className="text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <select className="text-sm font-medium text-[#374151] bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 <option>San Francisco, CA</option>
                 <option>Los Angeles, CA</option>
                 <option>New York, NY</option>
@@ -761,7 +761,7 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab('create')}
                 className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'create'
-                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    ? 'border-accent text-[#111827]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
@@ -771,7 +771,7 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab('analytics')}
                 className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'analytics'
-                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    ? 'border-accent text-[#111827]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
@@ -781,7 +781,7 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab('quotes')}
                 className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'quotes'
-                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    ? 'border-accent text-[#111827]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
@@ -791,7 +791,7 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab('calendar')}
                 className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'calendar'
-                    ? 'border-accent text-gray-900 dark:text-gray-100'
+                    ? 'border-accent text-[#111827]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
@@ -847,7 +847,7 @@ export default function DashboardPage() {
                     <div className="space-y-3">
                       {analytics.quotesByPriceRange.map((range: any) => (
                         <div key={range.range} className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">{range.range}</span>
+                          <span className="text-[#374151]">{range.range}</span>
                           <div className="flex items-center space-x-3">
                             <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                               <div
@@ -864,7 +864,7 @@ export default function DashboardPage() {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-gray-600 dark:text-gray-400">No analytics data available</p>
+                  <p className="text-[#374151]">No analytics data available</p>
                 </div>
               )}
             </div>
@@ -874,8 +874,8 @@ export default function DashboardPage() {
           {activeTab === 'quotes' && (
             <div className="space-y-4">
               {quotes.length === 0 ? (
-                <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
-                  <p className="text-gray-600 dark:text-gray-400">No quotes yet</p>
+                <div className="text-center py-12 bg-white rounded-xl">
+                  <p className="text-[#374151]">No quotes yet</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -927,7 +927,7 @@ export default function DashboardPage() {
                 <div className="card card-hover p-6">
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Follow-ups Due</h3>
                   {followUps.length === 0 ? (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">No follow-ups scheduled</p>
+                    <p className="text-[#374151] text-sm">No follow-ups scheduled</p>
                   ) : (
                     <div className="space-y-3">
                       {followUps.map((followUp) => (
@@ -937,7 +937,7 @@ export default function DashboardPage() {
                               <p className="font-semibold text-gray-900 dark:text-white text-sm">
                                 Follow-up: {new Date(followUp.follow_up_date).toLocaleDateString()}
                               </p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400">Quote ID: {followUp.quote_id}</p>
+                              <p className="text-xs text-[#374151]">Quote ID: {followUp.quote_id}</p>
                             </div>
                             <button
                               onClick={async () => {
@@ -964,16 +964,16 @@ export default function DashboardPage() {
                 <div className="card card-hover p-6">
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Upcoming Moves (Next 30 Days)</h3>
                   {calendarEvents.length === 0 ? (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">No upcoming moves</p>
+                    <p className="text-[#374151] text-sm">No upcoming moves</p>
                   ) : (
                     <div className="space-y-3">
                       {calendarEvents.slice(0, 5).map((event) => (
                         <div key={event.id} className="p-3 bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/50 rounded-md">
                           <p className="font-semibold text-gray-900 dark:text-white text-sm">{event.title}</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-[#374151] mt-1">
                             {new Date(event.startDate).toLocaleDateString()} at {event.startTime}
                           </p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">{event.location}</p>
+                          <p className="text-xs text-[#374151]">{event.location}</p>
                           {event.notes.length > 0 && (
                             <div className="mt-2 space-y-1">
                               {event.notes.slice(0, 2).map((note: string, idx: number) => (
@@ -1061,12 +1061,12 @@ export default function DashboardPage() {
                 <div className="card section-padding">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Export & Actions</h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Export inventory data and send quotes</p>
+                      <h2 className="text-lg font-semibold text-[#111827] mb-2">Export & Actions</h2>
+                      <p className="text-sm text-[#374151]">Export inventory data and send quotes</p>
                     </div>
                   </div>
                   
-                  <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="mb-4 pb-4 border-b border-[#E5E7EB]">
                     <button
                       onClick={() => {
                         if (state.detections.length === 0) {

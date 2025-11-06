@@ -433,7 +433,7 @@ export default function SettingsPage() {
                 onClick={() => navigate('/dashboard')}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -443,7 +443,7 @@ export default function SettingsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">Settings</h1>
+              <h1 className="text-xl font-semibold text-[#111827] tracking-tight">Settings</h1>
             </div>
             <ThemeToggle />
           </div>
@@ -453,7 +453,7 @@ export default function SettingsPage() {
       {/* Main Content */}
       <main className="container-max px-6 py-12">
         {/* Tab Navigation */}
-        <div className="mb-8 border-b border-gray-200 dark:border-gray-700">
+        <div className="mb-8 border-b border-[#E5E7EB]">
           <nav className="flex space-x-8">
             {(['quote', 'email', 'company', 'upsells'] as const).map((tab) => (
               <button
@@ -480,11 +480,11 @@ export default function SettingsPage() {
         {/* Tab Content */}
         {activeTab === 'quote' && (
           <div className="card section-padding">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Quote Customization</h2>
+            <h2 className="text-2xl font-bold text-[#111827] mb-6">Quote Customization</h2>
 
           {/* Logo URL */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[#374151] mb-2">
               Custom Logo URL
             </label>
             <input
@@ -499,7 +499,7 @@ export default function SettingsPage() {
             </p>
             {settings.customLogoUrl && (
               <div className="mt-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+                <p className="text-sm text-[#374151] mb-2">Preview:</p>
                 <img
                   src={settings.customLogoUrl}
                   alt="Logo preview"
@@ -514,12 +514,12 @@ export default function SettingsPage() {
 
           {/* Brand Colors */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+            <label className="block text-sm font-medium text-[#374151] mb-4">
               Brand Colors
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">Primary Color</label>
+                <label className="block text-xs text-[#374151] mb-2">Primary Color</label>
                 <div className="flex items-center space-x-2">
                   <input
                     type="color"
@@ -537,7 +537,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">Secondary Color</label>
+                <label className="block text-xs text-[#374151] mb-2">Secondary Color</label>
                 <div className="flex items-center space-x-2">
                   <input
                     type="color"
@@ -555,7 +555,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">Accent Color</label>
+                <label className="block text-xs text-[#374151] mb-2">Accent Color</label>
                 <div className="flex items-center space-x-2">
                   <input
                     type="color"
@@ -587,7 +587,7 @@ export default function SettingsPage() {
                 onChange={(e) => setSettings(prev => ({ ...prev, includeMLSPhotos: e.target.checked }))}
                 className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-[#374151]">
                 Include MLS Photos in Quotes
               </span>
             </label>
@@ -600,23 +600,23 @@ export default function SettingsPage() {
 
         {activeTab === 'email' && (
           <div className="card section-padding">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Email Settings</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <h2 className="text-2xl font-bold text-[#111827] mb-6">Email Settings</h2>
+          <p className="text-sm text-[#374151] mb-6">
             Configure how your quote emails appear to customers. These settings apply to all emails sent from your account.
           </p>
 
           {/* Assigned Email Addresses */}
           {assignedEmails && (
             <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Your Assigned Email Addresses</h3>
+              <h3 className="text-sm font-semibold text-[#111827] mb-3">Your Assigned Email Addresses</h3>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">Sending Address:</span>
-                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{assignedEmails.fromEmail}</span>
+                  <span className="text-[#374151]">Sending Address:</span>
+                  <span className="ml-2 font-mono text-[#111827]">{assignedEmails.fromEmail}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">Reply Address:</span>
-                  <span className="ml-2 font-mono text-gray-900 dark:text-gray-100">{assignedEmails.replyToEmail}</span>
+                  <span className="text-[#374151]">Reply Address:</span>
+                  <span className="ml-2 font-mono text-[#111827]">{assignedEmails.replyToEmail}</span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
                   Replies to your quotes will be sent to {assignedEmails.replyToEmail} and forwarded to your company email.
@@ -633,7 +633,7 @@ export default function SettingsPage() {
             <>
               {/* From Email */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
                   From Email Address
                 </label>
                 <input
@@ -650,7 +650,7 @@ export default function SettingsPage() {
 
               {/* From Name */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
                   From Name (Display Name)
                 </label>
                 <input
@@ -667,7 +667,7 @@ export default function SettingsPage() {
 
               {/* Reply To */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
                   Reply-To Email
                 </label>
                 <input
@@ -683,7 +683,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Save Email Settings Button */}
-              <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between pt-6 border-t border-[#E5E7EB]">
                 <div>
                   {saved && (
                     <p className="text-sm text-green-600 dark:text-green-400 flex items-center space-x-2">
@@ -709,8 +709,8 @@ export default function SettingsPage() {
 
         {activeTab === 'company' && (
           <div className="card section-padding">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Company Information</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <h2 className="text-2xl font-bold text-[#111827] mb-6">Company Information</h2>
+          <p className="text-sm text-[#374151] mb-6">
             Configure your company details. This will appear in quotes, emails, and customer communications.
           </p>
 
@@ -722,7 +722,7 @@ export default function SettingsPage() {
             <>
               {/* Company Name */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
                   Company Name *
                 </label>
                 <input
@@ -740,7 +740,7 @@ export default function SettingsPage() {
 
               {/* Company Logo Upload */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
                   Company Logo
                 </label>
                 <div className="space-y-4">
@@ -759,14 +759,14 @@ export default function SettingsPage() {
                         {uploadingLogo ? (
                           <div className="flex items-center justify-center space-x-2">
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Uploading...</span>
+                            <span className="text-sm text-[#374151]">Uploading...</span>
                           </div>
                         ) : (
                           <div className="flex flex-col items-center space-y-2">
                             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <span className="text-sm font-medium text-[#374151]">
                               Click to upload logo
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG up to 5MB</span>
@@ -778,7 +778,7 @@ export default function SettingsPage() {
 
                   {/* Manual URL Input (Alternative) */}
                   <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">Or enter logo URL:</label>
+                    <label className="block text-xs text-[#374151] mb-2">Or enter logo URL:</label>
                     <input
                       type="url"
                       value={companySettings.companyLogoUrl}
@@ -791,7 +791,7 @@ export default function SettingsPage() {
                   {/* Logo Preview */}
                   {companySettings.companyLogoUrl && (
                     <div className="mt-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+                      <p className="text-sm text-[#374151] mb-2">Preview:</p>
                       <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 inline-block">
                         <img
                           src={companySettings.companyLogoUrl}
@@ -810,7 +810,7 @@ export default function SettingsPage() {
               {/* Company Contact Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-[#374151] mb-2">
                     Company Phone
                   </label>
                   <input
@@ -822,7 +822,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-[#374151] mb-2">
                     Company Email
                   </label>
                   <input
@@ -837,7 +837,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-[#374151] mb-2">
                     Company Website
                   </label>
                   <input
@@ -849,7 +849,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-[#374151] mb-2">
                     Company Address
                   </label>
                   <input
@@ -864,7 +864,7 @@ export default function SettingsPage() {
 
               {/* Email Forwarding */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
                   Forward Replies To <span className="text-gray-500 text-xs font-normal">(Optional)</span>
                 </label>
                 <input
@@ -880,7 +880,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Save Company Settings Button */}
-              <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between pt-6 border-t border-[#E5E7EB]">
                 <div>
                   {saved && (
                     <p className="text-sm text-green-600 dark:text-green-400 flex items-center space-x-2">
@@ -910,8 +910,8 @@ export default function SettingsPage() {
             <div className="card section-padding mb-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Custom Upsells</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <h2 className="text-2xl font-bold text-[#111827]">Custom Upsells</h2>
+                  <p className="text-sm text-[#374151] mt-1">
                     Create and manage your own upsell service templates that will appear in quotes
                   </p>
                 </div>
@@ -967,11 +967,11 @@ export default function SettingsPage() {
                   {customUpsells.map((upsell) => (
                     <div
                       key={upsell.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="flex items-center justify-between p-4 border border-[#E5E7EB] rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{upsell.name}</h3>
+                          <h3 className="font-semibold text-[#111827]">{upsell.name}</h3>
                           {upsell.recommended_by_default && (
                             <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full">
                               Recommended
@@ -984,9 +984,9 @@ export default function SettingsPage() {
                           )}
                         </div>
                         {upsell.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{upsell.description}</p>
+                          <p className="text-sm text-[#374151] mt-1">{upsell.description}</p>
                         )}
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-1">
+                        <p className="text-sm font-semibold text-[#111827] mt-1">
                           ${parseFloat(upsell.price).toFixed(2)}
                         </p>
                       </div>
@@ -1014,12 +1014,12 @@ export default function SettingsPage() {
             {showUpsellModal && (
               <div className="modal-overlay" onClick={() => setShowUpsellModal(false)}>
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  <h3 className="text-lg font-semibold text-[#111827] mb-4">
                     {editingUpsell ? 'Edit Upsell' : 'Add New Upsell'}
                   </h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-[#374151] mb-2">
                         Name <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -1031,7 +1031,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-[#374151] mb-2">
                         Description
                       </label>
                       <textarea
@@ -1044,7 +1044,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-[#374151] mb-2">
                           Price <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -1058,7 +1058,7 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-[#374151] mb-2">
                           Category
                         </label>
                         <select
@@ -1081,7 +1081,7 @@ export default function SettingsPage() {
                           onChange={(e) => setUpsellForm(prev => ({ ...prev, recommended_by_default: e.target.checked }))}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Mark as recommended by default</span>
+                        <span className="text-sm text-[#374151]">Mark as recommended by default</span>
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
@@ -1090,7 +1090,7 @@ export default function SettingsPage() {
                           onChange={(e) => setUpsellForm(prev => ({ ...prev, auto_select: e.target.checked }))}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Auto-select when conditions are met</span>
+                        <span className="text-sm text-[#374151]">Auto-select when conditions are met</span>
                       </label>
                     </div>
                     <div className="flex justify-end space-x-3 pt-4">

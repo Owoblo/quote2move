@@ -38,7 +38,7 @@ export default function HowItWorksSection() {
           <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
             How MovSense works
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-[#374151] max-w-2xl mx-auto">
             From property link to accurate quote in a few seconds.
           </p>
         </div>
@@ -49,10 +49,10 @@ export default function HowItWorksSection() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent/10 dark:bg-accent/20 text-accent dark:text-accent-light mb-6">
                 {step.icon}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              <h3 className="text-xl font-semibold text-[#111827] mb-3">
                 {step.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-[#374151] leading-relaxed">
                 {step.description}
               </p>
             </div>

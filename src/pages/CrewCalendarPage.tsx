@@ -76,14 +76,14 @@ export default function CrewCalendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-[#F3F4F6]">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <header className="bg-white border-b border-[#E5E7EB]">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Crew Calendar</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Your scheduled moves</p>
+              <p className="text-sm text-[#374151]">Your scheduled moves</p>
             </div>
             <div className="flex items-center space-x-3">
               <select
@@ -111,17 +111,17 @@ export default function CrewCalendarPage() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Upcoming Jobs</h2>
           {upcomingEvents.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 text-center">
-              <p className="text-gray-600 dark:text-gray-400">No upcoming jobs scheduled</p>
+            <div className="bg-white rounded-xl shadow p-6 text-center">
+              <p className="text-[#374151]">No upcoming jobs scheduled</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {upcomingEvents.map((event) => (
-                <div key={event.id} className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <div key={event.id} className="bg-white rounded-xl shadow p-6">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">{event.title}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-[#374151] mt-1">
                         {new Date(event.startDate).toLocaleDateString('en-US', { 
                           weekday: 'short', 
                           month: 'short', 
@@ -142,7 +142,7 @@ export default function CrewCalendarPage() {
                         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Job Notes</p>
                         <ul className="space-y-1">
                           {event.notes.map((note, idx) => (
-                            <li key={idx} className="text-sm text-gray-700 dark:text-gray-300 flex items-start">
+                            <li key={idx} className="text-sm text-[#374151] flex items-start">
                               <span className="mr-2">•</span>
                               <span>{note}</span>
                             </li>
@@ -152,7 +152,7 @@ export default function CrewCalendarPage() {
                     )}
                   </div>
                   
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Job ID: {event.quoteId}
                     </p>
@@ -165,7 +165,7 @@ export default function CrewCalendarPage() {
 
         {/* Calendar View */}
         {viewMode === 'week' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow">
+          <div className="bg-white rounded-xl shadow">
             <div className="p-6">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Week View
@@ -178,8 +178,8 @@ export default function CrewCalendarPage() {
                   const dayEvents = eventsForDate(dateStr);
                   
                   return (
-                    <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 min-h-[200px]">
-                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div key={idx} className="border border-[#E5E7EB] rounded-lg p-3 min-h-[200px]">
+                      <p className="text-sm font-semibold text-[#374151] mb-2">
                         {date.toLocaleDateString('en-US', { weekday: 'short' })}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -203,7 +203,7 @@ export default function CrewCalendarPage() {
 
         {/* Export Calendar Button */}
         {events.length > 0 && (
-          <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <div className="mt-6 bg-white rounded-xl shadow p-6">
             <button
               onClick={() => {
                 const icsContent = CalendarService.exportToICS(events);
