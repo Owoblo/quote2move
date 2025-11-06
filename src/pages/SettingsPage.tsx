@@ -162,9 +162,10 @@ export default function SettingsPage() {
       // Create storage bucket if it doesn't exist (this will be handled by Supabase)
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      const filePath = `company-logos/${fileName}`;
+      const filePath = fileName; // Store directly in user's folder, not in company-logos subfolder
 
       // Upload file to Supabase Storage
+      // The RLS policy checks that the first folder is the user's ID
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('company-assets')
         .upload(filePath, file, {
