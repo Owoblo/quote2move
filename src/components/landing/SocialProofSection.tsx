@@ -4,17 +4,17 @@ export default function SocialProofSection() {
   const companies = [
     {
       name: 'Lets Get Moving',
-      logo: process.env.PUBLIC_URL + '/Lets Get Moving Logo.webp',
+      logo: '/Lets Get Moving Logo.webp',
       alt: 'Lets Get Moving Logo'
     },
     {
       name: 'Central Coast Moving',
-      logo: process.env.PUBLIC_URL + '/Central Coast Moving logo.webp',
+      logo: '/Central Coast Moving logo.webp',
       alt: 'Central Coast Moving Logo'
     },
     {
       name: 'United Van Lines',
-      logo: process.env.PUBLIC_URL + '/United-Van-Lines-Company-Logo.gif',
+      logo: '/United-Van-Lines-Company-Logo.gif',
       alt: 'United Van Lines Logo'
     }
   ];
@@ -38,12 +38,17 @@ export default function SocialProofSection() {
                   className="max-h-full max-w-full object-contain"
                   loading="lazy"
                   onError={(e) => {
-                    console.error('Failed to load logo:', company.logo);
+                    console.error('Failed to load logo:', company.logo, 'Trying URL encoded version...');
                     // Try with URL encoding as fallback
                     const encodedPath = company.logo.replace(/ /g, '%20');
-                    if (e.currentTarget.src !== encodedPath) {
+                    if (e.currentTarget.src !== window.location.origin + encodedPath) {
                       e.currentTarget.src = encodedPath;
+                    } else {
+                      console.error('Both paths failed for:', company.name);
                     }
+                  }}
+                  onLoad={() => {
+                    console.log('Successfully loaded logo:', company.name);
                   }}
                 />
               </div>
