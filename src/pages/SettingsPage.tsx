@@ -44,6 +44,7 @@ export default function SettingsPage() {
   });
   const [loadingCompanySettings, setLoadingCompanySettings] = useState(true);
   const [savingCompanySettings, setSavingCompanySettings] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     // Load saved quote settings
@@ -97,7 +98,7 @@ export default function SettingsPage() {
         .from('company_settings')
         .select('company_name, company_logo_url, company_address, company_phone, company_email, company_website')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading company settings:', error);
@@ -433,6 +434,185 @@ export default function SettingsPage() {
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-xl transition-colors duration-200 disabled:cursor-not-allowed"
                 >
                   {savingEmailSettings ? 'Saving...' : 'Save Email Settings'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Company Settings Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 mt-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Company Information</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Configure your company details. This will appear in quotes, emails, and customer communications.
+          </p>
+
+          {loadingCompanySettings ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <>
+              {/* Company Name */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Company Name *
+                </label>
+                <input
+                  type="text"
+                  value={companySettings.companyName}
+                  onChange={(e) => setCompanySettings(prev => ({ ...prev, companyName: e.target.value }))}
+                  placeholder="Saturn Star Movers"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                  required
+                />
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  This will replace "MovSense" in quotes and emails.
+                </p>
+              </div>
+
+              {/* Company Logo Upload */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Company Logo
+                </label>
+                <div className="space-y-4">
+                  {/* Upload Button */}
+                  <div className="flex items-center space-x-4">
+                    <label className="flex-1 cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        disabled={uploadingLogo}
+                        id="logo-upload"
+                      />
+                      <div className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 dark:hover:border-blue-500 transition-colors text-center">
+                        {uploadingLogo ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Uploading...</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center space-y-2">
+                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Click to upload logo
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG up to 5MB</span>
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Manual URL Input (Alternative) */}
+                  <div>
+                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">Or enter logo URL:</label>
+                    <input
+                      type="url"
+                      value={companySettings.companyLogoUrl}
+                      onChange={(e) => setCompanySettings(prev => ({ ...prev, companyLogoUrl: e.target.value }))}
+                      placeholder="https://example.com/logo.png"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                    />
+                  </div>
+
+                  {/* Logo Preview */}
+                  {companySettings.companyLogoUrl && (
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 inline-block">
+                        <img
+                          src={companySettings.companyLogoUrl}
+                          alt="Company logo"
+                          className="h-16 object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Company Contact Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Company Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={companySettings.companyPhone}
+                    onChange={(e) => setCompanySettings(prev => ({ ...prev, companyPhone: e.target.value }))}
+                    placeholder="(555) 123-4567"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Company Email
+                  </label>
+                  <input
+                    type="email"
+                    value={companySettings.companyEmail}
+                    onChange={(e) => setCompanySettings(prev => ({ ...prev, companyEmail: e.target.value }))}
+                    placeholder="info@yourcompany.com"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Company Website
+                  </label>
+                  <input
+                    type="url"
+                    value={companySettings.companyWebsite}
+                    onChange={(e) => setCompanySettings(prev => ({ ...prev, companyWebsite: e.target.value }))}
+                    placeholder="https://yourcompany.com"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Company Address
+                  </label>
+                  <input
+                    type="text"
+                    value={companySettings.companyAddress}
+                    onChange={(e) => setCompanySettings(prev => ({ ...prev, companyAddress: e.target.value }))}
+                    placeholder="123 Main St, City, State ZIP"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                </div>
+              </div>
+
+              {/* Save Company Settings Button */}
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div>
+                  {saved && (
+                    <p className="text-sm text-green-600 dark:text-green-400 flex items-center space-x-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Company settings saved!</span>
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleSaveCompanySettings()}
+                  disabled={savingCompanySettings || uploadingLogo}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-xl transition-colors duration-200 disabled:cursor-not-allowed"
+                >
+                  {savingCompanySettings ? 'Saving...' : 'Save Company Settings'}
                 </button>
               </div>
             </>

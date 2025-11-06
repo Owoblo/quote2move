@@ -45,13 +45,15 @@ export default function QuoteViewerPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('company_settings')
         .select('company_name, company_logo_url, company_phone, company_email, company_website')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (data) {
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading company settings:', error);
+      } else if (data) {
         setCompanySettings({
           companyName: data.company_name || 'Saturn Star Movers',
           companyLogoUrl: data.company_logo_url,
@@ -188,17 +190,17 @@ export default function QuoteViewerPage() {
       await QuoteService.addQuestion(quoteId, question);
       
       // Update local state
-      setQuestions(prev => [...prev, question]);
-      setQuestion('');
-      setShowQuestions(false);
-      
+    setQuestions(prev => [...prev, question]);
+    setQuestion('');
+    setShowQuestions(false);
+    
       // Refresh quote to get updated questions
       const updatedQuote = await QuoteService.getQuote(quoteId);
       if (updatedQuote) {
         setQuote(updatedQuote);
       }
       
-      alert('Question submitted! We\'ll get back to you soon.');
+    alert('Question submitted! We\'ll get back to you soon.');
       
       // Send notification email (would be handled by backend in production)
       console.log('Question submitted. Email notification should be sent.');
@@ -624,38 +626,38 @@ export default function QuoteViewerPage() {
 
             {/* Actions - Customer View (only show for non-authenticated users) */}
             {!canEdit && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Quote Actions</h2>
-                
-                {quote.status === 'pending' && (
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => handleQuoteAction('accept')}
-                      disabled={actionLoading}
-                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
-                      {actionLoading ? 'Processing...' : 'Accept Quote'}
-                    </button>
-                    
-                    <button
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Quote Actions</h2>
+              
+              {quote.status === 'pending' && (
+                <div className="space-y-3">
+                  <button
+                    onClick={() => handleQuoteAction('accept')}
+                    disabled={actionLoading}
+                    className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                  >
+                    {actionLoading ? 'Processing...' : 'Accept Quote'}
+                  </button>
+                  
+                  <button
                       onClick={() => {
                         setDeclineActionBy('customer');
                         setShowDeclineModal(true);
                       }}
-                      disabled={actionLoading}
-                      className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
+                    disabled={actionLoading}
+                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                  >
                       Decline Quote
-                    </button>
-                    
-                    <button
-                      onClick={() => setShowQuestions(true)}
-                      className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
-                      Ask Questions
-                    </button>
-                  </div>
-                )}
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowQuestions(true)}
+                    className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                  >
+                    Ask Questions
+                  </button>
+                </div>
+              )}
 
               {quote.status === 'accepted' && (
                 <div className="text-center">
