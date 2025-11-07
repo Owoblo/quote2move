@@ -345,7 +345,7 @@ export default function SettingsPage() {
   };
 
   const handleDeleteUpsell = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this upsell?')) return;
+    if (!window.confirm('Are you sure you want to delete this upsell?')) return;
     
     try {
       const { error } = await supabase
