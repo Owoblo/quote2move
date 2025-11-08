@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { QuoteService, QuoteData } from '../lib/quoteService';
@@ -16,7 +16,6 @@ export default function QuoteViewerPage() {
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
   const [customDeclineReason, setCustomDeclineReason] = useState('');
-  const [isSalesRep, setIsSalesRep] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [permissionChecked, setPermissionChecked] = useState(false); // Track if we've checked permissions
   const [declineActionBy, setDeclineActionBy] = useState<'customer' | 'sales_rep'>('customer');
@@ -31,19 +30,7 @@ export default function QuoteViewerPage() {
     companyWebsite: string | null;
   } | null>(null);
 
-  useEffect(() => {
-    fetchQuote();
-    checkUserRole();
-    loadCompanySettings();
-  }, [quoteId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    // Always check edit permission when quote loads or changes
-    // This ensures canEdit is properly set for both authenticated and unauthenticated users
-    checkEditPermission();
-  }, [quote]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const loadCompanySettings = async () => {
+  const loadCompanySettings = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -68,18 +55,9 @@ export default function QuoteViewerPage() {
     } catch (error) {
       console.error('Error loading company settings:', error);
     }
-  };
+  }, []);
 
-  const checkUserRole = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsSalesRep(!!user); // If user is authenticated, they're a sales rep
-    } catch (error) {
-      setIsSalesRep(false);
-    }
-  };
-
-  const checkEditPermission = async () => {
+  const checkEditPermission = useCallback(async () => {
     // Always start with false - only set to true if user is authenticated AND owns the quote
     setCanEdit(false);
     setPermissionChecked(false);
@@ -127,7 +105,13 @@ export default function QuoteViewerPage() {
       setCanEdit(false);
       setPermissionChecked(true);
     }
-  };
+  }, [quote]);
+
+  useEffect(() => {
+    // Always check edit permission when quote loads or changes
+    // This ensures canEdit is properly set for both authenticated and unauthenticated users
+    checkEditPermission();
+  }, [checkEditPermission]);
 
   // Track email open when quote is loaded (only for customers, not sales reps viewing their own quotes)
   useEffect(() => {
@@ -156,9 +140,9 @@ export default function QuoteViewerPage() {
       
       trackEmailOpen();
     }
-  }, [quote, quoteId]);
+  }, [quote, quoteId, canEdit]);
 
-  const fetchQuote = async () => {
+  const fetchQuote = useCallback(async () => {
     try {
       const quoteData = await QuoteService.getQuote(quoteId || '');
       if (quoteData) {
@@ -172,7 +156,12 @@ export default function QuoteViewerPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [quoteId]);
+
+  useEffect(() => {
+    fetchQuote();
+    loadCompanySettings();
+  }, [fetchQuote, loadCompanySettings]);
 
   const handleQuoteAction = async (action: 'accept' | 'decline', declineReason?: string, actionBy: 'customer' | 'sales_rep' = 'customer') => {
     if (!quote || !quoteId) return;
@@ -350,7 +339,7 @@ export default function QuoteViewerPage() {
                     <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
                       <img
                         src={photo.url || photo}
-                        alt={`Property photo ${index + 1}`}
+                        alt={`Property ${index + 1}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';

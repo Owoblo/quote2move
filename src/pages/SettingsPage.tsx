@@ -189,7 +189,7 @@ export default function SettingsPage() {
 
       // Upload file to Supabase Storage
       // The RLS policy checks that the first folder is the user's ID
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('company-assets')
         .upload(filePath, file, {
           cacheControl: '3600',

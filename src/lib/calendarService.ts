@@ -4,7 +4,7 @@
  */
 
 import { supabase } from './supabase';
-import { QuoteService, QuoteData } from './quoteService';
+import { QuoteData } from './quoteService';
 
 export interface CalendarEvent {
   id: string;
@@ -120,7 +120,6 @@ export class CalendarService {
     
     const jobNotes = this.generateJobNotes(quote);
     const moveTime = quote.moveTimeConfirmed || '09:00'; // Default 9 AM
-    const [hours, minutes] = moveTime.split(':');
     
     // Estimate end time based on quote hours
     const quoteHours = quote.estimate?.hours || 4;

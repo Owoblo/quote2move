@@ -1,14 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Navigation from '../components/landing/Navigation';
 import Footer from '../components/landing/Footer';
-import MovSenseLogo from '../components/MovSenseLogo';
 
 export default function DemoThankYouPage() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [isVerifying, setIsVerifying] = useState(true);
-  const [isVerified, setIsVerified] = useState(false);
+
+  const verifyPayment = useCallback(async (session: string) => {
+    try {
+      const response = await fetch(`/api/verify-payment?session_id=${session}`);
+      await response.json();
+    } catch (error) {
+      console.error('Error verifying payment:', error);
+    } finally {
+      setIsVerifying(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Verify payment session
@@ -17,24 +26,7 @@ export default function DemoThankYouPage() {
     } else {
       setIsVerifying(false);
     }
-  }, [sessionId]);
-
-  const verifyPayment = async (sessionId: string) => {
-    try {
-      const response = await fetch(`/api/verify-payment?session_id=${sessionId}`);
-      const data = await response.json();
-      
-      if (data.verified) {
-        setIsVerified(true);
-      }
-    } catch (error) {
-      console.error('Error verifying payment:', error);
-      // Still show success page for better UX
-      setIsVerified(true);
-    } finally {
-      setIsVerifying(false);
-    }
-  };
+  }, [sessionId, verifyPayment]);
 
   return (
     <div className="min-h-screen bg-[#F3F4F6] transition-colors duration-200">

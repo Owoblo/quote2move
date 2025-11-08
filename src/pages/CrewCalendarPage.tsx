@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CalendarService } from '../lib/calendarService';
 
 interface CalendarEvent {
@@ -20,11 +20,7 @@ export default function CrewCalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
 
-  useEffect(() => {
-    loadCalendarEvents();
-  }, [selectedDate, viewMode]);
-
-  const loadCalendarEvents = async () => {
+  const loadCalendarEvents = useCallback(async () => {
     setLoading(true);
     try {
       const today = new Date(selectedDate);
@@ -47,7 +43,11 @@ export default function CrewCalendarPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, viewMode]);
+
+  useEffect(() => {
+    loadCalendarEvents();
+  }, [loadCalendarEvents]);
 
   const eventsForDate = (date: string) => {
     return events.filter(e => e.startDate === date);

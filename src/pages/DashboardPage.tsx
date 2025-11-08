@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchPanel from '../components/SearchPanel';
 import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
 import ThemeToggle from '../components/ThemeToggle';
-import MovSenseLogo from '../components/MovSenseLogo';
 import { AppState, Photo, MappingTable, QuotePayload } from '../types';
 import { calculateEstimate } from '../lib/estimate';
 import { toCSV, generatePdf, downloadFile } from '../lib/export';
@@ -63,6 +62,14 @@ export default function DashboardPage() {
   const [followUps, setFollowUps] = useState<any[]>([]);
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
 
+  const addToast = useCallback((message: string, type: 'success' | 'error') => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id));
+    }, 3000);
+  }, []);
+
   // Load persisted state on mount
   useEffect(() => {
     const persisted = StatePersistence.loadState();
@@ -91,19 +98,7 @@ export default function DashboardPage() {
     }
   }, [state.address, state.detections, state.estimate, state.mapping]);
 
-  // Load analytics and quotes when tab changes
-  useEffect(() => {
-    if (activeTab === 'analytics' || activeTab === 'quotes') {
-      loadAnalytics();
-      loadQuotes();
-    }
-    if (activeTab === 'calendar') {
-      loadFollowUps();
-      loadCalendarEvents();
-    }
-  }, [activeTab]);
-
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     setLoadingAnalytics(true);
     try {
       const data = await QuoteService.getAnalytics();
@@ -114,9 +109,9 @@ export default function DashboardPage() {
     } finally {
       setLoadingAnalytics(false);
     }
-  };
+  }, [addToast]);
 
-  const loadQuotes = async () => {
+  const loadQuotes = useCallback(async () => {
     try {
       const data = await QuoteService.getUserQuotes();
       setQuotes(data);
@@ -124,18 +119,18 @@ export default function DashboardPage() {
       console.error('Error loading quotes:', error);
       addToast('Failed to load quotes', 'error');
     }
-  };
+  }, [addToast]);
 
-  const loadFollowUps = async () => {
+  const loadFollowUps = useCallback(async () => {
     try {
       const data = await FollowUpService.getPendingFollowUps();
       setFollowUps(data);
     } catch (error) {
       console.error('Error loading follow-ups:', error);
     }
-  };
+  }, []);
 
-  const loadCalendarEvents = async () => {
+  const loadCalendarEvents = useCallback(async () => {
     try {
       const today = new Date();
       const startDate = today.toISOString().split('T')[0];
@@ -148,7 +143,19 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Error loading calendar events:', error);
     }
-  };
+  }, []);
+
+  // Load analytics and quotes when tab changes
+  useEffect(() => {
+    if (activeTab === 'analytics' || activeTab === 'quotes') {
+      loadAnalytics();
+      loadQuotes();
+    }
+    if (activeTab === 'calendar') {
+      loadFollowUps();
+      loadCalendarEvents();
+    }
+  }, [activeTab, loadAnalytics, loadQuotes, loadFollowUps, loadCalendarEvents]);
 
   // Update estimate when detections or estimate params change
   useEffect(() => {
@@ -173,14 +180,6 @@ export default function DashboardPage() {
       }));
     }
   }, [state.detections, state.mapping, state.estimate.crew, state.estimate.rate, state.estimate.travelMins, state.estimate.stairs, state.estimate.elevator, state.estimate.wrapping, state.estimate.safetyPct]);
-
-  const addToast = (message: string, type: 'success' | 'error') => {
-    const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(toast => toast.id !== id));
-    }, 3000);
-  };
 
   const handleAddressChange = (address: string) => {
     setState(prev => ({ ...prev, address }));

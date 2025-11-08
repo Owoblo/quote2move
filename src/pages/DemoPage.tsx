@@ -3,7 +3,6 @@ import Navigation from '../components/landing/Navigation';
 import Footer from '../components/landing/Footer';
 import InteractiveDemo from '../components/landing/InteractiveDemo';
 import SearchPanel from '../components/SearchPanel';
-import MovSenseLogo from '../components/MovSenseLogo';
 
 // Active regions that have full demo functionality
 const ACTIVE_REGIONS = [

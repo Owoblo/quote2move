@@ -325,23 +325,23 @@ export default function PricingPage() {
               <ul className="space-y-2 text-gray-400">
                 <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link to="/login" className="hover:text-white transition-colors">Get Started</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
+                <li><a href="https://docs.movsense.com/api" className="hover:text-white transition-colors" target="_blank" rel="noreferrer">API Documentation</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                <li><a href="https://support.movsense.com/help" className="hover:text-white transition-colors" target="_blank" rel="noreferrer">Help Center</a></li>
+                <li><a href="mailto:support@movsense.com" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="https://status.movsense.com" className="hover:text-white transition-colors" target="_blank" rel="noreferrer">Status</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
               </ul>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QuoteService, QuoteData } from '../lib/quoteService';
 import ThemeToggle from '../components/ThemeToggle';
@@ -25,11 +25,7 @@ export default function EditQuotePage() {
     salesRepNotes: ''
   });
 
-  useEffect(() => {
-    loadQuote();
-  }, [quoteId]);
-
-  const loadQuote = async () => {
+  const loadQuote = useCallback(async () => {
     if (!quoteId) return;
     
     try {
@@ -59,7 +55,11 @@ export default function EditQuotePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [quoteId, navigate]);
+
+  useEffect(() => {
+    loadQuote();
+  }, [loadQuote]);
 
   const handleSave = async () => {
     if (!quoteId) return;

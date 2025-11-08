@@ -310,7 +310,6 @@ export default function EstimatePage() {
   const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
   const [isCalculatingGPT, setIsCalculatingGPT] = useState(false);
   const [distanceError, setDistanceError] = useState<string | null>(null);
-  const [gptError, setGptError] = useState<string | null>(null);
   const [finalEstimate, setFinalEstimate] = useState<Estimate>({ ...baseEstimate });
   const [gptReasoning, setGptReasoning] = useState<string | null>(null);
   const [gptBreakdown, setGptBreakdown] = useState<SaturnMoveTimeResponse['breakdown'] | null>(null);
@@ -354,7 +353,6 @@ export default function EstimatePage() {
       setIsCalculatingDistance(true);
       setIsCalculatingGPT(true);
       setDistanceError(null);
-      setGptError(null);
 
       try {
         // Step 1: Get distance first
@@ -472,7 +470,6 @@ export default function EstimatePage() {
 
       } catch (error: any) {
         console.error('GPT Estimate Error:', error);
-        setGptError(error.message || 'Could not calculate estimate with GPT');
 
         // Fallback to simple calculation if GPT fails
         try {
@@ -501,7 +498,7 @@ export default function EstimatePage() {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [originAddress, destinationAddress, detections, mapping, baseEstimate, originType, destinationType, stairsDestination, elevatorDestination, floorOrigin, floorDestination, parkingOrigin, parkingDestination]);
+  }, [originAddress, destinationAddress, detections, mapping, baseEstimate, originType, destinationType, stairsDestination, elevatorDestination, floorOrigin, floorDestination, parkingOrigin, parkingDestination, upsells]);
 
   const handleUpsellToggle = (id: string) => {
     setUpsells(prev => {

@@ -22,8 +22,6 @@ export class SimplePDFService {
   static async downloadQuote(quoteData: QuoteData): Promise<void> {
     try {
       // For now, create a simple text-based PDF
-      const content = this.generateQuoteContent(quoteData);
-      
       // Create a simple HTML content
       const htmlContent = `
         <!DOCTYPE html>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { parseZillowPhotos } from '../../lib/zillowPhotos';
@@ -43,11 +43,16 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
   const [isLoading, setIsLoading] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [searchCount, setSearchCount] = useState(0);
+  const searchCountRef = useRef(0);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDefaultAddress, setIsDefaultAddress] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [displayAddress, setDisplayAddress] = useState('');
+
+  useEffect(() => {
+    searchCountRef.current = searchCount;
+  }, [searchCount]);
 
   // Update address when initialAddress prop changes
   useEffect(() => {
@@ -55,7 +60,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
       setAddress(initialAddress);
       setIsDefaultAddress(initialAddress === DEFAULT_ADDRESS);
     }
-  }, [initialAddress]);
+  }, [initialAddress, address]);
 
   // Update selectedListing when selectedListingData prop changes
   useEffect(() => {
@@ -65,15 +70,8 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
   }, [selectedListingData]);
 
   // Trigger photo fetch when triggerFetch prop changes
-  useEffect(() => {
-    if (triggerFetch && selectedListing && !isLoading && !isDetecting) {
-      console.log('Triggering photo fetch from DemoPage button click', selectedListing);
-      fetchPhotos();
-    }
-  }, [triggerFetch, selectedListing]);
-
   // Load cached data for default address
-  const loadCachedData = (): CachedData | null => {
+  const loadCachedData = useCallback((): CachedData | null => {
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
@@ -87,10 +85,10 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
       console.error('Error loading cache:', error);
     }
     return null;
-  };
+  }, []);
 
   // Save data to cache
-  const saveToCache = (photos: Photo[], detections: Detection[], address: string) => {
+  const saveToCache = useCallback((photos: Photo[], detections: Detection[], address: string) => {
     try {
       const cacheData: CachedData = {
         photos,
@@ -102,7 +100,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
     } catch (error) {
       console.error('Error saving cache:', error);
     }
-  };
+  }, []);
 
   // Typing animation for default address with blinking cursor
   useEffect(() => {
@@ -143,7 +141,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
     } else if (address !== DEFAULT_ADDRESS) {
       setDisplayAddress(address);
     }
-  }, [address, photos.length]);
+  }, [address, photos.length, isTyping]);
 
   // Auto-start for default address
   useEffect(() => {
@@ -235,7 +233,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
       }
     };
     autoStartDefault();
-  }, []);
+  }, [address, photos.length, isTyping, loadCachedData, saveToCache]);
 
   // Search for listings as user types
   useEffect(() => {
@@ -301,8 +299,8 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
     setIsDefaultAddress(false);
   };
 
-  const fetchPhotos = async () => {
-    if (searchCount >= MAX_DEMO_SEARCHES) {
+  const fetchPhotos = useCallback(async () => {
+    if (searchCountRef.current >= MAX_DEMO_SEARCHES) {
       setShowSignupPrompt(true);
       return;
     }
@@ -338,8 +336,8 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         if (state) {
           searchQuery += `,addressstate.ilike.%${state}%`;
         }
-
-                const [currentResult, soldResult] = await Promise.all([
+        
+        const [currentResult, soldResult] = await Promise.all([
           supabase
             .from('just_listed')
             .select('id, address, addresscity, addressstate, carousel_photos_composable')
@@ -381,7 +379,11 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
 
         // Show photos immediately
         setPhotos(formattedPhotos);
-        setSearchCount(prev => prev + 1);
+        setSearchCount(prev => {
+          const next = prev + 1;
+          searchCountRef.current = next;
+          return next;
+        });
 
         // Start detection with all photos
         setIsDetecting(true);
@@ -397,7 +399,14 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedListing, isDefaultAddress]);
+
+  useEffect(() => {
+    if (triggerFetch && selectedListing && !isLoading && !isDetecting) {
+      console.log('Triggering photo fetch from DemoPage button click', selectedListing);
+      fetchPhotos();
+    }
+  }, [triggerFetch, selectedListing, isLoading, isDetecting, fetchPhotos]);
 
   // Demo quote estimate - hardcoded for demo purposes
   const estimatedHours = 8;
