@@ -20,17 +20,17 @@ export default function SocialProofSection() {
   ];
 
   return (
-    <section className="py-12 bg-[#F3F4F6] border-y border-[#E5E7EB]">
-      <div className="container-max mx-auto px-6">
-        <div className="flex flex-col items-center justify-center">
-          <p className="text-sm text-[#9CA3AF] mb-8 uppercase tracking-wider font-medium">
+    <section className="py-16 lg:py-20 bg-[#F3F4F6] border-y border-[#E5E7EB]">
+      <div className="container-max px-6 lg:px-10">
+        <div className="flex flex-col items-center text-center">
+          <p className="text-sm text-[#9CA3AF] mb-10 uppercase tracking-[0.3em] font-medium">
             Used by growing moving companies
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-12 opacity-70 hover:opacity-100 transition-opacity">
+          <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-10 w-full opacity-80 hover:opacity-100 transition-opacity">
             {companies.map((company, index) => (
               <div 
                 key={index}
-                className="flex items-center justify-center h-16 max-w-[200px] grayscale hover:grayscale-0 transition-all duration-300"
+                className="flex items-center justify-center h-20 w-48 grayscale hover:grayscale-0 transition-all duration-300"
               >
                 <img 
                   src={company.logo} 
