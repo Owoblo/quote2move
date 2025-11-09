@@ -7,6 +7,11 @@ import MovSenseLogo from '../components/MovSenseLogo';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [companyPhone, setCompanyPhone] = useState('');
+  const [companySize, setCompanySize] = useState('');
+  const [referralSource, setReferralSource] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,15 +24,49 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
+        if (!fullName.trim() || !companyName.trim() || !companyPhone.trim()) {
+          setError('Please complete your name, business name, and phone number.');
+          setIsLoading(false);
+          return;
+        }
+
+        const cleanedPhone = companyPhone.trim();
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              full_name: fullName.trim(),
+              company_name: companyName.trim(),
+              company_phone: cleanedPhone,
+              company_size: companySize.trim(),
+              referral_source: referralSource.trim(),
+            },
           },
         });
         if (error) throw error;
         
+        if (data.user && data.session) {
+          try {
+            await supabase
+              .from('company_settings')
+              .upsert(
+                {
+                  user_id: data.user.id,
+                  company_name: companyName.trim(),
+                  company_email: email.trim(),
+                  company_phone: cleanedPhone,
+                  updated_at: new Date().toISOString(),
+                },
+                { onConflict: 'user_id' }
+              );
+          } catch (settingsError) {
+            console.error('Error initializing company settings:', settingsError);
+          }
+        }
+
         // Check if email confirmation is required
         if (data.user && !data.session) {
           // Email confirmation is required
@@ -143,6 +182,99 @@ export default function LoginPage() {
               />
             </div>
 
+            {isSignUp && (
+              <div className="space-y-5">
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-[#374151] mb-2">
+                    Your name
+                  </label>
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="Jane Doe"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="companyName" className="block text-sm font-medium text-[#374151] mb-2">
+                    Moving company name
+                  </label>
+                  <input
+                    id="companyName"
+                    name="companyName"
+                    type="text"
+                    required
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="MovSense Logistics"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="companyPhone" className="block text-sm font-medium text-[#374151] mb-2">
+                    Company phone number
+                  </label>
+                  <input
+                    id="companyPhone"
+                    name="companyPhone"
+                    type="tel"
+                    required
+                    value={companyPhone}
+                    onChange={(e) => setCompanyPhone(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="(555) 123-4567"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="companySize" className="block text-sm font-medium text-[#374151] mb-2">
+                      Team size (optional)
+                    </label>
+                    <select
+                      id="companySize"
+                      name="companySize"
+                      value={companySize}
+                      onChange={(e) => setCompanySize(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827]"
+                    >
+                      <option value="">Select...</option>
+                      <option value="solo">Just me</option>
+                      <option value="2-5">2 - 5 movers</option>
+                      <option value="6-15">6 - 15 movers</option>
+                      <option value="16-30">16 - 30 movers</option>
+                      <option value="30+">30+ movers</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="referralSource" className="block text-sm font-medium text-[#374151] mb-2">
+                      How did you hear about us? (optional)
+                    </label>
+                    <select
+                      id="referralSource"
+                      name="referralSource"
+                      value={referralSource}
+                      onChange={(e) => setReferralSource(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-[#111827]"
+                    >
+                      <option value="">Select...</option>
+                      <option value="friend">Friend or colleague</option>
+                      <option value="social">Social media</option>
+                      <option value="search">Google search</option>
+                      <option value="conference">Conference / event</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {!isSignUp && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -223,6 +355,11 @@ export default function LoginPage() {
                   setError('');
                   setEmail('');
                   setPassword('');
+                  setFullName('');
+                  setCompanyName('');
+                  setCompanyPhone('');
+                  setCompanySize('');
+                  setReferralSource('');
                 }}
                 className="font-medium text-accent dark:text-accent-light hover:text-accent-dark dark:hover:text-accent transition-colors"
               >
