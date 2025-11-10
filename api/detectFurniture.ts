@@ -47,6 +47,8 @@ export default async function handler(
   const allDetections: any[] = [];
   
   // Process photos in batches
+  const errorDetails: string[] = [];
+
   for (let i = 0; i < photosToProcess.length; i += batchSize) {
     const batch = photosToProcess.slice(i, i + batchSize);
     console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}: ${batch.length} photos`);
@@ -68,73 +70,55 @@ export default async function handler(
           }
 
           // Create timeout promise
-          const timeoutPromise = new Promise((_, reject) => 
+          const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Photo processing timeout')), photoTimeout)
           );
 
-          // Race between API call and timeout
-          const response = await Promise.race([
-            fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'gpt-4o',
-              messages: [{
+          const systemPrompt = `You are MovSense's AI inventory estimator. Extract ONLY movable items that professional movers handle. Return precise quantities, descriptive labels, room, size descriptors, confidence, and cubic feet estimates. Do not include built-ins or immovable fixtures.`;
+          const userPrompt = `Analyze this real estate photo and return the inventory JSON that matches the schema. Focus on movable furniture, appliances, electronics, decor, outdoor furniture, and boxes. Include size descriptors (dimensions or ranges) and room context.`;
+
+          const responseFormat = {
+            type: 'json_schema',
+            json_schema: {
+              name: 'furniture_detection',
+              schema: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  items: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      additionalProperties: false,
+                      properties: {
+                        label: { type: 'string' },
+                        qty: { type: 'integer', minimum: 1 },
+                        confidence: { type: 'number', minimum: 0, maximum: 1 },
+                        notes: { type: 'string' },
+                        room: { type: 'string' },
+                        size: { type: 'string' },
+                        cubicFeet: { type: 'number', minimum: 0 }
+                      },
+                      required: ['label', 'qty', 'confidence', 'room', 'cubicFeet']
+                    }
+                  }
+                },
+                required: ['items']
+              }
+            }
+          };
+
+          const requestPayload = {
+            model: 'gpt-4o-mini',
+            input: [
+              {
+                role: 'system',
+                content: [{ type: 'text', text: systemPrompt }]
+              },
+              {
                 role: 'user',
                 content: [
-                  {
-                    type: 'text',
-                    text: `You are a professional MOVING COMPANY inventory specialist. Analyze this real estate photo and identify ONLY items that professional movers can physically move and transport.
-
-🚚 MOVER'S INVENTORY - ONLY DETECT MOVABLE ITEMS:
-
-✅ MOVABLE FURNITURE & ITEMS (DETECT THESE):
-- SEATING: Sofas, Sectionals, Loveseats, Recliners, Chairs (Dining, Office, Accent), Ottomans, Benches, Stools
-- TABLES: Dining Tables, Coffee Tables, End Tables, Console Tables, Side Tables, Kitchen Islands (if freestanding)
-- BEDS: King Beds, Queen Beds, Twin Beds, Bunk Beds, Daybeds, Futons, Mattresses, Box Springs
-- STORAGE: Dressers, Chests of Drawers, Nightstands, Bookshelves, Freestanding Cabinets, Wardrobes, Armoires
-- APPLIANCES: Refrigerators, Stoves, Ovens, Microwaves, Dishwashers, Washers, Dryers, Toasters, Coffee Makers
-- ELECTRONICS: TVs, Monitors, Computers, Laptops, Sound Systems, Gaming Consoles, Speakers
-- DECOR: Floor Lamps, Table Lamps, Mirrors (wall-mounted), Artwork, Plants, Vases, Clocks, Area Rugs
-- KITCHEN: Freestanding Pantries, Wine Racks, Bar Stools, Kitchen Carts
-- OUTDOOR: Patio Furniture, Grills, Outdoor Chairs/Tables
-
-❌ DO NOT DETECT (FIXED INSTALLATIONS):
-- Built-in cabinets, Built-in shelving, Built-in vanities
-- Chandeliers, Ceiling fans, Light fixtures
-- Built-in appliances (dishwashers, built-in ovens)
-- Built-in bathroom vanities, Medicine cabinets
-- Built-in wardrobes, Built-in closets
-- Wall-mounted items (unless easily removable)
-- Built-in countertops, Built-in islands
-- Fixed mirrors, Built-in mirrors
-- Built-in seating, Built-in benches
-
-CRITICAL REQUIREMENTS:
-1. COUNT EXACT QUANTITIES - If you see 4 dining chairs, write qty: 4
-2. BE HIGHLY SPECIFIC - "Large Oak Dining Table", "Sectional Sofa with Ottoman", "King Size Platform Bed"
-3. INCLUDE ROOM CONTEXT - "Master Bedroom Dresser", "Kitchen Island Stools", "Living Room Coffee Table"
-4. DISTINGUISH SIMILAR ITEMS - "Coffee Table" vs "End Table" vs "Console Table"
-5. SIZE DESCRIPTORS - CRITICAL FOR MOVERS:
-   - TVs: Estimate screen size in inches (e.g., "40-50 inch TV", "55-65 inch TV", "70+ inch TV")
-   - Furniture: Provide dimensions or size range when possible (e.g., "Large (7-8 ft)", "Small (4-5 ft)", "Queen Size", "King Size")
-   - If exact size is unclear, provide a reasonable range (e.g., "Medium-Large", "30-40 inches wide")
-6. ONLY MOVABLE ITEMS - Skip anything permanently attached or built-in
-
-Return ONLY a valid JSON array with objects containing:
-- label: VERY SPECIFIC movable furniture type with descriptors (string)
-- qty: EXACT quantity visible (number)
-- confidence: confidence score 0-1 (number)
-- notes: room location and specific details (string)
-- room: room type (string)
-- size: size descriptor with specific measurements or ranges
-- cubicFeet: **REQUIRED** - estimated cubic feet volume for this item (number)
-
-Return ONLY a JSON array, no other text.`
-                  },
+                  { type: 'text', text: userPrompt },
                   {
                     type: 'image_url',
                     image_url: {
@@ -143,13 +127,25 @@ Return ONLY a JSON array, no other text.`
                     }
                   }
                 ]
-              }],
-              max_tokens: 2000,
-              temperature: 0.1
-            })
-          }),
-                        timeoutPromise as Promise<Response>
-            ]) as Response;
+              }
+            ],
+            temperature: 0.15,
+            max_output_tokens: 1800,
+            response_format: responseFormat
+          };
+
+          // Race between API call and timeout
+          const response = await Promise.race([
+            fetch('https://api.openai.com/v1/responses', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestPayload)
+            }),
+            timeoutPromise as Promise<Response>
+          ]) as Response;
 
           // Handle retryable errors (502, 503, 504, 429)
           if (!response.ok) {
@@ -165,28 +161,67 @@ Return ONLY a JSON array, no other text.`
             
             // Non-retryable error or max retries reached
             console.error('❌ OpenAI API Error:', status, errorData);
-            return [];
+            errorDetails.push(`OpenAI API error ${status}: ${JSON.stringify(errorData)}`);
+            return { detections: [], rawContent: undefined };
           }
 
           const data = await response.json();
-          const content = data.choices[0]?.message?.content;
 
-          if (!content) {
-            console.error('❌ No content in OpenAI response');
+          const extractDetections = (payload: any): any[] => {
+            if (!payload) return [];
+
+            const tryParseText = (raw: string | undefined): any[] => {
+              if (!raw) return [];
+              try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) return parsed;
+                if (Array.isArray(parsed?.items)) return parsed.items;
+              } catch (parseError) {
+                errorDetails.push(`Failed to parse OpenAI text response: ${(parseError as Error).message}`);
+              }
+              return [];
+            };
+
+            // Prefer structured json content when using json schema
+            if (Array.isArray(payload.output)) {
+              for (const block of payload.output) {
+                if (Array.isArray(block?.content)) {
+                  for (const contentItem of block.content) {
+                    if (contentItem?.type === 'json' && contentItem.json) {
+                      if (Array.isArray(contentItem.json)) {
+                        return contentItem.json;
+                      }
+                      if (Array.isArray(contentItem.json?.items)) {
+                        return contentItem.json.items;
+                      }
+                    } else if (contentItem?.type === 'output_text' || contentItem?.type === 'text') {
+                      const parsed = tryParseText(contentItem.text);
+                      if (parsed.length > 0) return parsed;
+                    }
+                  }
+                }
+              }
+            }
+
+            if (typeof payload.output_text === 'string') {
+              const parsed = tryParseText(payload.output_text);
+              if (parsed.length > 0) return parsed;
+            }
+
             return [];
+          };
+
+          const detections = extractDetections(data);
+
+          if (detections.length === 0) {
+            errorDetails.push(`OpenAI returned no items for photo: ${photoUrl.substring(0, 120)}`);
           }
 
-          // Parse JSON from response
-          let detections;
-          try {
-            const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s);
-            detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
-          } catch (parseError) {
-            console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
-            return [];
+          if (errorDetails.length < 5) {
+            errorDetails.push(`OpenAI raw payload snippet: ${JSON.stringify(data).slice(0, 180)}...`);
           }
 
-          return Array.isArray(detections) ? detections : [];
+          return { detections, rawContent: JSON.stringify(data).slice(0, 500) };
 
         } catch (error: any) {
           lastError = error;
@@ -194,7 +229,8 @@ Return ONLY a JSON array, no other text.`
           // Don't retry on timeout - it's likely a real issue
           if (error.message === 'Photo processing timeout') {
             console.error('⏱️ Timeout processing photo:', photoUrl);
-            return [];
+            errorDetails.push(`Timeout processing photo: ${photoUrl}`);
+            return { detections: [], rawContent: undefined };
           }
           
           // Retry on network errors if we have retries left
@@ -205,22 +241,31 @@ Return ONLY a JSON array, no other text.`
           
           // Final error - no more retries
           console.error('❌ Error processing photo:', photoUrl, error.message);
+            errorDetails.push(`Error processing photo ${photoUrl}: ${error.message}`);
           return [];
         }
       }
 
       // If we get here, all retries failed
       console.error('❌ All retries exhausted for photo:', photoUrl, lastError?.message || '');
-      return [];
+      if (lastError?.message) {
+        errorDetails.push(`All retries exhausted for ${photoUrl}: ${lastError.message}`);
+      } else {
+        errorDetails.push(`All retries exhausted for ${photoUrl}`);
+      }
+      return { detections: [], rawContent: undefined };
     });
 
     // Wait for batch to complete
     const batchResults = await Promise.all(batchPromises);
     
     // Flatten batch results
-    batchResults.forEach(detections => {
-      if (Array.isArray(detections) && detections.length > 0) {
-        allDetections.push(...detections);
+    batchResults.forEach(result => {
+      if (result && Array.isArray((result as any).detections) && (result as any).detections.length > 0) {
+        allDetections.push(...(result as any).detections);
+      }
+      if (result && typeof (result as any).rawContent === 'string') {
+        errorDetails.push(`OpenAI raw content: ${(result as any).rawContent.slice(0, 180)}`);
       }
     });
 
@@ -243,5 +288,14 @@ Return ONLY a JSON array, no other text.`
 
   console.log(`✅ All processing complete: ${uniqueDetections.length} unique detections from ${photosToProcess.length} photos`);
 
-  return res.status(200).json({ detections: uniqueDetections });
+  if (uniqueDetections.length === 0 && errorDetails.length > 0) {
+    return res.status(502).json({
+      error: 'AI detection failed',
+      details: errorDetails.slice(0, 10),
+    });
+  }
+
+  const payload: Record<string, any> = { detections: uniqueDetections, debug: errorDetails.slice(0, 10) };
+
+  return res.status(200).json(payload);
 }
