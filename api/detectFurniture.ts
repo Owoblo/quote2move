@@ -77,7 +77,7 @@ export default async function handler(
           const systemPrompt = `You are MovSense's AI inventory estimator. Extract ONLY movable items that professional movers handle. Return precise quantities, descriptive labels, room, size descriptors, confidence, and cubic feet estimates. Do not include built-ins or immovable fixtures.`;
           const userPrompt = `Analyze this real estate photo and return the inventory JSON that matches the schema. Focus on movable furniture, appliances, electronics, decor, outdoor furniture, and boxes. Include size descriptors (dimensions or ranges) and room context.`;
 
-          const responseFormat = {
+          const jsonSchemaFormat = {
             type: 'json_schema',
             json_schema: {
               name: 'furniture_detection',
@@ -108,8 +108,9 @@ export default async function handler(
             }
           };
 
-          const requestPayload = {
+          const requestPayload: Record<string, any> = {
             model: 'gpt-4o-mini',
+            modalities: ['text'],
             input: [
               {
                 role: 'system',
@@ -131,8 +132,13 @@ export default async function handler(
             ],
             temperature: 0.15,
             max_output_tokens: 1800,
-            response_format: responseFormat
+            text: {
+              format: jsonSchemaFormat
+            }
           };
+
+          // Ensure we never send legacy response_format (deprecated in Responses API)
+          delete (requestPayload as any).response_format;
 
           // Race between API call and timeout
           const response = await Promise.race([
@@ -187,12 +193,22 @@ export default async function handler(
               for (const block of payload.output) {
                 if (Array.isArray(block?.content)) {
                   for (const contentItem of block.content) {
-                    if (contentItem?.type === 'json' && contentItem.json) {
+                    if (
+                      (contentItem?.type === 'json' || contentItem?.type === 'output_json' || contentItem?.type === 'output_json_schema') &&
+                      contentItem.json
+                    ) {
                       if (Array.isArray(contentItem.json)) {
                         return contentItem.json;
                       }
                       if (Array.isArray(contentItem.json?.items)) {
                         return contentItem.json.items;
+                      }
+                    } else if (contentItem?.type === 'json_schema' && contentItem.json_schema) {
+                      if (Array.isArray(contentItem.json_schema)) {
+                        return contentItem.json_schema;
+                      }
+                      if (Array.isArray(contentItem.json_schema?.items)) {
+                        return contentItem.json_schema.items;
                       }
                     } else if (contentItem?.type === 'output_text' || contentItem?.type === 'text') {
                       const parsed = tryParseText(contentItem.text);
