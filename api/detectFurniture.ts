@@ -110,7 +110,6 @@ export default async function handler(
 
           const requestPayload: Record<string, any> = {
             model: 'gpt-4o-mini',
-            modalities: ['text'],
             input: [
               {
                 role: 'system',
