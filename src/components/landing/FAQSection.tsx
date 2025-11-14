@@ -10,24 +10,24 @@ export default function FAQSection() {
 
   const faqs: FAQItem[] = [
     {
-      question: 'How accurate are the quotes?',
-      answer: 'They are based on detected inventory, distance, and your own rate settings. You can calibrate over time.'
+      question: 'What if the AI misses something?',
+      answer: 'MovSense detects ~96% of items from MLS photos. You can manually add garage/shed/attic items or custom pieces in seconds before you send the quote—still 10x faster than a walkthrough.'
     },
     {
-      question: 'Can my team adjust the inventory and quote?',
-      answer: 'Yes, they can review, edit, and override any part of the auto generated quote.'
+      question: 'Do I still need to do walkthroughs?',
+      answer: 'For small-to-medium moves, MovSense covers everything from the listing. For huge or specialty jobs, use MovSense for the first pass, then schedule an in-person walkthrough only for serious leads.'
     },
     {
-      question: 'Do you integrate with my CRM?',
-      answer: 'Start with exports and webhooks. Native integrations are coming.'
+      question: 'What if my customer doesn’t have MLS photos?',
+      answer: 'They can upload their own photos or send you a Google Drive/iPhone link. MovSense works with any property photos, not just MLS.'
     },
     {
-      question: 'Do you need access to the MLS directly?',
-      answer: 'We can work with listing links and photos. Direct MLS access is optional.'
+      question: 'How long does setup take?',
+      answer: 'About 5 minutes. Enter your hourly or cubic-foot pricing, travel fees, and crew sizes. No complex integrations required.'
     },
     {
-      question: 'Is this only for residential moves?',
-      answer: 'We start with residential and can be configured for light commercial moves.'
+      question: 'Can I cancel anytime?',
+      answer: 'Yes. Month-to-month plans, no long-term contracts, no cancellation fees. Downgrade or cancel with one click.'
     }
   ];
 

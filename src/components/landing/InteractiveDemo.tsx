@@ -423,7 +423,20 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
   });
 
   return (
-    <div className="relative">
+    <div id="demo" className="relative space-y-6">
+      {!hideSearch && (
+        <div className="bg-white/80 dark:bg-gray-900/70 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-lg">
+          <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-2">
+            See it work right now
+          </p>
+          <h3 className="text-2xl font-bold text-[#111827] dark:text-white mb-3">
+            Type any property address. We'll pull MLS photos and show you what MovSense detects—live.
+          </h3>
+          <p className="text-sm text-[#374151] dark:text-gray-300">
+            💡 Try: <button type="button" className="text-accent underline" onClick={() => setAddress('245 Carlaw Ave #403, Toronto, ON')}>245 Carlaw Ave #403, Toronto</button> or any listing with photos.
+          </p>
+        </div>
+      )}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 max-h-[600px] flex flex-col">
         {/* Top: Address search field - Hidden if hideSearch prop is true */}
         {!hideSearch && (

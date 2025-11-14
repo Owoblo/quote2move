@@ -49,7 +49,7 @@ export default function KeyFeaturesSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 container-max mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 container-max mx-auto mb-12">
           {features.map((feature, index) => (
             <div 
               key={index} 
@@ -66,6 +66,30 @@ export default function KeyFeaturesSection() {
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-10 shadow-lg text-left">
+          <div className="text-sm uppercase tracking-[0.3em] text-accent font-semibold mb-4">Manual override built in</div>
+          <h3 className="text-3xl font-bold text-[#111827] mb-4">
+            AI gets it 96% right. You stay in control of the other 4%.
+          </h3>
+          <p className="text-lg text-[#374151] mb-6">
+            Add attic items, remove duplicates, tweak quantities, or override pricing before the quote goes out. MovSense handles the grunt work—you make the final call.
+          </p>
+          <ul className="space-y-3 text-[#111827]">
+            <li className="flex items-start gap-3">
+              <span className="text-green-600 mt-1">✓</span>
+              <span>Add missing rooms (garage, shed, storage)</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-green-600 mt-1">✓</span>
+              <span>Remove or merge anything the AI mislabels</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-green-600 mt-1">✓</span>
+              <span>Adjust rates and surcharges before sending</span>
+            </li>
+          </ul>
         </div>
       </div>
     </section>

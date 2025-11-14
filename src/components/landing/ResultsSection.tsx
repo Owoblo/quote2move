@@ -3,16 +3,20 @@ import React from 'react';
 export default function ResultsSection() {
   const stats = [
     {
-      value: '60%',
-      label: 'less time spent on quotes'
+      value: '⏱️ 60% less time on quotes',
+      detail: '= 15+ hours saved per rep, per week'
     },
     {
-      value: 'Up to 25%',
-      label: 'higher quote accuracy'
+      value: '💰 25% fewer pricing mistakes',
+      detail: '= $2,000+ margin protected every month'
     },
     {
-      value: '2x',
-      label: 'more follow ups sent on time'
+      value: '📈 2x more quotes sent',
+      detail: '= More bookings without hiring more reps'
+    },
+    {
+      value: '🔥 8x ROI in 30 days',
+      detail: 'Average results from teams using MovSense daily'
     }
   ];
 
@@ -25,14 +29,14 @@ export default function ResultsSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 container-max mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 container-max mx-auto">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="text-5xl font-bold text-accent dark:text-accent-light mb-2">
+            <div key={index} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-8 text-left shadow-sm">
+              <div className="text-2xl font-bold text-[#111827] mb-2">
                 {stat.value}
               </div>
-              <div className="text-lg text-[#374151]">
-                {stat.label}
+              <div className="text-[#374151]">
+                {stat.detail}
               </div>
             </div>
           ))}
