@@ -139,7 +139,7 @@ Return ONLY a JSON array, no other text.`
                     type: 'image_url',
                     image_url: {
                       url: photoUrl,
-                      detail: 'high'
+                      detail: 'auto'
                     }
                   }
                 ]
