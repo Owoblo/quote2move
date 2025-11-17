@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { parseZillowPhotos } from '../../lib/zillowPhotos';
 import { detectFurniture } from '../../lib/aiDetectionServices';
 import { Photo, Detection } from '../../types';
+import PropertyInfo from '../PropertyInfo';
 
 interface Listing {
   id: string;
@@ -581,6 +582,9 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
 
         {/* Scrollable content area - boxed sections */}
         <div className="flex-1 overflow-y-auto space-y-3">
+          {/* Property Info */}
+          {selectedListing && <PropertyInfo listing={selectedListing} />}
+          
           {/* Photo preview grid - boxed and scrollable */}
           {photos.length > 0 && (
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-[#E5E7EB]">

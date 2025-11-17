@@ -5,6 +5,7 @@ import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
 import ThemeToggle from '../components/ThemeToggle';
+import PropertyInfo from '../components/PropertyInfo';
 import { AppState, Photo, MappingTable, QuotePayload } from '../types';
 import { calculateEstimate } from '../lib/estimate';
 import { toCSV, generatePdf, downloadFile } from '../lib/export';
@@ -1031,6 +1032,7 @@ export default function DashboardPage() {
                     recentSearches={[]}
                     onListingSelect={handleListingSelect}
                   />
+                  {selectedListing && <PropertyInfo listing={selectedListing} />}
                   <PhotoGallery
                     photos={state.photos}
                     selectedPhotos={selectedPhotos}
