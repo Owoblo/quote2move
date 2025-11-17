@@ -5,7 +5,7 @@ import ThemeToggle from '../ThemeToggle';
 
 export default function Navigation() {
   return (
-    <nav className="bg-white border-b border-[#E5E7EB] sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 border-b border-[#E5E7EB] dark:border-gray-800 sticky top-0 z-50">
       <div className="container-max px-6 lg:px-10">
         <div className="flex items-center justify-between h-20 gap-6">
           {/* Left: Logo */}
@@ -15,11 +15,11 @@ export default function Navigation() {
 
           {/* Right: Links */}
           <div className="hidden md:flex items-center gap-10">
-            <div className="flex items-center gap-8 text-sm font-medium text-[#374151]">
-              <a href="#product" className="hover:text-[#2563EB] transition-colors">Product</a>
-              <a href="#how-it-works" className="hover:text-[#2563EB] transition-colors">How it works</a>
-              <a href="#pricing" className="hover:text-[#2563EB] transition-colors">Pricing</a>
-              <a href="#faq" className="hover:text-[#2563EB] transition-colors">FAQ</a>
+            <div className="flex items-center gap-8 text-sm font-medium text-[#374151] dark:text-gray-300">
+              <a href="#product" className="hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors">Product</a>
+              <a href="#how-it-works" className="hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors">How it works</a>
+              <a href="#pricing" className="hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors">Pricing</a>
+              <a href="#faq" className="hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors">FAQ</a>
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />

@@ -20,7 +20,7 @@ export default function FinalCTASection() {
           </a>
           <a
             href="/login"
-            className="px-8 py-3 border border-gray-300 text-[#111827] rounded-lg font-semibold hover:border-gray-400 transition"
+            className="px-8 py-3 border border-gray-300 dark:border-gray-700 text-[#111827] dark:text-gray-200 bg-white dark:bg-gray-800 rounded-lg font-semibold hover:border-gray-400 dark:hover:border-gray-600 transition"
           >
             Or start free trial
           </a>

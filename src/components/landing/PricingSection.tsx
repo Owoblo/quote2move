@@ -93,7 +93,7 @@ export default function PricingSection() {
                 className={`block text-center px-6 py-3 font-semibold rounded-lg transition-all ${
                   plan.mostPopular
                     ? 'bg-accent text-white hover:bg-accent-dark'
-                    : 'border border-gray-200 hover:border-gray-300 text-[#111827]'
+                    : 'border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-[#111827] dark:text-gray-200 bg-white dark:bg-gray-800'
                 }`}
               >
                 {plan.cta}

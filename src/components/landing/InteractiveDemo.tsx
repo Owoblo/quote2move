@@ -429,7 +429,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
           <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-2">
             See it work right now
           </p>
-          <h3 className="text-2xl font-bold text-[#111827] dark:text-white mb-3">
+          <h3 className="text-lg font-semibold text-[#111827] dark:text-white mb-2">
             Type any property address. We'll pull MLS photos and show you what MovSense detects—live.
           </h3>
           <p className="text-sm text-[#374151] dark:text-gray-300">

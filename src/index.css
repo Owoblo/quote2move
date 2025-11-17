@@ -83,11 +83,11 @@
   }
 
   .btn-secondary {
-    @apply bg-white text-[#374151] border border-[#E5E7EB] hover:bg-[#F9FAFB] focus:ring-[#2563EB];
+    @apply bg-white dark:bg-gray-800 text-[#374151] dark:text-gray-200 border border-[#E5E7EB] dark:border-gray-700 hover:bg-[#F9FAFB] dark:hover:bg-gray-700 focus:ring-[#2563EB];
   }
 
   .btn-ghost {
-    @apply bg-transparent text-[#374151] hover:bg-[#F9FAFB] focus:ring-[#2563EB];
+    @apply bg-transparent text-[#374151] dark:text-gray-200 hover:bg-[#F9FAFB] dark:hover:bg-gray-800 focus:ring-[#2563EB];
   }
 
   .btn-danger {
