@@ -39,6 +39,7 @@ export default function SearchPanel({
   const [error, setError] = useState<string | null>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const justSelectedRef = useRef(false);
 
   // Cleanup blur timeout on unmount
   useEffect(() => {
@@ -52,6 +53,12 @@ export default function SearchPanel({
   // Search for listings as user types
   useEffect(() => {
     const searchListings = async () => {
+      // Skip search if user just selected a suggestion
+      if (justSelectedRef.current) {
+        justSelectedRef.current = false;
+        return;
+      }
+
       if (address.length < 3) {
         setSuggestions([]);
         setShowSuggestions(false);
@@ -128,20 +135,24 @@ export default function SearchPanel({
       clearTimeout(blurTimeoutRef.current);
       blurTimeoutRef.current = null;
     }
-    
-    // Fill the input with the complete address FIRST
-    const fullAddress = `${listing.address}, ${listing.addresscity}, ${listing.addressstate}`;
-    onAddressChange(fullAddress);
-    
+
+    // Mark that we just selected a suggestion (prevents search from running)
+    justSelectedRef.current = true;
+
     // Close dropdown immediately - clear suggestions
     setShowSuggestions(false);
     setSuggestions([]);
-    
+    setError(null);
+
+    // Fill the input with the complete address
+    const fullAddress = `${listing.address}, ${listing.addresscity}, ${listing.addressstate}`;
+    onAddressChange(fullAddress);
+
     // Store the selected listing for photo fetching
     if (onListingSelect) {
       onListingSelect(listing);
     }
-    
+
     // Blur the input to remove focus
     const input = document.getElementById('address') as HTMLInputElement;
     if (input) {
