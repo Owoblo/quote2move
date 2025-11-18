@@ -36,21 +36,33 @@ export default function SearchPanel({
   const [suggestions, setSuggestions] = useState<Listing[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Cleanup blur timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Search for listings as user types
   useEffect(() => {
     const searchListings = async () => {
-      if (address.length < 1) {
+      if (address.length < 3) {
         setSuggestions([]);
         setShowSuggestions(false);
+        setError(null);
         return;
       }
 
       setLoading(true);
+      setError(null);
       console.log('Searching for:', address);
-      
+
       try {
         // Search both current and sold listings
         // Extract search terms from address - use first few words for better matching
@@ -58,7 +70,7 @@ export default function SearchPanel({
         const searchTerm = addressParts[0] || address; // Use first part (street address) or full address
         const cityTerm = addressParts[1] || ''; // City if available
         const stateTerm = addressParts[2] || ''; // State if available
-        
+
         // Build query with cleaner search terms
         let query = `address.ilike.%${searchTerm}%`;
         if (cityTerm) {
@@ -67,7 +79,7 @@ export default function SearchPanel({
         if (stateTerm) {
           query += `,addressstate.ilike.%${stateTerm}%`;
         }
-        
+
         const [currentListings, soldListings] = await Promise.all([
           supabase
             .from('just_listed')
@@ -91,10 +103,16 @@ export default function SearchPanel({
 
         console.log('All suggestions:', allSuggestions);
         setSuggestions(allSuggestions);
-        setShowSuggestions(true);
+        setShowSuggestions(allSuggestions.length > 0);
+
+        if (allSuggestions.length === 0) {
+          setError('No properties found. Try a different address.');
+        }
       } catch (error) {
         console.error('Error searching listings:', error);
         setSuggestions([]);
+        setError('Failed to search properties. Please try again.');
+        setShowSuggestions(false);
       } finally {
         setLoading(false);
       }
@@ -219,12 +237,24 @@ export default function SearchPanel({
             </div>
           )}
         </div>
-        
+
+        {/* Error Message */}
+        {error && !loading && (
+          <div className="absolute z-30 w-full mt-1.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md shadow-lg px-4 py-3">
+            <div className="flex items-center">
+              <svg className="h-5 w-5 text-red-500 dark:text-red-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm text-red-700 dark:text-red-300">{error}</span>
+            </div>
+          </div>
+        )}
+
         {/* Autocomplete Suggestions */}
-        {showSuggestions && suggestions.length > 0 && (
-          <div 
+        {showSuggestions && suggestions.length > 0 && !loading && (
+          <div
             ref={dropdownRef}
-            className="absolute z-30 w-full mt-1.5 bg-white border border-[#E5E7EB] rounded-md shadow-premium-lg max-h-64 overflow-y-auto"
+            className="absolute z-30 w-full mt-1.5 bg-white dark:bg-gray-800 border border-[#E5E7EB] dark:border-gray-700 rounded-md shadow-premium-lg max-h-64 overflow-y-auto"
           >
             {suggestions.map((listing, index) => (
               <div
@@ -236,10 +266,10 @@ export default function SearchPanel({
                 }}
                 className="suggestion-item px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors duration-150"
               >
-                <div className="font-medium text-[#111827] text-sm">
+                <div className="font-medium text-[#111827] dark:text-gray-100 text-sm">
                   {listing.address}
                 </div>
-                <div className="text-xs text-[#374151] mt-1">
+                <div className="text-xs text-[#374151] dark:text-gray-300 mt-1">
                   {listing.addresscity}, {listing.addressstate}
                   {listing.unformattedprice && (
                     <span className="ml-2 text-green-600 dark:text-green-400 font-medium">
@@ -248,23 +278,13 @@ export default function SearchPanel({
                   )}
                 </div>
                 {listing.beds && listing.baths && (
-                  <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {listing.beds} bed • {listing.baths} bath
                     {listing.area && ` • ${listing.area} sq ft`}
                   </div>
                 )}
               </div>
             ))}
-          </div>
-        )}
-        
-        {/* Loading indicator */}
-        {showSuggestions && loading && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400 mr-2"></div>
-              <span className="text-sm text-gray-500 dark:text-gray-400">Searching...</span>
-            </div>
           </div>
         )}
       </div>
