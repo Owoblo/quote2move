@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchPanel from '../components/SearchPanel';
+import UploadPanel from '../components/UploadPanel';
 import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
@@ -65,6 +66,13 @@ export default function DashboardPage() {
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
   const [classifiedRooms, setClassifiedRooms] = useState<Record<string, string[]>>({});
   const [currentDetectingRoom, setCurrentDetectingRoom] = useState<string | null>(null);
+  const [inputMode, setInputMode] = useState<'mls' | 'upload'>('mls');
+  const [uploadedPropertyInfo, setUploadedPropertyInfo] = useState<{
+    address?: string;
+    bedrooms?: number;
+    bathrooms?: number;
+    sqft?: number;
+  }>({});
 
   const addToast = useCallback((message: string, type: 'success' | 'error' | 'warning') => {
     const id = Date.now().toString();
@@ -473,7 +481,52 @@ export default function DashboardPage() {
     }));
     setSelectedPhotos([]);
     setSelectedListing(null);
+    setUploadedPropertyInfo({});
     addToast('Cleared all data', 'success');
+  };
+
+  const handleUploadComplete = async (files: Array<{ url: string; type: 'image' | 'video' }>) => {
+    try {
+      console.log('📤 Upload complete:', files.length, 'files');
+      addToast(`✅ Uploaded ${files.length} files successfully!`, 'success');
+
+      // Convert uploaded files to Photo format
+      const photos: Photo[] = files
+        .filter(f => f.type === 'image') // For now, only process images
+        .map((file, index) => ({
+          id: `upload-${index}`,
+          url: file.url,
+          thumbnailUrl: file.url,
+          filename: `upload-${index + 1}.jpg`,
+          uploadedAt: new Date()
+        }));
+
+      if (photos.length === 0) {
+        addToast('⚠️ No images to process. Videos will be supported soon!', 'warning');
+        return;
+      }
+
+      setState(prev => ({ ...prev, photos }));
+      addToast(`📸 Loaded ${photos.length} photos - Starting AI detection...`, 'success');
+
+      // Automatically select all photos and start detection
+      const allPhotoIds = photos.map(photo => photo.id);
+      setSelectedPhotos(allPhotoIds);
+
+      // Start AI detection automatically
+      await runAutomaticDetection(photos);
+
+    } catch (error) {
+      console.error('Error processing uploads:', error);
+      addToast('Error processing uploaded files', 'error');
+    }
+  };
+
+  const handlePropertyInfoChange = (info: { address?: string; bedrooms?: number; bathrooms?: number; sqft?: number }) => {
+    setUploadedPropertyInfo(info);
+    if (info.address) {
+      setState(prev => ({ ...prev, address: info.address || '' }));
+    }
   };
 
   const handlePhotoSelect = (photoId: string) => {
@@ -501,12 +554,17 @@ export default function DashboardPage() {
       setCurrentDetectingRoom(null);
       console.log('🏠 Starting 2-Phase AI Detection on', photos.length, 'photos');
 
-      // Extract property context from selectedListing hdpdata
+      // Extract property context from selectedListing hdpdata or uploaded property info
       const propertyContext: PropertyContext | undefined = selectedListing?.hdpdata?.homeInfo ? {
         bedrooms: selectedListing.hdpdata.homeInfo.bedrooms,
         bathrooms: selectedListing.hdpdata.homeInfo.bathrooms,
         sqft: selectedListing.hdpdata.homeInfo.lotAreaValue,
         propertyType: selectedListing.hdpdata.homeInfo.homeType
+      } : (uploadedPropertyInfo.bedrooms || uploadedPropertyInfo.bathrooms || uploadedPropertyInfo.sqft) ? {
+        bedrooms: uploadedPropertyInfo.bedrooms,
+        bathrooms: uploadedPropertyInfo.bathrooms,
+        sqft: uploadedPropertyInfo.sqft,
+        propertyType: 'SINGLE_FAMILY'
       } : undefined;
 
       console.log('🏠 Property Context:', propertyContext);
@@ -1075,15 +1133,61 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Left Column: Search + Photos */}
                 <div className="space-y-5">
-                  <SearchPanel
-                    address={state.address}
-                    onAddressChange={handleAddressChange}
-                    onFetchPhotos={handleFetchPhotos}
-                    onClear={handleClear}
-                    recentSearches={[]}
-                    onListingSelect={handleListingSelect}
-                  />
-                  {selectedListing && <PropertyInfo listing={selectedListing} />}
+                  {/* Mode Toggle */}
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors duration-200">
+                    <div className="flex items-center justify-center space-x-2">
+                      <button
+                        onClick={() => setInputMode('mls')}
+                        className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                          inputMode === 'mls'
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          <span>MLS Search</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => setInputMode('upload')}
+                        className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                          inputMode === 'upload'
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <span>Upload Photos</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Conditional Rendering Based on Mode */}
+                  {inputMode === 'mls' ? (
+                    <>
+                      <SearchPanel
+                        address={state.address}
+                        onAddressChange={handleAddressChange}
+                        onFetchPhotos={handleFetchPhotos}
+                        onClear={handleClear}
+                        recentSearches={[]}
+                        onListingSelect={handleListingSelect}
+                      />
+                      {selectedListing && <PropertyInfo listing={selectedListing} />}
+                    </>
+                  ) : (
+                    <UploadPanel
+                      onUploadComplete={handleUploadComplete}
+                      onPropertyInfoChange={handlePropertyInfoChange}
+                    />
+                  )}
                   <PhotoGallery
                     photos={state.photos}
                     selectedPhotos={selectedPhotos}
