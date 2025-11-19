@@ -68,7 +68,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (createError) {
       console.error('Error creating upload session:', createError);
-      return res.status(500).json({ error: 'Failed to create upload link' });
+      return res.status(500).json({
+        error: 'Failed to create upload link',
+        details: createError.message,
+        hint: createError.hint
+      });
     }
 
     // Generate shareable URL

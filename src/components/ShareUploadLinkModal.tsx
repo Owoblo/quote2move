@@ -59,7 +59,9 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate upload link');
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.details || errorData.error || 'Failed to generate upload link');
       }
 
       const result = await response.json();
@@ -67,7 +69,8 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
 
     } catch (error) {
       console.error('Error generating link:', error);
-      alert('Failed to generate upload link. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate upload link';
+      alert(`Error: ${errorMessage}\n\nPlease ensure the database migrations have been run.`);
     } finally {
       setLoading(false);
     }
