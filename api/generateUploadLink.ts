@@ -115,8 +115,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[generateUploadLink] Upload session created:', uploadSession.id);
 
     // Generate shareable URL
-    const baseUrl = process.env.VITE_APP_URL || 'http://localhost:5173';
+    // Use APP_URL or VERCEL_URL for production, fallback to localhost for dev
+    const baseUrl = process.env.APP_URL ||
+                    process.env.VITE_APP_URL ||
+                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:5173');
     const shareableUrl = `${baseUrl}/customer-upload/${uploadSession.token}`;
+
+    console.log('[generateUploadLink] Generated URL:', shareableUrl);
 
     return res.status(200).json({
       success: true,
