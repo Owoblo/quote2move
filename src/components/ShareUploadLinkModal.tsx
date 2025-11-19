@@ -10,6 +10,8 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
   const [loading, setLoading] = useState(false);
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [sendSMS, setSendSMS] = useState(false);
+  const [smsSent, setSmsSent] = useState(false);
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
@@ -18,7 +20,8 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
     bedrooms: '',
     bathrooms: '',
     sqft: '',
-    expiresInDays: '7'
+    expiresInDays: '7',
+    companyName: ''
   });
 
   const handleGenerateLink = async (e: React.FormEvent) => {
@@ -26,6 +29,11 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
 
     if (!formData.customerName || !formData.propertyAddress) {
       alert('Customer name and property address are required');
+      return;
+    }
+
+    if (sendSMS && !formData.customerPhone) {
+      alert('Customer phone number is required to send SMS');
       return;
     }
 
@@ -67,6 +75,38 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
       const result = await response.json();
       setGeneratedLink(result.uploadSession.shareableUrl);
 
+      // Send SMS if requested
+      if (sendSMS && formData.customerPhone) {
+        try {
+          const smsResponse = await fetch('/api/sendUploadLinkSMS', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              customerName: formData.customerName,
+              customerPhone: formData.customerPhone,
+              propertyAddress: formData.propertyAddress,
+              shareableUrl: result.uploadSession.shareableUrl,
+              companyName: formData.companyName || undefined
+            })
+          });
+
+          if (smsResponse.ok) {
+            setSmsSent(true);
+            console.log('SMS sent successfully');
+          } else {
+            const smsError = await smsResponse.json();
+            console.error('SMS Error:', smsError);
+            alert(`Link generated but SMS failed: ${smsError.details || smsError.error}\n\nYou can still copy and send the link manually.`);
+          }
+        } catch (smsError) {
+          console.error('SMS sending error:', smsError);
+          alert('Link generated but SMS failed to send. You can copy and send the link manually.');
+        }
+      }
+
     } catch (error) {
       console.error('Error generating link:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate upload link';
@@ -87,6 +127,8 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
   const handleClose = () => {
     setGeneratedLink(null);
     setCopied(false);
+    setSendSMS(false);
+    setSmsSent(false);
     setFormData({
       customerName: '',
       customerEmail: '',
@@ -95,7 +137,8 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
       bedrooms: '',
       bathrooms: '',
       sqft: '',
-      expiresInDays: '7'
+      expiresInDays: '7',
+      companyName: ''
     });
     onClose();
   };
@@ -158,7 +201,7 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Customer Phone
+                  Customer Phone {sendSMS && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="tel"
@@ -167,6 +210,44 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
                   placeholder="(555) 123-4567"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
+              </div>
+
+              {/* SMS Toggle */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={sendSMS}
+                    onChange={(e) => setSendSMS(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <div className="ml-3">
+                    <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                      Send SMS with upload link
+                    </span>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+                      Automatically text the link to customer's phone
+                    </p>
+                  </div>
+                </label>
+
+                {sendSMS && (
+                  <div className="mt-3">
+                    <label className="block text-xs font-medium text-blue-900 dark:text-blue-100 mb-1">
+                      Company Name (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.companyName}
+                      onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                      placeholder="Your Moving Company"
+                      className="w-full px-3 py-2 border border-blue-300 dark:border-blue-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    />
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                      Customize the SMS message with your company name (defaults to "MovSense")
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Property Information */}
@@ -289,9 +370,13 @@ export default function ShareUploadLinkModal({ isOpen, onClose }: ShareUploadLin
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <div>
-                    <h3 className="text-sm font-semibold text-green-900 dark:text-green-100">Link Generated Successfully!</h3>
+                    <h3 className="text-sm font-semibold text-green-900 dark:text-green-100">
+                      {smsSent ? 'Link Generated & SMS Sent!' : 'Link Generated Successfully!'}
+                    </h3>
                     <p className="text-sm text-green-700 dark:text-green-300 mt-1">
-                      Share this link with {formData.customerName} to upload property photos
+                      {smsSent
+                        ? `SMS sent to ${formData.customerName} at ${formData.customerPhone}`
+                        : `Share this link with ${formData.customerName} to upload property photos`}
                     </p>
                   </div>
                 </div>
