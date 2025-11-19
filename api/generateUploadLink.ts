@@ -7,11 +7,26 @@ const supabase = createClient(
 );
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    console.log('[generateUploadLink] Starting...');
+    console.log('[generateUploadLink] Environment check:', {
+      hasSupabaseUrl: !!process.env.VITE_SUPABASE_URL,
+      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasAppUrl: !!process.env.VITE_APP_URL
+    });
     const {
       customerName,
       customerEmail,
@@ -26,15 +41,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Get authenticated user from request
     const authHeader = req.headers.authorization;
     if (!authHeader) {
+      console.log('[generateUploadLink] No auth header');
       return res.status(401).json({ error: 'Missing authorization header' });
     }
 
     const token = authHeader.replace('Bearer ', '');
+    console.log('[generateUploadLink] Getting user...');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      console.log('[generateUploadLink] Auth error:', authError);
+      return res.status(401).json({ error: 'Unauthorized', details: authError?.message });
     }
+
+    console.log('[generateUploadLink] User authenticated:', user.id);
 
     // Validation
     if (!customerName || !propertyAddress) {
@@ -46,6 +66,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Calculate expiration date
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+
+    console.log('[generateUploadLink] Creating upload session...');
+    console.log('[generateUploadLink] Data:', {
+      user_id: user.id,
+      customerName,
+      propertyAddress,
+      bedrooms,
+      bathrooms,
+      sqft,
+      expiresAt: expiresAt.toISOString()
+    });
 
     // Create upload session with customer type
     const { data: uploadSession, error: createError } = await supabase
@@ -67,13 +98,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .single();
 
     if (createError) {
-      console.error('Error creating upload session:', createError);
+      console.error('[generateUploadLink] Database error:', createError);
       return res.status(500).json({
         error: 'Failed to create upload link',
         details: createError.message,
-        hint: createError.hint
+        hint: createError.hint,
+        code: createError.code
       });
     }
+
+    console.log('[generateUploadLink] Upload session created:', uploadSession.id);
 
     // Generate shareable URL
     const baseUrl = process.env.VITE_APP_URL || 'http://localhost:5173';
@@ -93,8 +127,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     });
 
-  } catch (error) {
-    console.error('Generate upload link error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+  } catch (error: any) {
+    console.error('[generateUploadLink] Unexpected error:', error);
+    console.error('[generateUploadLink] Error stack:', error.stack);
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }
