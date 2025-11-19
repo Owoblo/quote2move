@@ -288,7 +288,7 @@ export default function DashboardPage() {
             // Use timeout to prevent hanging on large datasets
             const searchPromise = supabase
               .from('just_listed')
-              .select('id, address, addresscity, addressstate, carousel_photos_composable')
+              .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .ilike('address', `%${term}%`)
               .limit(3); // Reduced limit for faster queries
             
@@ -315,7 +315,7 @@ export default function DashboardPage() {
             // Use timeout to prevent hanging on large datasets
             const searchPromise = supabase
               .from('sold_listings')
-              .select('id, address, addresscity, addressstate, carousel_photos_composable')
+              .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .ilike('address', `%${term}%`)
               .limit(3); // Reduced limit for faster queries
             
@@ -353,12 +353,12 @@ export default function DashboardPage() {
           const exactSearchPromise = Promise.all([
             supabase
               .from('just_listed')
-              .select('id, address, addresscity, addressstate, carousel_photos_composable')
+              .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .eq('address', address)
               .limit(1),
             supabase
               .from('sold_listings')
-              .select('id, address, addresscity, addressstate, carousel_photos_composable')
+              .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .eq('address', address)
               .limit(1)
           ]);

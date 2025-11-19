@@ -13,6 +13,8 @@ interface Listing {
   square_feet?: number;
   listing_date?: string;
   status?: string;
+  lotAreaValue?: number;
+  lotAreaUnit?: string;
   [key: string]: any;
 }
 
@@ -106,7 +108,23 @@ export default function SearchPanel({
         const allSuggestions = [
           ...(currentListings.data || []),
           ...(soldListings.data || [])
-        ];
+        ].map(listing => {
+          // Parse hdpdata to extract lot area information
+          if (listing.hdpdata && typeof listing.hdpdata === 'object') {
+            try {
+              const homeInfo = listing.hdpdata.homeInfo || {};
+              return {
+                ...listing,
+                lotAreaValue: homeInfo.lotAreaValue,
+                lotAreaUnit: homeInfo.lotAreaUnit
+              };
+            } catch (error) {
+              console.error('Error parsing hdpdata for listing:', listing.id, error);
+              return listing;
+            }
+          }
+          return listing;
+        });
 
         console.log('All suggestions:', allSuggestions);
         setSuggestions(allSuggestions);
@@ -288,10 +306,13 @@ export default function SearchPanel({
                     </span>
                   )}
                 </div>
-                {listing.beds && listing.baths && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {listing.beds} bed • {listing.baths} bath
-                    {listing.area && ` • ${listing.area} sq ft`}
+                {(listing.beds || listing.baths || listing.lotAreaValue) && (
+                  <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {listing.beds && `${listing.beds} bed`}
+                    {listing.beds && listing.baths && ' • '}
+                    {listing.baths && `${listing.baths} bath`}
+                    {(listing.beds || listing.baths) && listing.lotAreaValue && ' • '}
+                    {listing.lotAreaValue && `${listing.lotAreaValue.toLocaleString()} ${listing.lotAreaUnit || 'sqft'}`}
                   </div>
                 )}
               </div>
