@@ -1,6 +1,102 @@
 import { Detection } from '../types';
 import { estimateCubicFeet, estimateWeight } from './cubicFeetEstimator';
 
+// Property context interface
+export interface PropertyContext {
+  bedrooms?: number;
+  bathrooms?: number;
+  sqft?: number;
+  propertyType?: string;
+}
+
+// Phase 1: Room Classification ONLY
+export const classifyRooms = async (
+  photoUrls: string[],
+  propertyContext?: PropertyContext
+): Promise<{ rooms: Record<string, string[]>, metadata: any }> => {
+  console.log('🏠 Phase 1: Classifying rooms...');
+
+  try {
+    const response = await fetch('/api/classifyRooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        photoUrls,
+        propertyContext
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Rooms classified:', Object.keys(data.rooms || {}).length, 'rooms');
+
+    return {
+      rooms: data.rooms || {},
+      metadata: data.metadata || {}
+    };
+
+  } catch (error: any) {
+    console.error('❌ Room classification failed:', error);
+    throw new Error(`Failed to classify rooms: ${error.message}`);
+  }
+};
+
+// Phase 2: Detect furniture in a specific room
+export const detectFurnitureInRoom = async (
+  roomName: string,
+  roomPhotos: string[],
+  propertyContext?: PropertyContext
+): Promise<Detection[]> => {
+  console.log(`📍 Detecting furniture in ${roomName}...`);
+
+  try {
+    const response = await fetch('/api/detectFurniturePerRoom', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        roomName,
+        roomPhotos,
+        propertyContext
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const detections = data.detections || [];
+
+    // Process detections
+    const processedDetections: Detection[] = detections.map((detection: any) => ({
+      label: detection.label || 'Unknown Item',
+      qty: detection.qty || 1,
+      confidence: detection.confidence || 0.5,
+      notes: detection.notes || '',
+      room: detection.room || roomName,
+      size: detection.size || '',
+      cubicFeet: detection.cubicFeet || estimateCubicFeet(detection.label || ''),
+      weight: detection.weight || estimateWeight(detection.label || ''),
+    }));
+
+    console.log(`✅ ${roomName}: Found ${processedDetections.length} items`);
+    return processedDetections;
+
+  } catch (error: any) {
+    console.error(`❌ Detection failed for ${roomName}:`, error);
+    return [];
+  }
+};
+
 // Furniture Detection - Now uses secure backend API
 // The OpenAI API key is stored server-side and never exposed to the browser
 export const detectFurniture = async (photoUrls: string[]): Promise<Detection[]> => {

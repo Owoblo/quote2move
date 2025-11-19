@@ -11,6 +11,7 @@ import { calculateEstimate } from '../lib/estimate';
 import { toCSV, generatePdf, downloadFile } from '../lib/export';
 import { parseZillowPhotos } from '../lib/zillowPhotos';
 import { FurnitureDetectionService } from '../lib/furnitureDetection';
+import { PropertyContext } from '../lib/aiDetectionServices';
 import { supabase } from '../lib/supabase';
 import { ProjectService, Project } from '../lib/projectService';
 import { QuoteService } from '../lib/quoteService';
