@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SearchPanel from '../components/SearchPanel';
 import UploadPanel from '../components/UploadPanel';
 import ShareUploadLinkModal from '../components/ShareUploadLinkModal';
+import CustomerUploadsPanel from '../components/CustomerUploadsPanel';
 import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
@@ -528,6 +529,37 @@ export default function DashboardPage() {
     setUploadedPropertyInfo(info);
     if (info.address) {
       setState(prev => ({ ...prev, address: info.address || '' }));
+    }
+  };
+
+  const handleLoadCustomerUpload = async (uploadId: string, data: any) => {
+    try {
+      console.log('Loading customer upload:', uploadId, data);
+
+      // Set the photos
+      setState(prev => ({ ...prev, photos: data.photos, address: data.propertyInfo.address || '' }));
+
+      // Set uploaded property info for detection context
+      setUploadedPropertyInfo({
+        address: data.propertyInfo.address,
+        bedrooms: data.propertyInfo.bedrooms,
+        bathrooms: data.propertyInfo.bathrooms,
+        sqft: data.propertyInfo.sqft
+      });
+
+      // Auto-select all photos
+      const allPhotoIds = data.photos.map((photo: Photo) => photo.id);
+      setSelectedPhotos(allPhotoIds);
+
+      // Show success message
+      addToast(`✅ Loaded ${data.photos.length} photos from ${data.customerInfo.name}`, 'success');
+
+      // Automatically start detection
+      await runAutomaticDetection(data.photos);
+
+    } catch (error) {
+      console.error('Error loading customer upload:', error);
+      addToast('Failed to load customer upload', 'error');
     }
   };
 
@@ -1198,10 +1230,13 @@ export default function DashboardPage() {
                       {selectedListing && <PropertyInfo listing={selectedListing} />}
                     </>
                   ) : (
-                    <UploadPanel
-                      onUploadComplete={handleUploadComplete}
-                      onPropertyInfoChange={handlePropertyInfoChange}
-                    />
+                    <>
+                      <UploadPanel
+                        onUploadComplete={handleUploadComplete}
+                        onPropertyInfoChange={handlePropertyInfoChange}
+                      />
+                      <CustomerUploadsPanel onLoadUpload={handleLoadCustomerUpload} />
+                    </>
                   )}
                   <PhotoGallery
                     photos={state.photos}
