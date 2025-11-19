@@ -13,6 +13,7 @@ import DemoPage from './pages/DemoPage';
 import DemoThankYouPage from './pages/DemoThankYouPage';
 import CrewCalendarPage from './pages/CrewCalendarPage';
 import SettingsPage from './pages/SettingsPage';
+import CustomerUploadPage from './pages/CustomerUploadPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -68,6 +69,10 @@ function App() {
                 <SettingsPage />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/customer-upload/:token"
+            element={<CustomerUploadPage />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

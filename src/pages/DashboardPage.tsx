@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchPanel from '../components/SearchPanel';
 import UploadPanel from '../components/UploadPanel';
+import ShareUploadLinkModal from '../components/ShareUploadLinkModal';
 import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
@@ -73,6 +74,7 @@ export default function DashboardPage() {
     bathrooms?: number;
     sqft?: number;
   }>({});
+  const [showShareLinkModal, setShowShareLinkModal] = useState(false);
 
   const addToast = useCallback((message: string, type: 'success' | 'error' | 'warning') => {
     const id = Date.now().toString();
@@ -1167,6 +1169,19 @@ export default function DashboardPage() {
                         </div>
                       </button>
                     </div>
+
+                    {/* Share Link Button */}
+                    <div className="mt-3">
+                      <button
+                        onClick={() => setShowShareLinkModal(true)}
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        <span>Share Link with Customer</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Conditional Rendering Based on Mode */}
@@ -1323,6 +1338,12 @@ export default function DashboardPage() {
           onClose={() => setShowProjectHistory(false)}
         />
       )}
+
+      {/* Share Upload Link Modal */}
+      <ShareUploadLinkModal
+        isOpen={showShareLinkModal}
+        onClose={() => setShowShareLinkModal(false)}
+      />
     </div>
   );
 }
