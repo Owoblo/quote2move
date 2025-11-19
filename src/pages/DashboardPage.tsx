@@ -53,7 +53,7 @@ export default function DashboardPage() {
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [selectedListing, setSelectedListing] = useState<any>(null);
   const [isDetecting, setIsDetecting] = useState(false);
-  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: 'success' | 'error' }>>([]);
+  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'warning' }>>([]);
   const [showProjectHistory, setShowProjectHistory] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
@@ -63,8 +63,10 @@ export default function DashboardPage() {
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [followUps, setFollowUps] = useState<any[]>([]);
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+  const [classifiedRooms, setClassifiedRooms] = useState<Record<string, string[]>>({});
+  const [currentDetectingRoom, setCurrentDetectingRoom] = useState<string | null>(null);
 
-  const addToast = useCallback((message: string, type: 'success' | 'error') => {
+  const addToast = useCallback((message: string, type: 'success' | 'error' | 'warning') => {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
@@ -495,47 +497,95 @@ export default function DashboardPage() {
     try {
       setIsDetecting(true);
       setState(prev => ({ ...prev, detections: [] })); // Clear previous detections
-      console.log('Starting automatic AI detection on', photos.length, 'photos');
-      
-      // Process photos one by one for real-time updates
-      for (let i = 0; i < photos.length; i++) {
-        const photo = photos[i];
-        console.log(`Processing photo ${i + 1}/${photos.length}:`, photo.url);
-        
+      setClassifiedRooms({}); // Clear previous rooms
+      setCurrentDetectingRoom(null);
+      console.log('🏠 Starting 2-Phase AI Detection on', photos.length, 'photos');
+
+      // Extract property context from selectedListing hdpdata
+      const propertyContext: PropertyContext | undefined = selectedListing?.hdpdata?.homeInfo ? {
+        bedrooms: selectedListing.hdpdata.homeInfo.bedrooms,
+        bathrooms: selectedListing.hdpdata.homeInfo.bathrooms,
+        sqft: selectedListing.hdpdata.homeInfo.lotAreaValue,
+        propertyType: selectedListing.hdpdata.homeInfo.homeType
+      } : undefined;
+
+      console.log('🏠 Property Context:', propertyContext);
+
+      // PHASE 1: Classify Rooms
+      addToast('🏠 Classifying rooms...', 'success');
+      const photoUrls = photos.map(p => p.url);
+
+      const { rooms, metadata } = await FurnitureDetectionService.classifyRooms(photoUrls, propertyContext);
+
+      setClassifiedRooms(rooms);
+      const roomNames = Object.keys(rooms);
+      console.log('✅ Classified', roomNames.length, 'rooms:', roomNames.join(', '));
+      addToast(`✅ Found ${roomNames.length} rooms: ${roomNames.map(r => r.replace(/_/g, ' ')).join(', ')}`, 'success');
+
+      // Small delay to let user see the rooms
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // PHASE 2: Detect Furniture Room by Room
+      addToast('🔍 Detecting furniture room by room...', 'success');
+
+      for (const [roomName, roomPhotos] of Object.entries(rooms)) {
+        const displayName = roomName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        setCurrentDetectingRoom(roomName);
+
+        console.log(`📍 Detecting in ${displayName} (${roomPhotos.length} photos)...`);
+        addToast(`📍 Analyzing ${displayName}...`, 'success');
+
         try {
-          // Detect furniture in this single photo
-          const photoDetections = await FurnitureDetectionService.detectFurniture([photo.url]);
-          
-          if (photoDetections.length > 0) {
-            // Add new detections to existing ones
+          const roomDetections = await FurnitureDetectionService.detectFurnitureInRoom(
+            roomName,
+            roomPhotos,
+            propertyContext
+          );
+
+          if (roomDetections.length > 0) {
+            // Add room's detections to state incrementally
             setState(prev => ({
               ...prev,
-              detections: [...prev.detections, ...photoDetections]
+              detections: [...prev.detections, ...roomDetections]
             }));
-            
-            console.log(`Photo ${i + 1}: Detected ${photoDetections.length} items`);
-            
-            // Show real-time toast for each photo
-            addToast(`Photo ${i + 1}: Found ${photoDetections.length} items`, 'success');
+
+            console.log(`✅ ${displayName}: Found ${roomDetections.length} items`);
+            addToast(`✅ ${displayName}: ${roomDetections.length} items`, 'success');
+          } else {
+            console.log(`ℹ️ ${displayName}: No furniture detected`);
           }
-          
-          // Small delay to show real-time updates
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+
+          // Small delay between rooms for visual effect
+          await new Promise(resolve => setTimeout(resolve, 800));
+
         } catch (error) {
-          console.error(`Error processing photo ${i + 1}:`, error);
-          // Continue with next photo
+          console.error(`❌ Error detecting in ${displayName}:`, error);
+          addToast(`⚠️ Error in ${displayName}`, 'warning');
         }
       }
-      
-      console.log('Automatic AI detection completed');
-      addToast(`AI detection completed! Found ${state.detections.length} total items`, 'success');
-      
+
+      setCurrentDetectingRoom(null);
+      console.log('✅ All rooms processed!');
+      addToast(`🎉 Detection complete! Found ${state.detections.length} items total`, 'success');
+
+      // Show validation warnings if any
+      if (propertyContext?.bedrooms) {
+        const bedsDetected = state.detections.filter(d =>
+          d.label.toLowerCase().includes('bed') &&
+          !d.label.toLowerCase().includes('nightstand')
+        ).length;
+
+        if (bedsDetected > propertyContext.bedrooms + 1) {
+          addToast(`⚠️ Detected ${bedsDetected} beds in ${propertyContext.bedrooms}-bedroom property`, 'warning');
+        }
+      }
+
     } catch (error) {
-      console.error('Automatic AI detection error:', error);
+      console.error('❌ Automatic AI detection error:', error);
       addToast('AI detection failed. Please try again.', 'error');
     } finally {
       setIsDetecting(false);
+      setCurrentDetectingRoom(null);
     }
   };
 
@@ -1150,8 +1200,10 @@ export default function DashboardPage() {
           <div
             key={toast.id}
             className={`px-4 py-2 rounded-md shadow-lg text-sm font-medium ${
-              toast.type === 'success' 
-                ? 'bg-green-100 text-green-800 border border-green-200' 
+              toast.type === 'success'
+                ? 'bg-green-100 text-green-800 border border-green-200'
+                : toast.type === 'warning'
+                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                 : 'bg-red-100 text-red-800 border border-red-200'
             }`}
           >
