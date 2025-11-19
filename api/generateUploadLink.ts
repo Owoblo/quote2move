@@ -1,10 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// For Vercel serverless functions, use non-VITE prefixed env vars
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.');
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -23,9 +28,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     console.log('[generateUploadLink] Starting...');
     console.log('[generateUploadLink] Environment check:', {
-      hasSupabaseUrl: !!process.env.VITE_SUPABASE_URL,
-      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      hasAppUrl: !!process.env.VITE_APP_URL
+      hasSupabaseUrl: !!supabaseUrl,
+      hasServiceRoleKey: !!supabaseServiceKey,
+      hasAppUrl: !!(process.env.VITE_APP_URL || process.env.SUPABASE_URL)
     });
     const {
       customerName,
