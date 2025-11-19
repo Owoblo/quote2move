@@ -60,6 +60,8 @@ export default function DashboardPage() {
   const [showProjectHistory, setShowProjectHistory] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
   const [activeTab, setActiveTab] = useState<'create' | 'analytics' | 'quotes' | 'calendar'>('create');
   const [analytics, setAnalytics] = useState<any>(null);
   const [quotes, setQuotes] = useState<any[]>([]);
@@ -84,6 +86,39 @@ export default function DashboardPage() {
       setToasts(prev => prev.filter(toast => toast.id !== id));
     }, 3000);
   }, []);
+
+  // Auto-save current project to database
+  const autoSaveProject = useCallback(async () => {
+    if (!currentProject) return;
+
+    try {
+      setAutoSaveStatus('saving');
+
+      await ProjectService.updateProject(currentProject.id, {
+        detections: state.detections,
+        estimate: state.estimate,
+        photoUrls: state.photos.map(p => p.url),
+        roomsClassified: classifiedRooms
+      });
+
+      setAutoSaveStatus('saved');
+      console.log('[Dashboard] Auto-saved project:', currentProject.id);
+    } catch (error) {
+      console.error('[Dashboard] Auto-save failed:', error);
+      setAutoSaveStatus('unsaved');
+    }
+  }, [currentProject, state.detections, state.estimate, state.photos, classifiedRooms]);
+
+  // Auto-save when detections, estimate, or photos change
+  useEffect(() => {
+    if (!currentProject) return;
+
+    const timeoutId = setTimeout(() => {
+      autoSaveProject();
+    }, 2000); // Debounce 2 seconds
+
+    return () => clearTimeout(timeoutId);
+  }, [currentProject, state.detections, state.estimate, state.photos, autoSaveProject]);
 
   // Load persisted state on mount
   useEffect(() => {
