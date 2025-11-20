@@ -26,11 +26,11 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ''
     );
 
-    // 1. Create user
+    // 1. Create user with email already confirmed
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: adminEmail,
       password: adminPassword,
-      email_confirm: false, // Set to true if you want email verification
+      email_confirmed: true, // Auto-confirm email for company signups
       user_metadata: { full_name: adminName }
     })
     if (authError) throw authError;

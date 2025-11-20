@@ -17,7 +17,7 @@ import { toCSV, generatePdf, downloadFile } from '../lib/export';
 import { parseZillowPhotos } from '../lib/zillowPhotos';
 import { FurnitureDetectionService } from '../lib/furnitureDetection';
 import { PropertyContext } from '../lib/aiDetectionServices';
-import { supabase } from '../lib/supabase';
+import { supabase, supabasePublic } from '../lib/supabase';
 import { ProjectService, Project } from '../lib/projectService';
 import { QuoteService } from '../lib/quoteService';
 import { FollowUpService } from '../lib/followUpService';
@@ -361,7 +361,7 @@ export default function DashboardPage() {
           console.log(`🔍 Searching just_listed for: "${term}"`);
           try {
             // Use timeout to prevent hanging on large datasets
-            const searchPromise = supabase
+            const searchPromise = supabasePublic
               .from('just_listed')
               .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .ilike('address', `%${term}%`)
