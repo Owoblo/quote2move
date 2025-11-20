@@ -100,7 +100,14 @@ export default function CompanySignupPage() {
         }
       });
 
-      if (functionError) throw functionError;
+      if (functionError) {
+        // Handle specific error cases
+        if (functionError.message?.includes('email address has already been registered') ||
+            functionError.message?.includes('email_exists')) {
+          throw new Error('This email is already registered. Please use a different email address or sign in instead.');
+        }
+        throw functionError;
+      }
 
       // 2. Sign in the user to create a session
       const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -108,13 +115,34 @@ export default function CompanySignupPage() {
         password: adminPassword,
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        // Handle specific sign-in errors
+        if (signInError.message?.includes('email address has already been registered') ||
+            signInError.message?.includes('email_exists')) {
+          throw new Error('This email is already registered. Please use a different email address or sign in instead.');
+        }
+        throw signInError;
+      }
 
       // 3. Navigate to the dashboard
       navigate('/dashboard');
 
     } catch (error: any) {
-      setError(error.message || 'Failed to create company account');
+      let errorMessage = error.message || 'Failed to create company account';
+
+      // Friendly error messages
+      if (errorMessage.includes('email address has already been registered') ||
+          errorMessage.includes('email_exists')) {
+        errorMessage = 'This email is already registered. Please use a different email address or sign in to your existing account.';
+      } else if (errorMessage.includes('Invalid email')) {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (errorMessage.includes('Password')) {
+        errorMessage = 'Password must be at least 8 characters with uppercase, lowercase, and numbers.';
+      }
+
+      setError(errorMessage);
+      // Go back to step 2 so user can change email
+      setStep(2);
     } finally {
       setIsLoading(false);
     }
@@ -176,10 +204,20 @@ export default function CompanySignupPage() {
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                 <div className="flex">
-                  <svg className="w-5 h-5 text-red-400 dark:text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-red-400 dark:text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="ml-3 text-sm text-red-800 dark:text-red-200">{error}</p>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                    {error.includes('already registered') && (
+                      <p className="text-xs text-red-700 dark:text-red-300 mt-2">
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-semibold underline hover:text-red-900 dark:hover:text-red-100">
+                          Sign in here
+                        </Link>
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

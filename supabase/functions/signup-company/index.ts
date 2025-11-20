@@ -40,7 +40,7 @@ serve(async (req) => {
 
     // 2. Create company
     const { data: companyData, error: companyError } = await supabaseAdmin
-      .from('companies')
+      .from('movsense.companies')
       .insert({
         name: companyName,
         owner_id: adminUserId,
@@ -61,7 +61,7 @@ serve(async (req) => {
 
     // 3. Update profile with company and role
     const { error: profileError } = await supabaseAdmin
-      .from('profiles')
+      .from('movsense.profiles')
       .update({
         company_id: newCompanyId,
         role: 'admin',
@@ -71,7 +71,7 @@ serve(async (req) => {
     if (profileError) {
       // If profile update fails, delete user and company
       await supabaseAdmin.auth.admin.deleteUser(adminUserId);
-      await supabaseAdmin.from('companies').delete().eq('id', newCompanyId);
+      await supabaseAdmin.from('movsense.companies').delete().eq('id', newCompanyId);
       throw profileError;
     }
     
