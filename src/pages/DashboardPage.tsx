@@ -9,7 +9,7 @@ import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
 import ThemeToggle from '../components/ThemeToggle';
 import PropertyInfo from '../components/PropertyInfo';
-import { AppState, Photo, MappingTable, QuotePayload } from '../types';
+import { AppState, Photo, MappingTable, QuotePayload, Detection } from '../types';
 import { calculateEstimate } from '../lib/estimate';
 import { toCSV, generatePdf, downloadFile } from '../lib/export';
 import { parseZillowPhotos } from '../lib/zillowPhotos';
