@@ -245,19 +245,35 @@ export default function DashboardPage() {
       addToast('Please select a listing from the autocomplete first', 'error');
       return;
     }
-    
+
     try {
       console.log('Fetching photos for selected listing:', selectedListing.address);
       console.log('Has carousel_photos_composable:', !!selectedListing.carousel_photos_composable);
-      
+
+      // Create or load project for this MLS listing
+      const mlsId = selectedListing.zpid || selectedListing.id || selectedListing.address;
+      const project = await ProjectService.getOrCreateFromMLS(
+        mlsId,
+        selectedListing.address,
+        {
+          bedrooms: selectedListing.hdpdata?.homeInfo?.bedrooms,
+          bathrooms: selectedListing.hdpdata?.homeInfo?.bathrooms,
+          sqft: selectedListing.hdpdata?.homeInfo?.lotAreaValue
+        }
+      );
+
+      setCurrentProject(project);
+      setCurrentProjectId(project.id);
+      console.log('[Dashboard] Created/loaded MLS project:', project.id);
+
       // Check if the listing has carousel_photos_composable data
       if (selectedListing.carousel_photos_composable) {
         try {
           // Use the utility function to parse Zillow photos
           const photoUrls = parseZillowPhotos(selectedListing.carousel_photos_composable);
-          
+
           console.log('Parsed photo URLs:', photoUrls.length);
-          
+
           if (photoUrls.length > 0) {
             // Convert URLs to Photo format
             const photos: Photo[] = photoUrls.map((url: string, index: number) => ({
@@ -267,17 +283,23 @@ export default function DashboardPage() {
               filename: `property-photo-${index + 1}.jpg`,
               uploadedAt: new Date()
             }));
-            
+
             setState(prev => ({ ...prev, photos }));
+
+            // Save photos to project
+            await ProjectService.updateProject(project.id, {
+              photoUrls: photos.map(p => p.url)
+            });
+
             addToast(`Found ${photos.length} photos - Starting AI detection...`, 'success');
-            
+
             // Automatically select all photos and start detection
             const allPhotoIds = photos.map(photo => photo.id);
             setSelectedPhotos(allPhotoIds);
-            
+
             // Start AI detection automatically
             await runAutomaticDetection(photos);
-            
+
           } else {
             // No photos found
             setState(prev => ({ ...prev, photos: [] }));
@@ -544,6 +566,20 @@ export default function DashboardPage() {
         return;
       }
 
+      // Create project for manual upload
+      const project = await ProjectService.createProject({
+        address: uploadedPropertyInfo.address || 'Manual Upload',
+        source: 'manual_upload',
+        bedrooms: uploadedPropertyInfo.bedrooms,
+        bathrooms: uploadedPropertyInfo.bathrooms,
+        sqft: uploadedPropertyInfo.sqft,
+        photoUrls: photos.map(p => p.url)
+      });
+
+      setCurrentProject(project);
+      setCurrentProjectId(project.id);
+      console.log('[Dashboard] Created manual upload project:', project.id);
+
       setState(prev => ({ ...prev, photos }));
       addToast(`📸 Loaded ${photos.length} photos - Starting AI detection...`, 'success');
 
@@ -570,6 +606,16 @@ export default function DashboardPage() {
   const handleLoadCustomerUpload = async (uploadId: string, data: any) => {
     try {
       console.log('Loading customer upload:', uploadId, data);
+
+      // Create project from customer upload using ProjectService
+      const project = await ProjectService.createFromCustomerUpload(
+        uploadId,
+        data.photos.map((p: Photo) => p.url)
+      );
+
+      setCurrentProject(project);
+      setCurrentProjectId(project.id);
+      console.log('[Dashboard] Created customer upload project:', project.id);
 
       // Set the photos
       setState(prev => ({ ...prev, photos: data.photos, address: data.propertyInfo.address || '' }));
@@ -655,6 +701,9 @@ export default function DashboardPage() {
       // PHASE 2: Detect Furniture Room by Room
       addToast('🔍 Detecting furniture room by room...', 'success');
 
+      // Accumulate all detections locally
+      const allDetections: Detection[] = [];
+
       for (const [roomName, roomPhotos] of Object.entries(rooms)) {
         const displayName = roomName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         setCurrentDetectingRoom(roomName);
@@ -670,7 +719,10 @@ export default function DashboardPage() {
           );
 
           if (roomDetections.length > 0) {
-            // Add room's detections to state incrementally
+            // Add to local accumulator
+            allDetections.push(...roomDetections);
+
+            // Add room's detections to state incrementally for UI updates
             setState(prev => ({
               ...prev,
               detections: [...prev.detections, ...roomDetections]
@@ -692,12 +744,29 @@ export default function DashboardPage() {
       }
 
       setCurrentDetectingRoom(null);
-      console.log('✅ All rooms processed!');
-      addToast(`🎉 Detection complete! Found ${state.detections.length} items total`, 'success');
+
+      console.log('✅ All rooms processed! Total items:', allDetections.length);
+      addToast(`🎉 Detection complete! Found ${allDetections.length} items total`, 'success');
+
+      // Save detections to project if we have a current project
+      if (currentProject) {
+        try {
+          console.log('[Dashboard] Saving detections to project:', currentProject.id);
+          await ProjectService.updateDetections(
+            currentProject.id,
+            allDetections,
+            rooms
+          );
+          console.log('[Dashboard] ✅ Detections saved to project');
+        } catch (error) {
+          console.error('[Dashboard] Failed to save detections:', error);
+          addToast('⚠️ Detections saved locally but failed to sync to database', 'warning');
+        }
+      }
 
       // Show validation warnings if any
       if (propertyContext?.bedrooms) {
-        const bedsDetected = state.detections.filter(d =>
+        const bedsDetected = allDetections.filter(d =>
           d.label.toLowerCase().includes('bed') &&
           !d.label.toLowerCase().includes('nightstand')
         ).length;
@@ -1414,6 +1483,39 @@ export default function DashboardPage() {
         isOpen={showShareLinkModal}
         onClose={() => setShowShareLinkModal(false)}
       />
+
+      {/* Auto-save Status Indicator */}
+      {currentProject && (
+        <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 text-xs z-50">
+          {autoSaveStatus === 'saving' && (
+            <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+              <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Saving...
+            </span>
+          )}
+          {autoSaveStatus === 'saved' && (
+            <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Auto-saved{' '}
+              {currentProject.lastAutoSave &&
+                new Date(currentProject.lastAutoSave).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+          {autoSaveStatus === 'unsaved' && (
+            <span className="text-red-600 dark:text-red-400 flex items-center gap-1">
+              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              Save failed
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
