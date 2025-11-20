@@ -1517,76 +1517,60 @@ export default function DashboardPage() {
               </div>
             </>
           )}
-        </div>
-      </main>
-
-      {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 space-y-2 z-50">
-        {toasts.map(toast => (
-          <div
-            key={toast.id}
-            className={`px-4 py-2 rounded-md shadow-lg text-sm font-medium ${
-              toast.type === 'success'
-                ? 'bg-green-100 text-green-800 border border-green-200'
-                : toast.type === 'warning'
-                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                : 'bg-red-100 text-red-800 border border-red-200'
-            }`}
-          >
-            {toast.message}
           </div>
-        ))}
-      </div>
+        </main>
 
-      {/* Project History Modal */}
-      {showProjectHistory && (
-        <ProjectHistory
-          onLoadProject={handleLoadProject}
-          onClose={() => setShowProjectHistory(false)}
-        />
-      )}
+        {/* Auto-save Status Indicator */}
+        {currentProject && (
+          <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 text-xs z-50">
+            {autoSaveStatus === 'saving' && (
+              <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </span>
+            )}
+            {autoSaveStatus === 'saved' && (
+              <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Auto-saved{' '}
+                {currentProject.lastAutoSave &&
+                  new Date(currentProject.lastAutoSave).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+            {autoSaveStatus === 'unsaved' && (
+              <span className="text-red-600 dark:text-red-400 flex items-center gap-1">
+                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                Save failed
+              </span>
+            )}
+          </div>
+        )}
 
-      {/* Share Upload Link Modal */}
-      <ShareUploadLinkModal
-        isOpen={showShareLinkModal}
-        onClose={() => setShowShareLinkModal(false)}
-      />
-
-          {/* Auto-save Status Indicator */}
-          {currentProject && (
-            <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 text-xs z-50">
-              {autoSaveStatus === 'saving' && (
-                <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Saving...
-                </span>
-              )}
-              {autoSaveStatus === 'saved' && (
-                <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
-                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Auto-saved{' '}
-                  {currentProject.lastAutoSave &&
-                    new Date(currentProject.lastAutoSave).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              )}
-              {autoSaveStatus === 'unsaved' && (
-                <span className="text-red-600 dark:text-red-400 flex items-center gap-1">
-                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  Save failed
-                </span>
-              )}
+        {/* Toast Notifications */}
+        <div className="fixed top-4 right-4 space-y-2 z-50">
+          {toasts.map(toast => (
+            <div
+              key={toast.id}
+              className={`px-4 py-2 rounded-md shadow-lg text-sm font-medium ${
+                toast.type === 'success'
+                  ? 'bg-green-100 text-green-800 border border-green-200'
+                  : toast.type === 'warning'
+                  ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                  : 'bg-red-100 text-red-800 border border-red-200'
+              }`}
+            >
+              {toast.message}
             </div>
-          )}
+          ))}
         </div>
-      </main>
-    </div>
+      </div>
 
     {/* Modals */}
     <NewQuoteModal
