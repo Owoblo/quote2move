@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 import { supabase } from '../lib/supabase';
+import UserManagementPage from './UserManagementPage';
 
 interface QuoteSettings {
   customLogoUrl: string;
@@ -18,7 +19,8 @@ const SETTINGS_KEY = 'movsense_quote_settings';
 export default function SettingsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'quote' | 'email' | 'company' | 'upsells'>('quote');
+  const [activeTab, setActiveTab] = useState<'quote' | 'email' | 'company' | 'upsells' | 'users'>('quote');
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [settings, setSettings] = useState<QuoteSettings>({
     customLogoUrl: '',
     brandColors: {
@@ -68,10 +70,25 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
+    const loadUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (data) {
+          setUserRole(data.role);
+        }
+      }
+    };
+    loadUserRole();
+
     // Check URL for tab parameter
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
-    if (tab && ['quote', 'email', 'company', 'upsells'].includes(tab)) {
+    if (tab && ['quote', 'email', 'company', 'upsells', 'users'].includes(tab)) {
       setActiveTab(tab as any);
     }
     // Load saved quote settings
@@ -454,30 +471,41 @@ export default function SettingsPage() {
       <main className="container-max px-6 py-12">
         {/* Tab Navigation */}
         <div className="mb-8 border-b border-[#E5E7EB]">
-          <nav className="flex space-x-8">
-            {(['quote', 'email', 'company', 'upsells'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => {
-                  setActiveTab(tab);
-                  navigate(`/settings?tab=${tab}`);
-                }}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {tab === 'quote' && 'Quote Customization'}
-                {tab === 'email' && 'Email Settings'}
-                {tab === 'company' && 'Company Information'}
-                {tab === 'upsells' && 'Custom Upsells'}
-              </button>
-            ))}
+          <nav className="-mb-px flex space-x-8">
+            {(['quote', 'email', 'company', 'upsells', 'users'] as const).map((tab) => {
+              if (tab === 'users' && userRole !== 'admin') return null;
+              
+              return (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    navigate(`/settings?tab=${tab}`);
+                  }}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tab === 'quote' && 'Quote Customization'}
+                  {tab === 'email' && 'Email Settings'}
+                  {tab === 'company' && 'Company Information'}
+                  {tab === 'upsells' && 'Custom Upsells'}
+                  {tab === 'users' && 'User Management'}
+                </button>
+              )
+            })}
           </nav>
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'users' && (
+          <div className="card section-padding">
+            <UserManagementPage />
+          </div>
+        )}
+
         {activeTab === 'quote' && (
           <div className="card section-padding">
             <h2 className="text-2xl font-bold text-[#111827] mb-6">Quote Customization</h2>

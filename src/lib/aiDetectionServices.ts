@@ -52,7 +52,7 @@ export const detectFurnitureInRoom = async (
   roomName: string,
   roomPhotos: string[],
   propertyContext?: PropertyContext
-): Promise<Detection[]> => {
+): Promise<{ detections: Detection[], detectionTimeMs: number }> => {
   console.log(`📍 Detecting furniture in ${roomName}...`);
 
   try {
@@ -89,11 +89,14 @@ export const detectFurnitureInRoom = async (
     }));
 
     console.log(`✅ ${roomName}: Found ${processedDetections.length} items`);
-    return processedDetections;
+    return {
+      detections: processedDetections,
+      detectionTimeMs: data.detectionTimeMs || 0
+    };
 
   } catch (error: any) {
     console.error(`❌ Detection failed for ${roomName}:`, error);
-    return [];
+    return { detections: [], detectionTimeMs: 0 };
   }
 };
 

@@ -16,8 +16,12 @@ if (!resendApiKey) {
   console.error('Missing RESEND_API_KEY environment variable');
 }
 
-const supabase = supabaseUrl && supabaseServiceKey 
-  ? createClient(supabaseUrl, supabaseServiceKey)
+const supabase = supabaseUrl && supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      db: {
+        schema: 'movsense'
+      }
+    })
   : null;
 
 interface EmailRequest {

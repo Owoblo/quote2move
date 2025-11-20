@@ -35,13 +35,14 @@ export default async function handler(
   console.log(`📍 Detecting furniture in ${roomName} (${roomPhotos.length} photos)...`);
 
   try {
-    const detections = await detectFurnitureForRoom(roomName, roomPhotos, context, apiKey);
+    const { detections, detectionTimeMs } = await detectFurnitureForRoom(roomName, roomPhotos, context, apiKey);
 
     console.log(`✅ ${roomName}: Found ${detections.length} items`);
 
     return res.status(200).json({
       detections,
-      room: roomName
+      room: roomName,
+      detectionTimeMs: detectionTimeMs
     });
 
   } catch (error: any) {
@@ -58,7 +59,7 @@ async function detectFurnitureForRoom(
   roomPhotos: string[],
   context: any,
   apiKey: string
-): Promise<any[]> {
+): Promise<{ detections: any[], detectionTimeMs: number }> {
 
   const isBedroomRoom = roomName.toLowerCase().includes('bedroom');
   const isBathroomRoom = roomName.toLowerCase().includes('bathroom');
@@ -143,6 +144,7 @@ Return ONLY a valid JSON array:
 Return ONLY valid JSON array, no other text.`;
 
   try {
+    const startTime = performance.now();
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -165,6 +167,7 @@ Return ONLY valid JSON array, no other text.`;
         temperature: 0.05 // Very low temperature for consistency
       })
     });
+    const endTime = performance.now();
 
     if (!response.ok) {
       throw new Error(`OpenAI API error: ${response.status}`);
@@ -175,6 +178,8 @@ Return ONLY valid JSON array, no other text.`;
 
     const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
     const detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
+    
+    let processedDetections = Array.isArray(detections) ? detections : [];
 
     // Post-processing validation for bedrooms
     if (isBedroomRoom && Array.isArray(detections)) {
@@ -194,19 +199,22 @@ Return ONLY valid JSON array, no other text.`;
         );
 
         // Remove all other beds
-        const filteredDetections = detections.filter(d =>
+        processedDetections = detections.filter(d =>
           !beds.includes(d) || d === bestBed
         );
 
         console.log(`✅ Fixed: Kept only "${bestBed.label}" (confidence: ${bestBed.confidence})`);
-        return filteredDetections;
       }
     }
 
-    return Array.isArray(detections) ? detections : [];
+    return {
+      detections: processedDetections,
+      detectionTimeMs: endTime - startTime
+    };
 
   } catch (error: any) {
     console.error(`❌ Detection failed for ${roomName}:`, error);
-    return [];
+    return { detections: [], detectionTimeMs: 0 };
   }
 }
+

@@ -9,7 +9,11 @@ if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error('Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.');
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  db: {
+    schema: 'movsense'
+  }
+});
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS

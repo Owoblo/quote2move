@@ -15,6 +15,9 @@ interface LocationState {
   detections: Detection[];
   estimate: Estimate;
   mapping: MappingTable;
+  totalDetectionTimeMs: number;
+  propertyContext: any;
+  source: string;
 }
 
 interface Upsell {
@@ -59,6 +62,9 @@ export default function EstimatePage() {
   const includeMLSPhotos = settings.includeMLSPhotos;
   const [detections] = useState<Detection[]>(state?.detections || []);
   const [mapping] = useState<MappingTable>(state?.mapping || {});
+  const [totalDetectionTimeMs] = useState<number>(state?.totalDetectionTimeMs || 0);
+  const [propertyContext] = useState<any>(state?.propertyContext || {});
+  const [source] = useState<string>(state?.source || 'mls');
   const [baseEstimate] = useState<Estimate>(state?.estimate || {
     crew: 3,
     rate: 75,
@@ -547,7 +553,11 @@ export default function EstimatePage() {
         // Quote customization
         customLogoUrl,
         brandColors,
-        includeMLSPhotos
+        includeMLSPhotos,
+        // Data Logging
+        totalDetectionTimeMs,
+        propertyContext,
+        source
       }
     });
   };

@@ -22,7 +22,7 @@ export default function QuoteViewerPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
-  const [companySettings, setCompanySettings] = useState<{
+  const [companySettings, setCompanySettings] = useState<{ 
     companyName: string;
     companyLogoUrl: string | null;
     companyPhone: string | null;
@@ -164,11 +164,11 @@ export default function QuoteViewerPage() {
   }, [fetchQuote, loadCompanySettings]);
 
   const handleQuoteAction = async (action: 'accept' | 'decline', declineReason?: string, actionBy: 'customer' | 'sales_rep' = 'customer') => {
-    if (!quote || !quoteId) return;
+    if (!quote || !quoteId) return; 
     
     setActionLoading(true);
     try {
-      await QuoteService.updateQuoteStatus(
+      await QuoteService.updateQuoteOutcome(
         quoteId,
         action === 'accept' ? 'accepted' : 'declined',
         actionBy,
@@ -196,7 +196,7 @@ export default function QuoteViewerPage() {
   };
 
   const handleSubmitQuestion = async () => {
-    if (!question.trim() || !quoteId) return;
+    if (!question.trim() || !quoteId) return; 
     
     try {
       await QuoteService.addQuestion(quoteId, question);
@@ -223,7 +223,7 @@ export default function QuoteViewerPage() {
   };
 
   const handleSendQuote = async () => {
-    if (!quote || !quoteId) return;
+    if (!quote || !quoteId) return; 
     
     setIsSendingEmail(true);
     try {
@@ -542,7 +542,7 @@ export default function QuoteViewerPage() {
                       </button>
                     </>
                   )}
-                  {quote.status === 'pending' && canEdit && (
+                  {quote.outcome === 'pending' && canEdit && (
                     <>
                       <button
                         onClick={() => handleQuoteAction('accept', undefined, 'sales_rep')}
@@ -644,7 +644,7 @@ export default function QuoteViewerPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quote Actions</h2>
               
-              {quote.status === 'pending' && (
+              {quote.outcome === 'pending' && (
                 <div className="space-y-3">
                   <button
                     onClick={() => handleQuoteAction('accept')}
@@ -674,16 +674,22 @@ export default function QuoteViewerPage() {
                 </div>
               )}
 
-              {quote.status === 'accepted' && (
+              {(quote.outcome === 'accepted' || quote.outcome === 'booked') && (
                 <div className="text-center">
                   <div className="bg-green-100 text-green-800 px-4 py-3 rounded-lg mb-4">
                     <p className="font-semibold">Quote Accepted!</p>
-                    <p className="text-sm">We'll contact you soon to schedule your move.</p>
+                    <p className="text-sm">We\'ll contact you soon to schedule your move.</p>
                   </div>
+                  <button
+                    onClick={() => navigate(`/quote/${quoteId}/feedback`)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-2"
+                  >
+                    Add Post-Move Feedback
+                  </button>
                 </div>
               )}
 
-              {quote.status === 'declined' && (
+              {(quote.outcome === 'declined' || quote.outcome === 'lost') && (
                 <div className="text-center">
                   <div className="bg-red-100 text-red-800 px-4 py-3 rounded-lg mb-4">
                     <p className="font-semibold">Quote Declined</p>

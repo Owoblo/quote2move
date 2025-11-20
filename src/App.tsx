@@ -14,6 +14,8 @@ import DemoThankYouPage from './pages/DemoThankYouPage';
 import CrewCalendarPage from './pages/CrewCalendarPage';
 import SettingsPage from './pages/SettingsPage';
 import CustomerUploadPage from './pages/CustomerUploadPage';
+import CompanySignupPage from './pages/CompanySignupPage';
+import QuoteFeedbackPage from './pages/QuoteFeedbackPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup-company" element={<CompanySignupPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/demo" element={<DemoPage />} />
           <Route path="/demo/thank-you" element={<DemoThankYouPage />} />
@@ -55,6 +58,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <EditQuotePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quote/:quoteId/feedback"
+            element={
+              <ProtectedRoute>
+                <QuoteFeedbackPage />
               </ProtectedRoute>
             }
           />

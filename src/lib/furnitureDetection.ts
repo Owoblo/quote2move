@@ -25,16 +25,16 @@ export class FurnitureDetectionService {
     roomName: string,
     roomPhotos: string[],
     propertyContext?: PropertyContext
-  ): Promise<Detection[]> {
+  ): Promise<{ detections: Detection[], detectionTimeMs: number }> {
     console.log(`📍 Detecting furniture in ${roomName}`);
 
     try {
-      const detections = await detectFurnitureInRoom(roomName, roomPhotos, propertyContext);
-      console.log(`${roomName}: Found ${detections.length} items`);
-      return detections;
+      const result = await detectFurnitureInRoom(roomName, roomPhotos, propertyContext);
+      console.log(`${roomName}: Found ${result.detections.length} items`);
+      return result;
     } catch (error) {
       console.error(`Detection failed for ${roomName}:`, error);
-      return [];
+      return { detections: [], detectionTimeMs: 0 };
     }
   }
 

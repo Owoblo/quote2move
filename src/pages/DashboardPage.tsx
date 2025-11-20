@@ -81,6 +81,7 @@ export default function DashboardPage() {
   }>({});
   const [showShareLinkModal, setShowShareLinkModal] = useState(false);
   const [showNewQuoteModal, setShowNewQuoteModal] = useState(false);
+  const [totalDetectionTimeMs, setTotalDetectionTimeMs] = useState(0);
 
   const addToast = useCallback((message: string, type: 'success' | 'error' | 'warning') => {
     const id = Date.now().toString();
@@ -692,6 +693,7 @@ export default function DashboardPage() {
       const photoUrls = photos.map(p => p.url);
 
       const { rooms, metadata } = await FurnitureDetectionService.classifyRooms(photoUrls, propertyContext);
+      let totalTime = metadata.detectionTimeMs || 0;
 
       setClassifiedRooms(rooms);
       const roomNames = Object.keys(rooms);
@@ -715,11 +717,12 @@ export default function DashboardPage() {
         addToast(`📍 Analyzing ${displayName}...`, 'success');
 
         try {
-          const roomDetections = await FurnitureDetectionService.detectFurnitureInRoom(
+          const { detections: roomDetections, detectionTimeMs } = await FurnitureDetectionService.detectFurnitureInRoom(
             roomName,
             roomPhotos,
             propertyContext
           );
+          totalTime += detectionTimeMs;
 
           if (roomDetections.length > 0) {
             // Add to local accumulator
@@ -745,6 +748,7 @@ export default function DashboardPage() {
           addToast(`⚠️ Error in ${displayName}`, 'warning');
         }
       }
+      setTotalDetectionTimeMs(totalTime);
 
       setCurrentDetectingRoom(null);
 
@@ -1235,11 +1239,11 @@ export default function DashboardPage() {
                         <div className="text-right ml-4">
                           <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">${quote.totalAmount.toFixed(2)}</p>
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
-                            quote.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                            quote.status === 'declined' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                            quote.outcome === 'accepted' || quote.outcome === 'booked' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                            quote.outcome === 'declined' || quote.outcome === 'lost' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
                             'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                           }`}>
-                            {quote.status}
+                            {quote.outcome}
                           </span>
                         </div>
                       </div>
@@ -1486,7 +1490,20 @@ export default function DashboardPage() {
                             address: state.address,
                             detections: state.detections,
                             estimate: state.estimate,
-                            mapping: state.mapping
+                            mapping: state.mapping,
+                            totalDetectionTimeMs: totalDetectionTimeMs,
+                            propertyContext: selectedListing?.hdpdata?.homeInfo ? {
+                              bedrooms: selectedListing.hdpdata.homeInfo.bedrooms,
+                              bathrooms: selectedListing.hdpdata.homeInfo.bathrooms,
+                              sqft: selectedListing.hdpdata.homeInfo.lotAreaValue,
+                              propertyType: selectedListing.hdpdata.homeInfo.homeType
+                            } : (uploadedPropertyInfo.bedrooms || uploadedPropertyInfo.bathrooms || uploadedPropertyInfo.sqft) ? {
+                              bedrooms: uploadedPropertyInfo.bedrooms,
+                              bathrooms: uploadedPropertyInfo.bathrooms,
+                              sqft: uploadedPropertyInfo.sqft,
+                              propertyType: 'SINGLE_FAMILY'
+                            } : undefined,
+                            source: inputMode
                           }
                         });
                       }}

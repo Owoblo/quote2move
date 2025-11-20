@@ -37,17 +37,18 @@ export default async function handler(
   console.log(`📸 Classifying ${photoUrls.length} photos by room...`);
 
   try {
-    const roomClassification = await classifyPhotosByRoom(photoUrls, context, apiKey);
+    const { rooms, detectionTimeMs } = await classifyPhotosByRoom(photoUrls, context, apiKey);
 
     console.log('✅ Room Classification Complete');
-    console.log('Rooms:', Object.keys(roomClassification));
+    console.log('Rooms:', Object.keys(rooms));
 
     return res.status(200).json({
-      rooms: roomClassification,
+      rooms: rooms,
       metadata: {
-        totalRooms: Object.keys(roomClassification).length,
+        totalRooms: Object.keys(rooms).length,
         totalPhotos: photoUrls.length,
-        propertyContext: context
+        propertyContext: context,
+        detectionTimeMs: detectionTimeMs
       }
     });
 
@@ -64,7 +65,7 @@ async function classifyPhotosByRoom(
   photoUrls: string[],
   context: any,
   apiKey: string
-): Promise<Record<string, string[]>> {
+): Promise<Record<string, any>> {
 
   const prompt = `You are a real estate photo classifier. Analyze these ${photoUrls.length} property photos and classify each by room type.
 
@@ -98,6 +99,7 @@ Return ONLY a JSON object mapping room names to arrays of photo indices:
 Return ONLY valid JSON, no other text.`;
 
   try {
+    const startTime = performance.now();
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -120,6 +122,7 @@ Return ONLY valid JSON, no other text.`;
         temperature: 0.1
       })
     });
+    const endTime = performance.now();
 
     if (!response.ok) {
       throw new Error(`OpenAI API error: ${response.status}`);
@@ -137,11 +140,17 @@ Return ONLY valid JSON, no other text.`;
       roomClassification[room] = (indices as number[]).map(i => photoUrls[i]);
     }
 
-    return roomClassification;
+    return {
+      rooms: roomClassification,
+      detectionTimeMs: endTime - startTime
+    };
 
   } catch (error: any) {
     console.error('❌ Room classification failed:', error);
     // Fallback: treat all photos as one group
-    return { 'all_rooms': photoUrls };
+    return { 
+      rooms: { 'all_rooms': photoUrls },
+      detectionTimeMs: 0
+    };
   }
 }

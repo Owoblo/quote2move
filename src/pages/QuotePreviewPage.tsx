@@ -27,6 +27,10 @@ interface QuotePreviewData {
   brandColors?: { primary?: string; secondary?: string; accent?: string };
   includeMLSPhotos?: boolean;
   followUpDate?: string;
+  // Data Logging
+  totalDetectionTimeMs?: number;
+  propertyContext?: any;
+  source?: string;
 }
 
 export default function QuotePreviewPage() {
@@ -92,7 +96,13 @@ export default function QuotePreviewPage() {
         // Quote customization
         customLogoUrl: quoteData.customLogoUrl,
         brandColors: quoteData.brandColors,
-        status: 'pending'
+        status: 'pending',
+        // Data Logging
+        detection_time_ms: quoteData.totalDetectionTimeMs,
+        home_size: quoteData.propertyContext,
+        source: quoteData.source,
+        ai_detected_items: quoteData.detections,
+        original_photos: quoteData.photos,
       });
 
       if (!savedQuote.id) {
