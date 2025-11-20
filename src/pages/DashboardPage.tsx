@@ -9,6 +9,8 @@ import InventoryTable from '../components/InventoryTable';
 import ProjectHistory from '../components/ProjectHistory';
 import ThemeToggle from '../components/ThemeToggle';
 import PropertyInfo from '../components/PropertyInfo';
+import NewQuoteModal from '../components/NewQuoteModal';
+import ProjectsSidebar from '../components/ProjectsSidebar';
 import { AppState, Photo, MappingTable, QuotePayload, Detection } from '../types';
 import { calculateEstimate } from '../lib/estimate';
 import { toCSV, generatePdf, downloadFile } from '../lib/export';
@@ -78,6 +80,7 @@ export default function DashboardPage() {
     sqft?: number;
   }>({});
   const [showShareLinkModal, setShowShareLinkModal] = useState(false);
+  const [showNewQuoteModal, setShowNewQuoteModal] = useState(false);
 
   const addToast = useCallback((message: string, type: 'success' | 'error' | 'warning') => {
     const id = Date.now().toString();
@@ -928,79 +931,144 @@ export default function DashboardPage() {
       estimate: project.estimate
     });
     setCurrentProjectId(project.id);
+    setCurrentProject(project);
     setSelectedPhotos([]);
     addToast('Project loaded successfully', 'success');
   };
 
+  const handleSelectProject = async (project: Project) => {
+    try {
+      console.log('[Dashboard] Switching to project:', project.id);
+
+      // Load project data into state
+      setCurrentProject(project);
+      setCurrentProjectId(project.id);
+
+      setState({
+        address: project.address,
+        photos: project.photoUrls.map((url, index) => ({
+          id: `photo-${index}`,
+          url: url,
+          thumbnailUrl: url,
+          filename: `photo-${index + 1}.jpg`,
+          uploadedAt: new Date()
+        })),
+        detections: project.detections,
+        mapping: state.mapping,
+        estimate: project.estimate || { total: 0, hours: 0, cubicFeet: 0, items: [] }
+      });
+
+      if (project.roomsClassified) {
+        setClassifiedRooms(project.roomsClassified);
+      }
+
+      // Set uploaded property info if available
+      if (project.bedrooms || project.bathrooms || project.sqft) {
+        setUploadedPropertyInfo({
+          address: project.address,
+          bedrooms: project.bedrooms,
+          bathrooms: project.bathrooms,
+          sqft: project.sqft
+        });
+      }
+
+      setActiveTab('create');
+      addToast(`Loaded: ${project.projectName || project.address}`, 'success');
+    } catch (error) {
+      console.error('Error loading project:', error);
+      addToast('Failed to load project', 'error');
+    }
+  };
+
+  const handleNewQuoteClick = () => {
+    setShowNewQuoteModal(true);
+  };
+
+  const handleNewQuoteMLS = () => {
+    setInputMode('mls');
+    setActiveTab('create');
+    // Clear current project to start fresh
+    setCurrentProject(null);
+    setCurrentProjectId(null);
+    setState(prev => ({
+      ...prev,
+      address: '',
+      photos: [],
+      detections: [],
+      estimate: { total: 0, hours: 0, cubicFeet: 0, items: [] }
+    }));
+    setClassifiedRooms({});
+    addToast('Ready to search MLS', 'success');
+  };
+
+  const handleNewQuoteManualUpload = () => {
+    setInputMode('upload');
+    setActiveTab('create');
+    // Clear current project to start fresh
+    setCurrentProject(null);
+    setCurrentProjectId(null);
+    setState(prev => ({
+      ...prev,
+      address: '',
+      photos: [],
+      detections: [],
+      estimate: { total: 0, hours: 0, cubicFeet: 0, items: [] }
+    }));
+    setClassifiedRooms({});
+    addToast('Ready to upload photos', 'success');
+  };
+
+  const handleNewQuoteCustomerUpload = () => {
+    setShowShareLinkModal(true);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
-      {/* Header */}
-      <header className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
-        <div className="container-max px-6">
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-purple-600 rounded-md flex items-center justify-center shadow-sm">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h1 className="text-lg font-semibold text-[#111827] tracking-tight">MovSense</h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate('/settings')}
-                className="btn btn-ghost text-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Settings</span>
-              </button>
-              <button
-                onClick={() => setShowProjectHistory(true)}
-                className="btn btn-ghost text-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>History</span>
-              </button>
-              <button
-                onClick={handleSaveProject}
-                disabled={isSaving || (!state.address && state.detections.length === 0)}
-                className="btn btn-primary text-sm disabled:opacity-50"
-              >
-                {isSaving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div>
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    <span>{currentProjectId ? 'Update' : 'Save'}</span>
-                  </>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
+      <ProjectsSidebar
+        currentProject={currentProject}
+        onSelectProject={handleSelectProject}
+        onNewQuote={handleNewQuoteClick}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+          <div className="px-6">
+            <div className="flex items-center justify-between h-14">
+              <div className="flex items-center gap-3">
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
+                  {currentProject ? (currentProject.projectName || currentProject.address || 'Untitled Project') : 'MovSense Dashboard'}
+                </h1>
+                {currentProject && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {currentProject.source === 'mls' && '🏠 MLS'}
+                    {currentProject.source === 'manual_upload' && '📤 Manual'}
+                    {currentProject.source === 'customer_upload' && '📩 Customer'}
+                  </span>
                 )}
-              </button>
-              <div className="w-px h-5 bg-gray-200 dark:bg-gray-700"></div>
-              <select className="text-sm font-medium text-[#374151] bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <option>San Francisco, CA</option>
-                <option>Los Angeles, CA</option>
-                <option>New York, NY</option>
-                <option>Chicago, IL</option>
-              </select>
-              <ThemeToggle />
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate('/settings')}
+                  className="btn btn-ghost text-sm"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>Settings</span>
+                </button>
+                <ThemeToggle />
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="min-h-screen transition-colors duration-200">
-        <div className="container-max px-6 py-12">
+        {/* Main Scrollable Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="px-6 py-8">
           {/* Tabs */}
           <div className="mb-8 border-b border-gray-200/60 dark:border-gray-700/60">
             <div className="flex gap-6">
@@ -1484,38 +1552,50 @@ export default function DashboardPage() {
         onClose={() => setShowShareLinkModal(false)}
       />
 
-      {/* Auto-save Status Indicator */}
-      {currentProject && (
-        <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 text-xs z-50">
-          {autoSaveStatus === 'saving' && (
-            <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-              <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            </span>
+          {/* Auto-save Status Indicator */}
+          {currentProject && (
+            <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 text-xs z-50">
+              {autoSaveStatus === 'saving' && (
+                <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </span>
+              )}
+              {autoSaveStatus === 'saved' && (
+                <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Auto-saved{' '}
+                  {currentProject.lastAutoSave &&
+                    new Date(currentProject.lastAutoSave).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+              {autoSaveStatus === 'unsaved' && (
+                <span className="text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  Save failed
+                </span>
+              )}
+            </div>
           )}
-          {autoSaveStatus === 'saved' && (
-            <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
-              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Auto-saved{' '}
-              {currentProject.lastAutoSave &&
-                new Date(currentProject.lastAutoSave).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          )}
-          {autoSaveStatus === 'unsaved' && (
-            <span className="text-red-600 dark:text-red-400 flex items-center gap-1">
-              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              Save failed
-            </span>
-          )}
-        </div>
-      )}
+          </div>
+        </main>
+      </div>
+
+      {/* Modals */}
+      <NewQuoteModal
+        isOpen={showNewQuoteModal}
+        onClose={() => setShowNewQuoteModal(false)}
+        onSelectMLS={handleNewQuoteMLS}
+        onSelectManualUpload={handleNewQuoteManualUpload}
+        onSelectCustomerUpload={handleNewQuoteCustomerUpload}
+      />
     </div>
   );
 }
