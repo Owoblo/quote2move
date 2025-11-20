@@ -892,13 +892,12 @@ export default function DashboardPage() {
 
       if (currentProjectId) {
         // Update existing project
-        await ProjectService.updateProject(
-          currentProjectId,
-          state.address,
-          state.detections,
-          state.estimate,
-          projectName
-        );
+        await ProjectService.updateProject(currentProjectId, {
+          address: state.address,
+          projectName: projectName,
+          detections: state.detections,
+          estimate: state.estimate
+        });
         addToast('Project updated successfully', 'success');
       } else {
         // Save new project
@@ -909,6 +908,7 @@ export default function DashboardPage() {
           projectName
         );
         setCurrentProjectId(project.id);
+        setCurrentProject(project);
         addToast('Project saved successfully', 'success');
       }
     } catch (error: any) {
