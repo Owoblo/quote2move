@@ -26,37 +26,41 @@ export default function HeroSection() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
+              <a 
+                href="https://calendly.com"
+                className="btn btn-primary px-8 py-3 text-base text-center"
+              >
+                Book a Demo
+              </a>
               <Link 
                 to="/login" 
-                className="btn btn-primary px-8 py-3 text-base"
+                className="btn btn-secondary px-8 py-3 text-base"
               >
-                Try it free — no credit card
+                Start Free Trial
               </Link>
-              <a 
-                href="#demo"
-                className="btn btn-secondary px-8 py-3 text-base text-center"
-              >
-                Watch 2-min demo
-              </a>
             </div>
 
-            {/* Trust text */}
-            <div className="flex flex-col gap-2 text-sm text-[#6B7280]">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[#111827] font-semibold">
-                  <span className="text-green-600">✓</span> Used by 50+ moving companies
-                </span>
-                <span className="hidden sm:inline text-[#D1D5DB]">•</span>
-                <span>96% detection accuracy • setup in 5 minutes</span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="text-green-600">✓</span> Quote 10x more jobs without driving
-                </span>
-                <span className="hidden sm:inline text-[#D1D5DB]">•</span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="text-green-600">✓</span> 30-second inventory builder
-                </span>
+            {/* Logo cloud */}
+            <div className="mt-4">
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                Trusted by leading moving companies
+              </p>
+              <div className="mt-4 flex flex-wrap items-center justify-start gap-x-8 gap-y-4">
+                <img
+                  src="/Central Coast Moving logo.webp"
+                  alt="Central Coast Moving"
+                  className="h-8 w-auto object-contain"
+                />
+                <img
+                  src="/Lets Get Moving Logo.webp"
+                  alt="Lets Get Moving"
+                  className="h-10 w-auto object-contain"
+                />
+                <img
+                  src="/United-Van-Lines-Company-Logo.gif"
+                  alt="United Van Lines"
+                  className="h-8 w-auto object-contain"
+                />
               </div>
             </div>
           </div>
