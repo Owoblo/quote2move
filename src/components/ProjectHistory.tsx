@@ -19,7 +19,7 @@ export default function ProjectHistory({ onLoadProject, onClose }: ProjectHistor
     try {
       setIsLoading(true);
       setError(null);
-      const userProjects = await ProjectService.getUserProjects();
+      const userProjects = await ProjectService.getActiveProjects();
       setProjects(userProjects);
     } catch (err: any) {
       setError(err.message || 'Failed to load projects');
@@ -115,7 +115,7 @@ export default function ProjectHistory({ onLoadProject, onClose }: ProjectHistor
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          {project.project_name || project.address || 'Untitled Project'}
+                          {project.projectName || project.address || 'Untitled Project'}
                         </h3>
                         {project.detections.length > 0 && (
                           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
@@ -126,13 +126,13 @@ export default function ProjectHistory({ onLoadProject, onClose }: ProjectHistor
                       <p className="text-sm text-gray-600 mb-1">
                         📍 {project.address || 'No address'}
                       </p>
-                      {project.estimate && project.estimate.total > 0 && (
+                      {project.estimate && (project.estimate as any).total > 0 && (
                         <p className="text-sm font-medium text-gray-900 mb-2">
-                          💰 ${project.estimate.total.toFixed(2)}
+                          💰 ${(project.estimate as any).total.toFixed(2)}
                         </p>
                       )}
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span>📅 {formatDate(project.updated_at || project.created_at)}</span>
+                        <span>📅 {formatDate(project.updatedAt || project.createdAt)}</span>
                         {project.notes && (
                           <span className="flex items-center">
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
