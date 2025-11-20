@@ -96,7 +96,7 @@ export default function QuotePreviewPage() {
         // Quote customization
         customLogoUrl: quoteData.customLogoUrl,
         brandColors: quoteData.brandColors,
-        status: 'pending',
+        outcome: 'pending',
         // Data Logging
         detection_time_ms: quoteData.totalDetectionTimeMs,
         home_size: quoteData.propertyContext,
