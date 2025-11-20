@@ -38,41 +38,25 @@ serve(async (req) => {
 
     // The handle_new_user trigger will create the profile.
 
-    // 2. Create company in movsense schema
-    const { data: companyData, error: companyError } = await supabaseAdmin
-      .from('movsense.companies')
-      .insert({
-        name: companyName,
-        owner_id: adminUserId,
-        phone: adminPhone,
-        address: companyAddress,
-        truck_count: truckCount,
-        service_area: serviceArea,
-      })
-      .select()
-      .single();
+    // Wait a bit for trigger to execute
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (companyError) {
+    // 2. Create company and link admin using RPC function
+    const { data: rpcData, error: rpcError } = await supabaseAdmin
+      .rpc('create_company_with_admin', {
+        p_company_name: companyName,
+        p_admin_id: adminUserId,
+        p_admin_name: adminName,
+        p_phone: adminPhone,
+        p_address: companyAddress,
+        p_truck_count: truckCount,
+        p_service_area: serviceArea
+      });
+
+    if (rpcError || (rpcData && !rpcData.success)) {
       // If company creation fails, delete the user
       await supabaseAdmin.auth.admin.deleteUser(adminUserId);
-      throw companyError;
-    }
-    const newCompanyId = companyData.id;
-
-    // 3. Update profile with company and role in movsense schema
-    const { error: profileError } = await supabaseAdmin
-      .from('movsense.profiles')
-      .update({
-        company_id: newCompanyId,
-        role: 'admin',
-      })
-      .eq('id', adminUserId);
-
-    if (profileError) {
-      // If profile update fails, delete user and company
-      await supabaseAdmin.auth.admin.deleteUser(adminUserId);
-      await supabaseAdmin.from('movsense.companies').delete().eq('id', newCompanyId);
-      throw profileError;
+      throw rpcError || new Error(rpcData.error);
     }
     
     // The user is created, but not logged in.

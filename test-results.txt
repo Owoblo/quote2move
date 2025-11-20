@@ -1,0 +1,98 @@
+🚀 STARTING COMPREHENSIVE ENTERPRISE WORKFLOW TEST
+
+======================================================================
+Test Data:
+  Company Name: Test Movers 1763663063355
+  Admin Email: admin1763663063355@testmovers.com
+  Admin Name: John Test Admin
+======================================================================
+
+
+📝 TEST 1: Company Signup via Edge Function
+----------------------------------------------------------------------
+✅ Company signup succeeded!
+   User ID: 366b7dda-add8-45a4-aa1e-6513123b0d95
+
+📊 TEST 2: Verify Company Created in Database
+----------------------------------------------------------------------
+❌ Company NOT found in database!
+   Response: {
+  status: 201,
+  data: [
+    {
+      id: 'ffd0bcc9-6aa3-4af9-b420-234ae49cd166',
+      name: 'Test Movers 1763663063355',
+      phone: '+1-555-TEST-001',
+      address: '123 Test Street, Austin, TX 78701',
+      service_area: 'Austin, TX',
+      truck_count: 5,
+      owner_id: '366b7dda-add8-45a4-aa1e-6513123b0d95'
+    }
+  ],
+  headers: {
+    date: 'Thu, 20 Nov 2025 18:24:27 GMT',
+    'content-type': 'application/json',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'cf-ray': '9a19fbfb1c3c0f01-YYZ',
+    'cf-cache-status': 'DYNAMIC',
+    'cache-control': 'no-cache',
+    server: 'cloudflare',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    vary: 'Origin, accept-encoding',
+    'access-control-allow-credentials': 'true',
+    'access-control-expose-headers': 'x-connection-encrypted,x-forwarded-for,user-agent,CF-Connecting-IP,Retry-After',
+    'x-powered-by': 'Express',
+    'x-ratelimit-limit': '120',
+    'x-ratelimit-remaining': '119',
+    'x-ratelimit-reset': '60',
+    'set-cookie': [
+      '__cf_bm=IOu.Pb7lUwSDEIk2hiDoJxB6Ao3315vwwlTPYlsZ2UU-1763663067.3726218-1.0.1.1-EaneoqOAOCGv3HkkkwXwngbGPPkulWoyiAs32_zl5Omu5Jq1QAWG_aQkAJlOIlpaBooDgZQJGrL0wwug4B6gFfcPppJ32U.YrI6TNDZMYI7DATuirheV_Sr2LWIAo3An; HttpOnly; Secure; Path=/; Domain=supabase.com; Expires=Thu, 20 Nov 2025 18:54:27 GMT'
+    ]
+  }
+}
+
+👤 TEST 3: Verify Admin Profile Created
+----------------------------------------------------------------------
+❌ Admin profile NOT found!
+
+🔒 TEST 4: Test RLS Helper Functions
+----------------------------------------------------------------------
+❌ Some RLS helper functions are missing!
+   Found: 3/3
+
+🏢 TEST 5: Test Multi-Tenancy Isolation
+----------------------------------------------------------------------
+
+📋 TEST 6: Verify Table Structures
+----------------------------------------------------------------------
+
+
+
+======================================================================
+📊 COMPREHENSIVE TEST REPORT
+======================================================================
+
+✅ companySignup: PASS
+❌ companyInDb: FAIL
+❌ profileInDb: FAIL
+❌ rlsPolicies: FAIL
+⚠️  userInvite: NOT RUN
+⚠️  multiTenancy: NOT RUN
+
+----------------------------------------------------------------------
+Total Tests: 4
+✅ Passed: 1
+❌ Failed: 3
+Success Rate: 25.0%
+----------------------------------------------------------------------
+
+⚠️  Some tests failed. Review the errors above.
+
+Test user credentials:
+  Email: admin1763663063355@testmovers.com
+  Password: TestPass123!Strong
+
+🧹 Note: Test data was created and left in database for verification.
+   You can delete this test company later from the database if needed.
+
