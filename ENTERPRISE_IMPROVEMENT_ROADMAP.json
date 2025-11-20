@@ -1,0 +1,286 @@
+{
+  "criticalIssues": [
+    {
+      "area": "Security",
+      "issue": "Public quote access policy",
+      "details": "From audit: \"Anyone can view quotes by ID\" - GDPR risk",
+      "fix": "Implement token-based quote sharing"
+    },
+    {
+      "area": "Security",
+      "issue": "Public storage read access",
+      "details": "All uploaded photos are publicly accessible",
+      "fix": "Restrict to authenticated users or token-based access"
+    }
+  ],
+  "missingFeatures": [
+    {
+      "priority": "HIGH",
+      "feature": "Company Dashboard",
+      "description": "Need a company-level dashboard showing:",
+      "details": [
+        "- Total quotes this month (all reps)",
+        "- Conversion rate",
+        "- Revenue pipeline",
+        "- Top performing sales reps",
+        "- Truck utilization",
+        "- Upcoming jobs calendar",
+        "- Recent activity feed"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Sales Rep Performance Metrics",
+      "description": "Managers need to see:",
+      "details": [
+        "- Quotes created per rep",
+        "- Win rate per rep",
+        "- Average quote value",
+        "- Response time to leads",
+        "- Commission tracking"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "Bulk User Import",
+      "description": "For companies with large teams, need CSV import for users",
+      "details": [
+        "- Upload CSV with name, email, role",
+        "- Bulk send invitations",
+        "- Preview before import"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "User Activity Tracking",
+      "description": "Track when users last logged in and what they're working on",
+      "details": [
+        "- Last login timestamp",
+        "- Active quotes",
+        "- Recent actions"
+      ]
+    },
+    {
+      "priority": "CRITICAL",
+      "feature": "Quote Assignment System",
+      "description": "Ability to assign/reassign quotes between reps",
+      "details": [
+        "- Assign new lead to specific rep",
+        "- Reassign if rep is overwhelmed",
+        "- Round-robin auto-assignment",
+        "- Territory-based assignment"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Quote Pipeline View",
+      "description": "Kanban-style board for quote stages",
+      "details": [
+        "Columns: New Lead → Quote Sent → Follow-up → Won/Lost",
+        "Drag-and-drop between stages",
+        "Filter by rep, date range",
+        "Quick stats per stage"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Quote Templates",
+      "description": "Save common quote configurations",
+      "details": [
+        "- Save as template (e.g., \"2BR Apartment\", \"4BR House\")",
+        "- Company-wide templates for consistency",
+        "- Rep-specific templates"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "Duplicate Quote Detection",
+      "description": "Alert if same address/customer already quoted",
+      "details": [
+        "- Check by address match",
+        "- Check by email/phone",
+        "- Show previous quotes for customer"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Email Template Management",
+      "description": "Company-branded email templates",
+      "details": [
+        "- Quote follow-up templates",
+        "- Thank you emails",
+        "- Job reminder emails",
+        "- Company logo in emails",
+        "- Custom email signature per rep"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "SMS Notifications",
+      "description": "Text customers for quick updates",
+      "details": [
+        "- Quote ready notification",
+        "- Appointment reminders",
+        "- Two-way SMS conversation"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "Customer Portal",
+      "description": "Let customers track their quote/job status",
+      "details": [
+        "- Login to see quote details",
+        "- Accept/decline quote online",
+        "- Upload additional photos",
+        "- Message the rep"
+      ]
+    },
+    {
+      "priority": "CRITICAL",
+      "feature": "Move Scheduling Calendar",
+      "description": "Schedule jobs and assign trucks/crews",
+      "details": [
+        "- Calendar view of scheduled moves",
+        "- Assign truck number",
+        "- Assign crew members",
+        "- Conflict detection (double-booking)",
+        "- Truck availability tracking",
+        "- Crew availability tracking"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Truck & Crew Management",
+      "description": "Track resources and availability",
+      "details": [
+        "- List all trucks with status",
+        "- Maintenance schedule",
+        "- Crew roster",
+        "- Availability calendar",
+        "- GPS tracking integration"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Dynamic Pricing Rules",
+      "description": "Smart pricing based on various factors",
+      "details": [
+        "- Weekend/holiday surcharge",
+        "- Peak season pricing",
+        "- Distance-based pricing",
+        "- Competitor pricing intelligence",
+        "- Automatic discount rules (repeat customers)",
+        "- Min/max price guardrails"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Profit Margin Calculator",
+      "description": "Know profitability before accepting job",
+      "details": [
+        "- Labor cost calculator",
+        "- Fuel cost estimate",
+        "- Equipment/materials cost",
+        "- Overhead allocation",
+        "- Target profit margin alerts"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "Competitive Bidding Alerts",
+      "description": "Get notified when quote might be too high",
+      "details": [
+        "- Compare to company average",
+        "- Industry benchmarks",
+        "- Win/loss analysis by price point"
+      ]
+    },
+    {
+      "priority": "CRITICAL",
+      "feature": "Executive Dashboard",
+      "description": "High-level metrics for business owners",
+      "details": [
+        "- Monthly revenue vs target",
+        "- Quote-to-close ratio",
+        "- Average job value",
+        "- Top revenue sources",
+        "- Seasonal trends",
+        "- Year-over-year comparison"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Exportable Reports",
+      "description": "Generate reports for accounting/analysis",
+      "details": [
+        "- Sales report by date range",
+        "- Rep performance report",
+        "- Lost quote analysis",
+        "- Customer acquisition report",
+        "- Export to Excel/PDF"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Mobile App for Reps",
+      "description": "Reps need mobile access in the field",
+      "details": [
+        "- Create quote on mobile",
+        "- Take photos on-site",
+        "- Quick quote sharing via SMS",
+        "- GPS location for job sites",
+        "- Offline mode"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "QuickBooks Integration",
+      "description": "Sync invoices and payments",
+      "details": [
+        "- Auto-create invoice when job completed",
+        "- Sync payments",
+        "- Track accounts receivable"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "feature": "Google Calendar Sync",
+      "description": "Sync scheduled moves to Google Calendar",
+      "details": []
+    },
+    {
+      "priority": "LOW",
+      "feature": "Zapier Integration",
+      "description": "Connect to other tools",
+      "details": [
+        "- CRM integration",
+        "- Email marketing",
+        "- Lead sources"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Audit Log",
+      "description": "Track all changes for compliance",
+      "details": [
+        "- Who changed what and when",
+        "- Quote modifications history",
+        "- User permission changes",
+        "- Customer data access log"
+      ]
+    }
+  ],
+  "uxImprovements": [
+    {
+      "area": "User Management",
+      "improvement": "Add user search/filter",
+      "reason": "With 15+ users, need to quickly find specific reps"
+    },
+    {
+      "area": "Mobile Web",
+      "improvement": "Ensure responsive design works well",
+      "reason": "Reps often work from phones/tablets"
+    }
+  ],
+  "niceToHave": []
+}
