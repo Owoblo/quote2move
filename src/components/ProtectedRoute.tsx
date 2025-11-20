@@ -17,11 +17,25 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       setLoading(false);
     });
 
-    // Listen for changes on auth state (signed in, signed out, etc.)
+    // Listen for changes on auth state with proper event handling
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // Clear user state and redirect to login
+        setUser(null);
+        window.location.href = '/login';
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Session token refreshed successfully');
+        setUser(session?.user ?? null);
+      } else if (event === 'SIGNED_IN') {
+        setUser(session?.user ?? null);
+      } else if (event === 'USER_UPDATED') {
+        setUser(session?.user ?? null);
+      } else {
+        // Handle other events
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 

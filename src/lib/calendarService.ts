@@ -185,7 +185,7 @@ export class CalendarService {
         upsells: quote.upsells,
         totalAmount: parseFloat(quote.total_amount),
         photos: quote.photos,
-        status: quote.status,
+        outcome: quote.status,
         questions: quote.questions,
         moveTimeConfirmed: quote.move_time_confirmed,
         jobNotes: quote.job_notes

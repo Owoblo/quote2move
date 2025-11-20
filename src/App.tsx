@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from './contexts/ThemeContext';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import PricingPage from './pages/PricingPage';
 import DashboardPage from './pages/DashboardPage';
 import EstimatePage from './pages/EstimatePage';
@@ -25,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/signup-company" element={<CompanySignupPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/demo" element={<DemoPage />} />

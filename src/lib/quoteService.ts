@@ -448,7 +448,7 @@ export class QuoteService {
     if (error) throw error;
 
     const totalQuotes = quotes.length;
-    const pendingQuotes = quotes.filter(q => q.outcome === 'pending').length;
+    const pendingQuotes = quotes.filter(q => q.outcome === 'pending' || q.outcome === 'draft' || q.outcome === 'sent').length;
     const acceptedQuotes = quotes.filter(q => q.outcome === 'accepted' || q.outcome === 'booked').length;
     const declinedQuotes = quotes.filter(q => q.outcome === 'declined' || q.outcome === 'lost').length;
     const totalRevenue = quotes
