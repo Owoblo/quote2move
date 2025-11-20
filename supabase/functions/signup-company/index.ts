@@ -38,9 +38,9 @@ serve(async (req) => {
 
     // The handle_new_user trigger will create the profile.
 
-    // 2. Create company
+    // 2. Create company in movsense schema
     const { data: companyData, error: companyError } = await supabaseAdmin
-      .from('companies')
+      .from('movsense.companies')
       .insert({
         name: companyName,
         owner_id: adminUserId,
@@ -59,9 +59,9 @@ serve(async (req) => {
     }
     const newCompanyId = companyData.id;
 
-    // 3. Update profile with company and role
+    // 3. Update profile with company and role in movsense schema
     const { error: profileError } = await supabaseAdmin
-      .from('profiles')
+      .from('movsense.profiles')
       .update({
         company_id: newCompanyId,
         role: 'admin',
@@ -71,7 +71,7 @@ serve(async (req) => {
     if (profileError) {
       // If profile update fails, delete user and company
       await supabaseAdmin.auth.admin.deleteUser(adminUserId);
-      await supabaseAdmin.from('companies').delete().eq('id', newCompanyId);
+      await supabaseAdmin.from('movsense.companies').delete().eq('id', newCompanyId);
       throw profileError;
     }
     
