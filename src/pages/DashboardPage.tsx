@@ -1584,19 +1584,33 @@ export default function DashboardPage() {
               )}
             </div>
           )}
-          </div>
-        </main>
-      </div>
-
-      {/* Modals */}
-      <NewQuoteModal
-        isOpen={showNewQuoteModal}
-        onClose={() => setShowNewQuoteModal(false)}
-        onSelectMLS={handleNewQuoteMLS}
-        onSelectManualUpload={handleNewQuoteManualUpload}
-        onSelectCustomerUpload={handleNewQuoteCustomerUpload}
-      />
+        </div>
+      </main>
     </div>
+
+    {/* Modals */}
+    <NewQuoteModal
+      isOpen={showNewQuoteModal}
+      onClose={() => setShowNewQuoteModal(false)}
+      onSelectMLS={handleNewQuoteMLS}
+      onSelectManualUpload={handleNewQuoteManualUpload}
+      onSelectCustomerUpload={handleNewQuoteCustomerUpload}
+    />
+
+    {/* Project History Modal */}
+    {showProjectHistory && (
+      <ProjectHistory
+        onLoadProject={handleLoadProject}
+        onClose={() => setShowProjectHistory(false)}
+      />
+    )}
+
+    {/* Share Upload Link Modal */}
+    <ShareUploadLinkModal
+      isOpen={showShareLinkModal}
+      onClose={() => setShowShareLinkModal(false)}
+    />
+  </div>
   );
 }
 
