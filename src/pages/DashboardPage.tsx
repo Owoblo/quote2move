@@ -955,7 +955,17 @@ export default function DashboardPage() {
         })),
         detections: project.detections,
         mapping: state.mapping,
-        estimate: project.estimate || { total: 0, hours: 0, cubicFeet: 0, items: [] }
+        estimate: project.estimate || {
+          crew: 3,
+          rate: 75,
+          travelMins: 30,
+          stairs: false,
+          elevator: false,
+          wrapping: false,
+          safetyPct: 10,
+          hours: 0,
+          total: 0
+        }
       });
 
       if (project.roomsClassified) {
@@ -995,7 +1005,17 @@ export default function DashboardPage() {
       address: '',
       photos: [],
       detections: [],
-      estimate: { total: 0, hours: 0, cubicFeet: 0, items: [] }
+      estimate: {
+        crew: 3,
+        rate: 75,
+        travelMins: 30,
+        stairs: false,
+        elevator: false,
+        wrapping: false,
+        safetyPct: 10,
+        hours: 0,
+        total: 0
+      }
     }));
     setClassifiedRooms({});
     addToast('Ready to search MLS', 'success');
@@ -1012,7 +1032,17 @@ export default function DashboardPage() {
       address: '',
       photos: [],
       detections: [],
-      estimate: { total: 0, hours: 0, cubicFeet: 0, items: [] }
+      estimate: {
+        crew: 3,
+        rate: 75,
+        travelMins: 30,
+        stairs: false,
+        elevator: false,
+        wrapping: false,
+        safetyPct: 10,
+        hours: 0,
+        total: 0
+      }
     }));
     setClassifiedRooms({});
     addToast('Ready to upload photos', 'success');
