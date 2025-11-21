@@ -239,7 +239,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
   // Search for listings as user types
   useEffect(() => {
     const searchListings = async () => {
-      if (address.length < 3 || address === DEFAULT_ADDRESS) {
+      if (address.length < 1 || address === DEFAULT_ADDRESS) {
         setSuggestions([]);
         setShowSuggestions(false);
         return;
@@ -251,28 +251,18 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         // Extract search terms from address for better query
         const addressParts = address.split(',').map(s => s.trim());
         const searchTerm = addressParts[0] || address;
-        const cityTerm = addressParts[1] || '';
-        const stateTerm = addressParts[2] || '';
-        
-        let query = `address.ilike.%${searchTerm}%`;
-        if (cityTerm) {
-          query += `,addresscity.ilike.%${cityTerm}%`;
-        }
-        if (stateTerm) {
-          query += `,addressstate.ilike.%${stateTerm}%`;
-        }
-        
+
         const [currentListings, soldListings] = await Promise.all([
           supabase
             .from('just_listed')
             .select('*')
-            .or(query)
-            .limit(3), // Limited to 3 for demo
+            .ilike('address', `%${searchTerm}%`)
+            .limit(5),
           supabase
             .from('sold_listings')
             .select('*')
-            .or(query)
-            .limit(3) // Limited to 3 for demo
+            .ilike('address', `%${searchTerm}%`)
+            .limit(5)
         ]);
 
         const allSuggestions = [

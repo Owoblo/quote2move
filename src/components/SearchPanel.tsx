@@ -61,7 +61,7 @@ export default function SearchPanel({
         return;
       }
 
-      if (address.length < 3) {
+      if (address.length < 1) {
         setSuggestions([]);
         setShowSuggestions(false);
         setError(null);
@@ -77,29 +77,18 @@ export default function SearchPanel({
         // Extract search terms from address - use first few words for better matching
         const addressParts = address.split(',').map(s => s.trim());
         const searchTerm = addressParts[0] || address; // Use first part (street address) or full address
-        const cityTerm = addressParts[1] || ''; // City if available
-        const stateTerm = addressParts[2] || ''; // State if available
-
-        // Build query with cleaner search terms
-        let query = `address.ilike.%${searchTerm}%`;
-        if (cityTerm) {
-          query += `,addresscity.ilike.%${cityTerm}%`;
-        }
-        if (stateTerm) {
-          query += `,addressstate.ilike.%${stateTerm}%`;
-        }
 
         const [currentListings, soldListings] = await Promise.all([
           supabase
             .from('just_listed')
             .select('*')
-            .or(query)
-            .limit(3), // Limited to 3 for demo
+            .ilike('address', `%${searchTerm}%`)
+            .limit(5),
           supabase
             .from('sold_listings')
             .select('*')
-            .or(query)
-            .limit(3) // Limited to 3 for demo
+            .ilike('address', `%${searchTerm}%`)
+            .limit(5)
         ]);
 
         console.log('Current listings:', currentListings);
