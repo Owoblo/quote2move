@@ -11,19 +11,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-// Main client for MovSense tables (movsense schema)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  db: {
-    schema: 'movsense'
-  }
-});
+// Main client for MovSense tables
+// Note: Using default 'public' schema until movsense schema is created in database
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Secondary client for accessing public schema tables (e.g., listings from Sold2Move)
-export const supabasePublic = createClient(supabaseUrl, supabaseAnonKey, {
-  db: {
-    schema: 'public'
-  }
-});
+// Secondary client for accessing public schema tables
+// Same as main client since both use public schema
+export const supabasePublic = supabase;
 
 // Client for Sold2Move project (property listings)
 // Falls back to supabasePublic if Sold2Move credentials are not available
