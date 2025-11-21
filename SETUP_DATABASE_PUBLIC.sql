@@ -1,7 +1,11 @@
 -- =====================================================
 -- MOVSENSE - QUICK DATABASE SETUP (Public Schema)
 -- =====================================================
--- Run this in your Supabase SQL Editor to create all required tables
+-- Run this in your Sold2Move Supabase SQL Editor
+-- Database: https://idbyrtwdeeruiutoukct.supabase.co
+--
+-- This creates the projects and quotes tables needed for MovSense
+-- The listings tables (just_listed, sold_listings) should already exist
 -- =====================================================
 
 BEGIN;
