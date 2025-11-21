@@ -11,10 +11,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-if (!sold2MoveUrl || !sold2MoveAnonKey) {
-  throw new Error('Missing Sold2Move Supabase environment variables');
-}
-
 // Main client for MovSense tables (movsense schema)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   db: {
@@ -30,4 +26,7 @@ export const supabasePublic = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 // Client for Sold2Move project (property listings)
-export const supabaseSold2Move = createClient(sold2MoveUrl, sold2MoveAnonKey);
+// Falls back to supabasePublic if Sold2Move credentials are not available
+export const supabaseSold2Move = (sold2MoveUrl && sold2MoveAnonKey)
+  ? createClient(sold2MoveUrl, sold2MoveAnonKey)
+  : supabasePublic;
