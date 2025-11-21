@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabaseSold2Move } from '../lib/supabase';
 
 interface Listing {
   id: string;
@@ -79,12 +79,12 @@ export default function SearchPanel({
         const searchTerm = addressParts[0] || address; // Use first part (street address) or full address
 
         const [currentListings, soldListings] = await Promise.all([
-          supabase
+          supabaseSold2Move
             .from('just_listed')
             .select('*')
             .ilike('address', `%${searchTerm}%`)
             .limit(5),
-          supabase
+          supabaseSold2Move
             .from('sold_listings')
             .select('*')
             .ilike('address', `%${searchTerm}%`)

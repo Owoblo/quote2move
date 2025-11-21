@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabaseSold2Move } from './supabase';
 
 export interface Listing {
   id: string;
@@ -30,10 +30,10 @@ export class SupabaseService {
   // Search listings with autocomplete
   static async searchListings(query: string, limit: number = 10): Promise<Listing[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseSold2Move
         .from('just_listed')
         .select('*')
-        .or(`address.ilike.%${query}%, city.ilike.%${query}%, state.ilike.%${query}%`)
+        .ilike('address', `%${query}%`)
         .limit(limit);
 
       if (error) {
@@ -51,10 +51,10 @@ export class SupabaseService {
   // Get sold listings
   static async getSoldListings(query: string, limit: number = 10): Promise<Listing[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseSold2Move
         .from('sold_listings')
         .select('*')
-        .or(`address.ilike.%${query}%, city.ilike.%${query}%, state.ilike.%${query}%`)
+        .ilike('address', `%${query}%`)
         .limit(limit);
 
       if (error) {
@@ -72,7 +72,7 @@ export class SupabaseService {
   // Get carousel images for a specific listing
   static async getCarouselImages(listingId: string): Promise<CarouselImage[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseSold2Move
         .from('carousel_images') // Assuming this is your carousel table name
         .select('*')
         .eq('listing_id', listingId)
@@ -93,7 +93,7 @@ export class SupabaseService {
   // Get a specific listing by ID
   static async getListingById(id: string): Promise<Listing | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseSold2Move
         .from('just_listed')
         .select('*')
         .eq('id', id)

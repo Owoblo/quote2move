@@ -17,7 +17,7 @@ import { toCSV, generatePdf, downloadFile } from '../lib/export';
 import { parseZillowPhotos } from '../lib/zillowPhotos';
 import { FurnitureDetectionService } from '../lib/furnitureDetection';
 import { PropertyContext } from '../lib/aiDetectionServices';
-import { supabase, supabasePublic } from '../lib/supabase';
+import { supabase, supabaseSold2Move } from '../lib/supabase';
 import { ProjectService, Project } from '../lib/projectService';
 import { QuoteService } from '../lib/quoteService';
 import { FollowUpService } from '../lib/followUpService';
@@ -361,7 +361,7 @@ export default function DashboardPage() {
           console.log(`🔍 Searching just_listed for: "${term}"`);
           try {
             // Use timeout to prevent hanging on large datasets
-            const searchPromise = supabasePublic
+            const searchPromise = supabaseSold2Move
               .from('just_listed')
               .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .ilike('address', `%${term}%`)
@@ -388,7 +388,7 @@ export default function DashboardPage() {
           console.log(`🔍 Searching sold_listings for: "${term}"`);
           try {
             // Use timeout to prevent hanging on large datasets
-            const searchPromise = supabase
+            const searchPromise = supabaseSold2Move
               .from('sold_listings')
               .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .ilike('address', `%${term}%`)
@@ -426,12 +426,12 @@ export default function DashboardPage() {
         
         try {
           const exactSearchPromise = Promise.all([
-            supabase
+            supabaseSold2Move
               .from('just_listed')
               .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .eq('address', address)
               .limit(1),
-            supabase
+            supabaseSold2Move
               .from('sold_listings')
               .select('id, address, addresscity, addressstate, carousel_photos_composable, hdpdata')
               .eq('address', address)
