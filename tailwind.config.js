@@ -7,26 +7,22 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#2563EB',
-          hover: '#1D4ED8',
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
         },
-        background: {
-          DEFAULT: '#F3F4F6',
-          card: '#FFFFFF',
-          muted: '#F9FAFB',
-        },
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        border: 'var(--color-border)',
         text: {
-          primary: '#111827',
-          secondary: '#374151',
-          muted: '#9CA3AF',
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          muted: 'var(--color-text-muted)',
         },
-        border: {
-          DEFAULT: '#E5E7EB',
-        },
+        'card-bg': 'var(--color-card-bg)',
         chip: {
-          bg: '#EFF6FF',
-          text: '#1D4ED8',
-          border: '#BFDBFE',
+          bg: 'var(--color-chip-bg)',
+          text: 'var(--color-chip-text)',
+          border: 'var(--color-chip-border)',
         },
       },
       fontFamily: {
@@ -68,4 +64,3 @@ module.exports = {
   },
   plugins: [],
 }
-
