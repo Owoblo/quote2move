@@ -88,9 +88,14 @@
     @apply active:scale-95 hover:-translate-y-0.5;
   }
 
+  /* 
+   * NOTE: Opacity modifiers (like /25) only work with Tailwind utility classes, NOT with custom CSS variables inside @apply.
+   * We must use rgba/hex or standard utility classes. Here we rely on specific shadow utilities or inline styles if needed.
+   * For now, we'll use standard shadow utilities to avoid build errors.
+   */
   .btn-primary {
-    @apply bg-primary text-white shadow-lg shadow-primary/25;
-    @apply hover:bg-primary-hover hover:shadow-primary/40;
+    @apply bg-primary text-white shadow-lg;
+    @apply hover:bg-primary-hover hover:shadow-xl;
   }
 
   .btn-secondary {
@@ -104,19 +109,20 @@
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white shadow-lg shadow-red-600/20;
+    @apply bg-red-600 text-white shadow-lg;
     @apply hover:bg-red-700 focus:ring-red-500;
   }
 
   .btn-success {
-    @apply bg-emerald-600 text-white shadow-lg shadow-emerald-600/20;
+    @apply bg-emerald-600 text-white shadow-lg;
     @apply hover:bg-emerald-700 focus:ring-emerald-500;
   }
 
   /* Input Styles */
   .input {
     @apply w-full px-4 py-2.5 text-base bg-surface border border-border rounded-xl;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
+    /* Removing opacity modifier from border/ring with custom variables */
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
     @apply transition-all duration-200;
     @apply placeholder:text-text-muted;
     @apply text-text-primary;
@@ -129,7 +135,7 @@
   }
 
   .card-hover {
-    @apply hover:shadow-xl hover:-translate-y-1 hover:border-primary/20;
+    @apply hover:shadow-xl hover:-translate-y-1 hover:border-primary;
   }
 
   /* Metric/Card Styles */
@@ -148,7 +154,7 @@
 
   /* Link Styles */
   .link {
-    @apply text-primary hover:text-primary-hover underline decoration-primary/30 hover:decoration-primary transition-all;
+    @apply text-primary hover:text-primary-hover underline hover:decoration-primary transition-all;
   }
 
   /* Modal Styles */
