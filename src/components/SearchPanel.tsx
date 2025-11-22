@@ -25,6 +25,7 @@ interface SearchPanelProps {
   onClear: () => void;
   recentSearches: string[];
   onListingSelect?: (listing: Listing) => void;
+  onPhotoUpload?: (files: FileList) => void;
 }
 
 export default function SearchPanel({
@@ -33,7 +34,8 @@ export default function SearchPanel({
   onFetchPhotos,
   onClear,
   recentSearches,
-  onListingSelect
+  onListingSelect,
+  onPhotoUpload
 }: SearchPanelProps) {
   const [suggestions, setSuggestions] = useState<Listing[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -42,6 +44,7 @@ export default function SearchPanel({
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const justSelectedRef = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Cleanup blur timeout on unmount
   useEffect(() => {

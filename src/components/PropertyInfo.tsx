@@ -57,3 +57,6 @@ export default function PropertyInfo({ listing }: PropertyInfoProps) {
   );
 }
 
+
+
+

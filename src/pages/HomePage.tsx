@@ -14,18 +14,20 @@ import Footer from '../components/landing/Footer';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-background text-text-primary selection:bg-primary/20 selection:text-primary">
       <Navigation />
-      <HeroSection />
-      <SocialProofSection />
-      <HowItWorksSection />
-      <KeyFeaturesSection />
-      <UseCasesSection />
-      <ResultsSection />
-      <IntegrationsSection />
-      <PricingSection />
-      <FAQSection />
-      <FinalCTASection />
+      <main>
+        <HeroSection />
+        <SocialProofSection />
+        <HowItWorksSection />
+        <KeyFeaturesSection />
+        <UseCasesSection />
+        <ResultsSection />
+        <IntegrationsSection />
+        <PricingSection />
+        <FAQSection />
+        <FinalCTASection />
+      </main>
       <Footer />
     </div>
   );

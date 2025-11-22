@@ -1,10 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-10-29.clover',
-});
-
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
@@ -12,6 +8,18 @@ export default async function handler(
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+
+  if (!apiKey) {
+    console.error('❌ STRIPE_SECRET_KEY not found in environment');
+    return res.status(500).json({ error: 'Server configuration error: Stripe key not configured' });
+  }
+
+  const stripe = new Stripe(apiKey, {
+    // Use the account's default API version or a specific stable version
+    apiVersion: '2023-10-16', 
+  });
 
   try {
     const { priceId, mode, successUrl, cancelUrl } = req.body;
