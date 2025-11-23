@@ -886,46 +886,6 @@ export default function DashboardPage() {
     addToast('CSV copied to clipboard', 'success');
   };
 
-  const handleSaveProject = async () => {
-    if (!state.address && state.detections.length === 0) {
-      addToast('Please add an address or detections before saving', 'error');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      // Automatically use address as project name, fallback to "Untitled Project"
-      const projectName = state.address || 'Untitled Project';
-
-      if (currentProjectId) {
-        // Update existing project
-        await ProjectService.updateProject(currentProjectId, {
-          address: state.address,
-          projectName: projectName,
-          detections: state.detections,
-          estimate: state.estimate
-        });
-        addToast('Project updated successfully', 'success');
-      } else {
-        // Save new project
-        const project = await ProjectService.saveProject(
-          state.address,
-          state.detections,
-          state.estimate,
-          projectName
-        );
-        setCurrentProjectId(project.id);
-        setCurrentProject(project);
-        addToast('Project saved successfully', 'success');
-      }
-    } catch (error: any) {
-      console.error('Error saving project:', error);
-      addToast(`Failed to save project: ${error.message}`, 'error');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleLoadProject = (project: Project) => {
     setState({
       address: project.address,
@@ -1057,7 +1017,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background text-text-primary">
       {/* Sidebar */}
       <ProjectsSidebar
         currentProject={currentProject}
@@ -1066,154 +1026,142 @@ export default function DashboardPage() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-          <div className="px-6">
-            <div className="flex items-center justify-between h-14">
-              <div className="flex items-center gap-3">
-                <h1 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
-                  {currentProject ? (currentProject.projectName || currentProject.address || 'Untitled Project') : 'MovSense Dashboard'}
-                </h1>
+        <header className="bg-surface/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
+          <div className="px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col">
+                <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                  {currentProject ? (currentProject.projectName || currentProject.address || 'Untitled Project') : 'Dashboard'}
                 {currentProject && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {currentProject.source === 'mls' && '🏠 MLS'}
-                    {currentProject.source === 'manual_upload' && '📤 Manual'}
-                    {currentProject.source === 'customer_upload' && '📩 Customer'}
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                      {currentProject.source === 'mls' && 'MLS'}
+                      {currentProject.source === 'manual_upload' && 'Manual'}
+                      {currentProject.source === 'customer_upload' && 'Customer'}
                   </span>
+                  )}
+                </h1>
+                {currentProject?.address && currentProject.address !== currentProject.projectName && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium truncate max-w-md">
+                    {currentProject.address}
+                  </p>
                 )}
               </div>
+            </div>
+
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate('/settings')}
-                  className="btn btn-ghost text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                className="btn btn-ghost text-sm flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>Settings</span>
                 </button>
+              <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
                 <ThemeToggle />
-              </div>
             </div>
           </div>
         </header>
 
-        {/* Main Scrollable Content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="px-6 py-8">
-          {/* Tabs */}
-          <div className="mb-8 border-b border-gray-200/60 dark:border-gray-700/60">
-            <div className="flex gap-6">
+        {/* Navigation Tabs - Segmented Style */}
+        <div className="px-6 py-4 bg-surface border-b border-gray-100 dark:border-gray-800/50">
+          <div className="inline-flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl relative">
+            <div className="flex space-x-1 relative z-10">
+              {['create', 'analytics', 'quotes', 'calendar'].map((tab) => (
               <button
-                onClick={() => setActiveTab('create')}
-                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'create'
-                    ? 'border-accent text-[#111827]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                Create Quote
+                  key={tab}
+                  onClick={() => setActiveTab(tab as any)}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    activeTab === tab
+                      ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === 'create' && ' Quote'}
               </button>
-              <button
-                onClick={() => setActiveTab('analytics')}
-                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'analytics'
-                    ? 'border-accent text-[#111827]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                Analytics
-              </button>
-              <button
-                onClick={() => setActiveTab('quotes')}
-                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'quotes'
-                    ? 'border-accent text-[#111827]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                All Quotes
-              </button>
-              <button
-                onClick={() => setActiveTab('calendar')}
-                className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'calendar'
-                    ? 'border-accent text-[#111827]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                Calendar & Reminders
-              </button>
+              ))}
+            </div>
             </div>
           </div>
 
+        {/* Main Scrollable Content */}
+        <main className="flex-1 overflow-y-auto bg-background p-6">
+          <div className="max-w-[1600px] mx-auto space-y-8">
+
           {/* Analytics View */}
           {activeTab === 'analytics' && (
-            <div className="space-y-6">
+              <div className="space-y-6 animate-in fade-in duration-300">
               {loadingAnalytics ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+                  <div className="flex justify-center py-20">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
                 </div>
               ) : analytics ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="card card-hover section-padding">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Total Quotes</p>
-                      <p className="text-2xl font-semibold text-gray-900 dark:text-white">{analytics.totalQuotes}</p>
+                      {[
+                        { label: 'Total Quotes', value: analytics.totalQuotes, color: 'text-primary' },
+                        { label: 'Pending', value: analytics.pendingQuotes, color: 'text-yellow-600' },
+                        { label: 'Accepted', value: analytics.acceptedQuotes, color: 'text-green-600' },
+                        { label: 'Declined', value: analytics.declinedQuotes, color: 'text-red-600' }
+                      ].map((item, idx) => (
+                        <div key={idx} className="card p-5 hover:shadow-lg transition-shadow">
+                          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{item.label}</p>
+                          <p className={`text-3xl font-bold ${item.color}`}>{item.value}</p>
                     </div>
-                    <div className="card card-hover section-padding">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Pending</p>
-                      <p className="text-2xl font-semibold text-yellow-600">{analytics.pendingQuotes}</p>
+                      ))}
+                  </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="card p-6">
+                        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                          <span className="p-1.5 rounded-md bg-green-100 dark:bg-green-900/30 text-green-600">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          </span>
+                          Revenue
+                        </h3>
+                        <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2">${analytics.totalRevenue.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500">Total revenue from accepted quotes</p>
                     </div>
-                    <div className="card card-hover section-padding">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Accepted</p>
-                      <p className="text-2xl font-semibold text-green-600">{analytics.acceptedQuotes}</p>
-                    </div>
-                    <div className="card card-hover section-padding">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Declined</p>
-                      <p className="text-2xl font-semibold text-red-600">{analytics.declinedQuotes}</p>
+                      <div className="card p-6">
+                        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                          <span className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-600">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                          </span>
+                          Performance
+                        </h3>
+                        <div className="flex items-baseline gap-4">
+                          <p className="text-4xl font-bold text-primary">{analytics.conversionRate.toFixed(1)}%</p>
+                          <span className="text-sm text-gray-500 font-medium">Conversion Rate</span>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">Avg. Quote Value: <span className="font-semibold text-gray-900 dark:text-white">${analytics.averageQuoteValue.toFixed(2)}</span></p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="card card-hover section-padding">
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Revenue</h3>
-                      <p className="text-3xl font-semibold text-green-600 mb-1.5">${analytics.totalRevenue.toFixed(2)}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">From accepted quotes</p>
-                    </div>
-                    <div className="card card-hover section-padding">
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Performance</h3>
-                      <p className="text-3xl font-semibold text-accent mb-1.5">{analytics.conversionRate.toFixed(1)}%</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Conversion rate</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Avg: ${analytics.averageQuoteValue.toFixed(2)}</p>
-                    </div>
-                  </div>
-
-                  <div className="card card-hover p-6">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Quotes by Price Range</h3>
-                    <div className="space-y-3">
+                    <div className="card p-6">
+                      <h3 className="text-lg font-semibold mb-6">Quote Distribution by Price</h3>
+                      <div className="space-y-4">
                       {analytics.quotesByPriceRange.map((range: any) => (
-                        <div key={range.range} className="flex items-center justify-between">
-                          <span className="text-[#374151]">{range.range}</span>
-                          <div className="flex items-center space-x-3">
-                            <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div key={range.range} className="flex items-center">
+                            <span className="w-32 text-sm text-gray-600 dark:text-gray-400 font-medium">{range.range}</span>
+                            <div className="flex-1 mx-4 h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                               <div
-                                className="bg-accent h-2 rounded-full"
+                                className="h-full bg-primary rounded-full transition-all duration-500"
                                 style={{ width: `${(range.count / analytics.totalQuotes) * 100}%` }}
                               ></div>
                             </div>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white w-8 text-right">{range.count}</span>
-                          </div>
+                            <span className="w-12 text-right text-sm font-bold text-gray-900 dark:text-white">{range.count}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="text-center py-12">
-                  <p className="text-[#374151]">No analytics data available</p>
+                  <div className="text-center py-20 bg-surface rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
+                    <p className="text-gray-500">No analytics data available yet.</p>
                 </div>
               )}
             </div>
@@ -1221,45 +1169,60 @@ export default function DashboardPage() {
 
           {/* Quotes List View */}
           {activeTab === 'quotes' && (
-            <div className="space-y-4">
+              <div className="space-y-4 animate-in fade-in duration-300">
               {quotes.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-xl">
-                  <p className="text-[#374151]">No quotes yet</p>
+                  <div className="text-center py-20 bg-surface rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                    <p className="text-gray-500 font-medium">No quotes generated yet</p>
+                    <button onClick={() => setActiveTab('create')} className="btn btn-link mt-2">Create your first quote</button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
                   {quotes.map((quote) => (
-                    <div key={quote.id} className="card card-hover p-5">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{quote.customerName}</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{quote.customerEmail}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Move Date: {quote.moveDate}</p>
+                      <div key={quote.id} className="card p-5 hover:shadow-lg transition-all group border border-transparent hover:border-primary/20">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 font-bold text-lg">
+                              {quote.customerName.charAt(0)}
                         </div>
-                        <div className="text-right ml-4">
-                          <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">${quote.totalAmount.toFixed(2)}</p>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
-                            quote.outcome === 'accepted' || quote.outcome === 'booked' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                            quote.outcome === 'declined' || quote.outcome === 'lost' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                            <div>
+                              <h3 className="font-bold text-gray-900 dark:text-white">{quote.customerName}</h3>
+                              <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
+                                <span>{new Date(quote.createdAt).toLocaleDateString()}</span>
+                                <span>•</span>
+                                <span>{quote.customerEmail}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-6">
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-gray-900 dark:text-white">${quote.totalAmount.toFixed(2)}</p>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                quote.outcome === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                quote.outcome === 'declined' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
                             'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                           }`}>
-                            {quote.outcome}
+                                {quote.outcome.charAt(0).toUpperCase() + quote.outcome.slice(1)}
                           </span>
-                        </div>
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => navigate(`/quote/${quote.id}`)}
-                          className="btn btn-primary text-xs px-3 py-1.5"
+                                className="btn btn-secondary text-sm px-4"
                         >
                           View
                         </button>
                         <button
                           onClick={() => navigate(`/quote/${quote.id}/edit`)}
-                          className="btn btn-secondary text-xs px-3 py-1.5"
+                                className="btn btn-ghost text-sm p-2"
                         >
-                          Edit
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                         </button>
+                            </div>
+                          </div>
                       </div>
                     </div>
                   ))}
@@ -1268,25 +1231,27 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Calendar & Reminders View */}
+            {/* Calendar View */}
           {activeTab === 'calendar' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Follow-ups Due */}
-                <div className="card card-hover p-6">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Follow-ups Due</h3>
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="card p-6 border-l-4 border-yellow-400">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                        <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Follow-ups Due
+                      </h3>
+                      <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">{followUps.length} Pending</span>
+                    </div>
                   {followUps.length === 0 ? (
-                    <p className="text-[#374151] text-sm">No follow-ups scheduled</p>
+                      <p className="text-gray-500 text-sm">No follow-ups scheduled for today.</p>
                   ) : (
                     <div className="space-y-3">
                       {followUps.map((followUp) => (
-                        <div key={followUp.id} className="p-3 bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200/50 dark:border-yellow-800/50 rounded-md">
-                          <div className="flex items-center justify-between">
+                          <div key={followUp.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex justify-between items-center group hover:bg-yellow-50 dark:hover:bg-yellow-900/10 transition-colors">
                             <div>
-                              <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                                Follow-up: {new Date(followUp.follow_up_date).toLocaleDateString()}
-                              </p>
-                              <p className="text-xs text-[#374151]">Quote ID: {followUp.quote_id}</p>
+                              <p className="font-semibold text-sm">{new Date(followUp.follow_up_date).toLocaleDateString()}</p>
+                              <p className="text-xs text-gray-500">Quote #{followUp.quote_id.slice(0, 8)}</p>
                             </div>
                             <button
                               onClick={async () => {
@@ -1298,133 +1263,83 @@ export default function DashboardPage() {
                                   addToast('Failed to complete follow-up', 'error');
                                 }
                               }}
-                              className="btn btn-success text-xs px-2.5 py-1"
+                              className="btn btn-sm btn-ghost text-green-600 hover:text-green-700 hover:bg-green-50"
                             >
-                              Complete
+                              Done
                             </button>
-                          </div>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* Upcoming Moves */}
-                <div className="card card-hover p-6">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Upcoming Moves (Next 30 Days)</h3>
+                  <div className="card p-6 border-l-4 border-blue-500">
+                     <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Upcoming Moves
+                      </h3>
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">Next 30 Days</span>
+                    </div>
                   {calendarEvents.length === 0 ? (
-                    <p className="text-[#374151] text-sm">No upcoming moves</p>
+                      <p className="text-gray-500 text-sm">No upcoming moves scheduled.</p>
                   ) : (
                     <div className="space-y-3">
                       {calendarEvents.slice(0, 5).map((event) => (
-                        <div key={event.id} className="p-3 bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/50 rounded-md">
-                          <p className="font-semibold text-gray-900 dark:text-white text-sm">{event.title}</p>
-                          <p className="text-xs text-[#374151] mt-1">
-                            {new Date(event.startDate).toLocaleDateString()} at {event.startTime}
-                          </p>
-                          <p className="text-xs text-[#374151]">{event.location}</p>
-                          {event.notes.length > 0 && (
-                            <div className="mt-2 space-y-1">
-                              {event.notes.slice(0, 2).map((note: string, idx: number) => (
-                                <p key={idx} className="text-xs text-gray-500 dark:text-gray-400">• {note}</p>
-                              ))}
+                          <div key={event.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <div className="flex justify-between items-start">
+                              <p className="font-semibold text-sm text-gray-900 dark:text-white">{event.title}</p>
+                              <span className="text-xs font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{event.startTime}</span>
                             </div>
-                          )}
+                            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                              {event.location}
+                            </p>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
               </div>
-
-              {/* Export Calendar */}
-              {calendarEvents.length > 0 && (
-                <div className="card card-hover p-6">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Export Calendar</h3>
-                  <button
-                    onClick={() => {
-                      const icsContent = CalendarService.exportToICS(calendarEvents);
-                      const blob = new Blob([icsContent], { type: 'text/calendar' });
-                      const url = URL.createObjectURL(blob);
-                      const link = document.createElement('a');
-                      link.href = url;
-                      link.download = 'movsense-calendar.ics';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                      URL.revokeObjectURL(url);
-                      addToast('Calendar exported successfully', 'success');
-                    }}
-                    className="btn btn-primary text-sm"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>Download Calendar (ICS)</span>
-                  </button>
-                </div>
-              )}
             </div>
           )}
 
           {/* Create Quote View */}
           {activeTab === 'create' && (
-            <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column: Search + Photos */}
-                <div className="space-y-5">
-                  {/* Mode Toggle */}
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors duration-200">
-                    <div className="flex items-center justify-center space-x-2">
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  {/* Left Column: Input & Photos */}
+                  <div className="space-y-6">
+                    {/* Mode Selection */}
+                    <div className="card p-2 bg-surface inline-flex rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                       <button
                         onClick={() => setInputMode('mls')}
-                        className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                        className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
                           inputMode === 'mls'
                             ? 'bg-blue-600 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                         }`}
                       >
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                          <span>MLS Search</span>
-                        </div>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        MLS Search
                       </button>
                       <button
                         onClick={() => setInputMode('upload')}
-                        className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                        className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
                           inputMode === 'upload'
                             ? 'bg-blue-600 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                         }`}
                       >
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                          </svg>
-                          <span>Upload Photos</span>
-                        </div>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        Upload Photos
                       </button>
                     </div>
 
-                    {/* Share Link Button */}
-                    <div className="mt-3">
-                      <button
-                        onClick={() => setShowShareLinkModal(true)}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        <span>Share Link with Customer</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Conditional Rendering Based on Mode */}
+                    <div className="bg-surface rounded-2xl shadow-sm border border-gray-200/60 dark:border-gray-700/60 overflow-hidden">
                   {inputMode === 'mls' ? (
                     <>
+                          <div className="p-6 border-b border-gray-100 dark:border-gray-800">
                       <SearchPanel
                         address={state.address}
                         onAddressChange={handleAddressChange}
@@ -1433,17 +1348,31 @@ export default function DashboardPage() {
                         recentSearches={[]}
                         onListingSelect={handleListingSelect}
                       />
-                      {selectedListing && <PropertyInfo listing={selectedListing} />}
+                            {selectedListing && <div className="mt-4"><PropertyInfo listing={selectedListing} /></div>}
+                          </div>
                     </>
                   ) : (
-                    <>
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-800">
                       <UploadPanel
                         onUploadComplete={handleUploadComplete}
                         onPropertyInfoChange={handlePropertyInfoChange}
                       />
+                          <div className="mt-4">
                       <CustomerUploadsPanel onLoadUpload={handleLoadCustomerUpload} />
-                    </>
-                  )}
+                          </div>
+                          <div className="mt-4">
+                             <button
+                                onClick={() => setShowShareLinkModal(true)}
+                                className="w-full btn btn-secondary py-3 flex items-center justify-center gap-2"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                                Share Upload Link with Customer
+                              </button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="p-6 bg-gray-50/50 dark:bg-gray-900/50">
                   <PhotoGallery
                     photos={state.photos}
                     selectedPhotos={selectedPhotos}
@@ -1453,10 +1382,27 @@ export default function DashboardPage() {
                     onSelectAll={handleSelectAllPhotos}
                     onDeselectAll={handleDeselectAllPhotos}
                   />
+                      </div>
+                    </div>
                 </div>
 
-                {/* Right Column: Inventory (Standalone) */}
-                <div>
+                  {/* Right Column: Inventory */}
+                  <div className="space-y-6">
+                    <div className="bg-surface rounded-2xl shadow-sm border border-gray-200/60 dark:border-gray-700/60 h-full flex flex-col">
+                      <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                          <span className="p-1.5 bg-primary/10 rounded-md text-primary">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                          </span>
+                          Inventory
+                        </h2>
+                        <div className="flex gap-2">
+                          <button onClick={handleCopyCSV} className="btn btn-sm btn-ghost" title="Copy CSV">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex-1 p-0 overflow-hidden">
                   <InventoryTable
                     detections={state.detections}
                     mapping={state.mapping}
@@ -1467,22 +1413,29 @@ export default function DashboardPage() {
                   />
                 </div>
               </div>
-            
-              {/* Action Buttons - Full Width Below */}
-              <div className="mt-8">
-                <div className="card section-padding">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h2 className="text-lg font-semibold text-[#111827] mb-2">Export & Actions</h2>
-                      <p className="text-sm text-[#374151]">Export inventory data and send quotes</p>
                     </div>
                   </div>
                   
-                  <div className="mb-4 pb-4 border-b border-[#E5E7EB]">
+                {/* Floating Action Bar (Sticky Bottom) */}
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-surface/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 z-50 flex justify-center items-center gap-4 transition-transform duration-300 translate-y-0 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)]">
+                   <div className="flex items-center gap-3 w-full max-w-5xl px-4">
+                      <div className="flex-1 flex items-center gap-2">
+                         {/* Secondary Actions */}
+                        <button onClick={handleDownloadPDF} className="btn btn-secondary px-4 py-2.5 text-sm flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                          PDF
+                        </button>
+                        <button onClick={handleSendEmail} className="btn btn-secondary px-4 py-2.5 text-sm flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                          Email
+                        </button>
+                      </div>
+
+                      {/* Primary Action */}
                     <button
                       onClick={() => {
                         if (state.detections.length === 0) {
-                          addToast('Please detect items first before creating a quote', 'error');
+                            addToast('Please detect items first', 'error');
                           return;
                         }
                         navigate('/estimate', {
@@ -1508,111 +1461,55 @@ export default function DashboardPage() {
                         });
                       }}
                       disabled={state.detections.length === 0}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2 disabled:cursor-not-allowed shadow-lg"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>Continue to Complete Quote</span>
-                      {state.detections.length > 0 && (
-                        <span className="ml-2 bg-white bg-opacity-20 px-2 py-1 rounded text-sm">
-                          {state.detections.length} items
-                        </span>
-                      )}
+                        className="btn btn-primary px-8 py-3 text-lg font-semibold shadow-lg shadow-primary/30 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all"
+                      >
+                        <span>Continue to Estimate</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                     </button>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <button
-                      onClick={handleSendSMS}
-                      className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <span>Send SMS Quote</span>
-                    </button>
-                    <button
-                      onClick={handleSendEmail}
-                      className="bg-accent hover:bg-accent-dark text-white font-medium py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span>Send Email</span>
-                    </button>
-                    <button
-                      onClick={handleDownloadPDF}
-                      className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>Download PDF</span>
-                    </button>
-                    <button
-                      onClick={handleCopyCSV}
-                      className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>Copy CSV</span>
-                    </button>
                   </div>
                 </div>
-              </div>
-            </>
           )}
           </div>
+          
+          {/* Spacer for sticky footer */}
+          <div className="h-24"></div>
         </main>
 
-        {/* Auto-save Status Indicator */}
+        {/* Auto-save Status Indicator - moved to top right */}
         {currentProject && (
-          <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 px-3 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 text-xs z-50">
+          <div className="fixed top-20 right-6 pointer-events-none z-30">
             {autoSaveStatus === 'saving' && (
-              <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              <span className="text-gray-400 text-xs flex items-center gap-1.5 bg-white/50 dark:bg-black/50 backdrop-blur rounded-full px-3 py-1">
+                <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
                 Saving...
               </span>
             )}
             {autoSaveStatus === 'saved' && (
-              <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
-                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                Auto-saved{' '}
-                {currentProject.lastAutoSave &&
-                  new Date(currentProject.lastAutoSave).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            )}
-            {autoSaveStatus === 'unsaved' && (
-              <span className="text-red-600 dark:text-red-400 flex items-center gap-1">
-                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                Save failed
+              <span className="text-gray-400 text-xs flex items-center gap-1.5 bg-white/50 dark:bg-black/50 backdrop-blur rounded-full px-3 py-1">
+                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                Saved
               </span>
             )}
           </div>
         )}
 
         {/* Toast Notifications */}
-        <div className="fixed top-4 right-4 space-y-2 z-50">
+        <div className="fixed top-20 right-6 space-y-2 z-50">
           {toasts.map(toast => (
             <div
               key={toast.id}
-              className={`px-4 py-2 rounded-md shadow-lg text-sm font-medium ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-in slide-in-from-right duration-300 ${
                 toast.type === 'success'
-                  ? 'bg-green-100 text-green-800 border border-green-200'
+                  ? 'bg-green-50 text-green-900 border border-green-200 dark:bg-green-900/90 dark:text-green-100 dark:border-green-800'
                   : toast.type === 'warning'
-                  ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                  : 'bg-red-100 text-red-800 border border-red-200'
+                  ? 'bg-yellow-50 text-yellow-900 border border-yellow-200 dark:bg-yellow-900/90 dark:text-yellow-100 dark:border-yellow-800'
+                  : 'bg-red-50 text-red-900 border border-red-200 dark:bg-red-900/90 dark:text-red-100 dark:border-red-800'
               }`}
             >
+              {toast.type === 'success' && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>}
+              {toast.type === 'warning' && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
+              {toast.type === 'error' && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>}
               {toast.message}
             </div>
           ))}
@@ -1628,7 +1525,6 @@ export default function DashboardPage() {
       onSelectCustomerUpload={handleNewQuoteCustomerUpload}
     />
 
-    {/* Project History Modal */}
     {showProjectHistory && (
       <ProjectHistory
         onLoadProject={handleLoadProject}
@@ -1636,7 +1532,6 @@ export default function DashboardPage() {
       />
     )}
 
-    {/* Share Upload Link Modal */}
     <ShareUploadLinkModal
       isOpen={showShareLinkModal}
       onClose={() => setShowShareLinkModal(false)}
@@ -1644,6 +1539,3 @@ export default function DashboardPage() {
   </div>
   );
 }
-
-
-

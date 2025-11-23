@@ -62,47 +62,30 @@ export default function ProjectsSidebar({
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays === 1) return 'Yest';
+    if (diffDays < 7) return `${diffDays}d`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-      detecting: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-      editing: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
-      quote_sent: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-      archived: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+  const getStatusColor = (status: string) => {
+    const styles: Record<string, string> = {
+      draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+      detecting: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+      editing: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+      quote_sent: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+      archived: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
     };
-
-    const labels = {
-      draft: 'Draft',
-      detecting: 'Detecting',
-      editing: 'Editing',
-      quote_sent: 'Sent',
-      archived: 'Archived'
-    };
-
-    return (
-      <span className={`text-xs px-2 py-1 rounded-full ${styles[status as keyof typeof styles] || styles.draft}`}>
-        {labels[status as keyof typeof labels] || status}
-      </span>
-    );
+    return styles[status] || styles.draft;
   };
 
   const getSourceIcon = (source: string) => {
     switch (source) {
-      case 'mls':
-        return '🏠';
-      case 'manual_upload':
-        return '📤';
-      case 'customer_upload':
-        return '📩';
-      default:
-        return '📁';
+      case 'mls': return '🏠';
+      case 'manual_upload': return '📤';
+      case 'customer_upload': return '📩';
+      default: return '📁';
     }
   };
 
@@ -117,32 +100,32 @@ export default function ProjectsSidebar({
   };
 
   return (
-    <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+    <div className="w-80 bg-surface border-r border-gray-200 dark:border-gray-800 flex flex-col h-full shadow-xl shadow-black/5 z-20">
+      {/* Header & New Quote */}
+      <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
         <button
           onClick={onNewQuote}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg py-3 px-4 font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2"
+          className="w-full btn-primary py-3 font-semibold shadow-lg shadow-primary/20 flex items-center justify-center gap-2 group transform transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <svg className="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
           </svg>
           <span>New Quote</span>
         </button>
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-        <div className="relative">
+      <div className="px-5 pt-4 pb-2">
+        <div className="relative group">
           <input
             type="text"
             placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-text-primary placeholder:text-gray-400"
           />
           <svg
-            className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+            className="absolute left-3.5 top-3 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -153,120 +136,101 @@ export default function ProjectsSidebar({
       </div>
 
       {/* Filters */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800 space-y-3">
-        <div>
-          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 block">
-            Status
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {(['all', 'draft', 'editing', 'quote_sent', 'archived'] as FilterStatus[]).map(status => (
-              <button
-                key={status}
-                onClick={() => setFilterStatus(status)}
-                className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
-                  filterStatus === status
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                {status === 'all' ? 'All' : status.replace('_', ' ')} ({statusCounts[status]})
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 block">
-            Source
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {(['all', 'mls', 'manual_upload', 'customer_upload'] as FilterSource[]).map(source => (
-              <button
-                key={source}
-                onClick={() => setFilterSource(source)}
-                className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
-                  filterSource === source
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                {source === 'all' ? 'All' : source.replace('_', ' ')}
-              </button>
-            ))}
-          </div>
+      <div className="px-5 pb-4">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-5 px-5">
+          {(['all', 'draft', 'editing', 'quote_sent'] as FilterStatus[]).map(status => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-all border ${
+                filterStatus === status
+                  ? 'bg-primary text-white border-primary shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+              }`}
+            >
+              {status === 'all' ? 'All' : status.replace('_', ' ')}
+              <span className={`ml-1.5 opacity-80 ${filterStatus === status ? 'text-white' : 'text-gray-400'}`}>
+                {statusCounts[status]}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-3 space-y-1 pb-4">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="flex flex-col items-center justify-center py-12 space-y-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="text-xs text-gray-400 animate-pulse">Loading projects...</p>
           </div>
         ) : filteredProjects.length === 0 ? (
-          <div className="text-center py-12 px-4">
-            <div className="text-gray-400 dark:text-gray-600 mb-2">
-              <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div className="text-center py-16 px-4">
+            <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300 dark:text-gray-600">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {searchQuery || filterStatus !== 'all' || filterSource !== 'all'
-                ? 'No projects match your filters'
-                : 'No projects yet'}
-            </p>
-            {!searchQuery && filterStatus === 'all' && filterSource === 'all' && (
-              <button
-                onClick={onNewQuote}
-                className="mt-4 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                Create your first quote
-              </button>
-            )}
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-300">No projects found</p>
+            <p className="text-xs text-gray-500 mt-1">Try adjusting your filters</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-800">
-            {filteredProjects.map(project => (
-              <button
-                key={project.id}
-                onClick={() => onSelectProject(project)}
-                className={`w-full p-4 text-left hover:bg-white dark:hover:bg-gray-800 transition-colors ${
-                  currentProject?.id === project.id
-                    ? 'bg-white dark:bg-gray-800 border-l-4 border-blue-500'
-                    : ''
-                }`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-lg">{getSourceIcon(project.source)}</span>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                        {project.projectName || project.address || 'Untitled'}
-                      </h3>
-                    </div>
-                    {project.address && project.projectName !== project.address && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate mb-2">
-                        {project.address}
-                      </p>
-                    )}
+          filteredProjects.map(project => (
+            <button
+              key={project.id}
+              onClick={() => onSelectProject(project)}
+              className={`w-full p-3 text-left rounded-xl transition-all group relative overflow-hidden border ${
+                currentProject?.id === project.id
+                  ? 'bg-white dark:bg-gray-800 border-primary/30 shadow-md shadow-primary/5 ring-1 ring-primary/20'
+                  : 'bg-transparent border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:border-gray-100 dark:hover:border-gray-700'
+              }`}
+            >
+              {currentProject?.id === project.id && (
+                <div className="absolute left-0 top-3 bottom-3 w-1 bg-primary rounded-r-full"></div>
+              )}
+              
+              <div className="pl-2">
+                <div className="flex items-start justify-between mb-1.5">
+                  <div className="min-w-0 flex-1 pr-2">
+                    <h3 className={`text-sm font-semibold truncate transition-colors ${
+                      currentProject?.id === project.id ? 'text-primary' : 'text-gray-900 dark:text-gray-100 group-hover:text-primary'
+                    }`}>
+                      {project.projectName || project.address || 'Untitled'}
+                    </h3>
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between mb-2">
-                  {getStatusBadge(project.status)}
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-[10px] font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
                     {formatDate(project.updatedAt)}
                   </span>
                 </div>
 
-                {project.detections.length > 0 && (
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {project.detections.length} items detected
-                  </div>
+                {project.address && project.projectName !== project.address && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate mb-2 pl-0.5">
+                    {project.address}
+                  </p>
                 )}
-              </button>
-            ))}
-          </div>
+
+                <div className="flex items-center justify-between mt-2">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-medium border border-transparent ${getStatusColor(project.status)}`}>
+                    {project.status.replace('_', ' ')}
+                  </span>
+                  
+                  <div className="flex items-center gap-2">
+                    {project.detections.length > 0 && (
+                      <span className="text-[10px] text-gray-500 flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-700">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        {project.detections.length}
+                      </span>
+                    )}
+                    <span className="text-xs opacity-50 grayscale" title={`Source: ${project.source}`}>
+                      {getSourceIcon(project.source)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))
         )}
       </div>
     </div>
