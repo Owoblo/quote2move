@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Auth Debugger</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #e0e0e0; }
+        .log { margin-bottom: 10px; padding: 10px; border-radius: 4px; }
+        .error { background: #4a1a1a; color: #ff9999; }
+        .success { background: #1a4a1a; color: #99ff99; }
+        .info { background: #1a2a4a; color: #9999ff; }
+        input { background: #333; color: white; border: 1px solid #555; padding: 5px; width: 300px; }
+        button { background: #444; color: white; border: 1px solid #666; padding: 5px 10px; cursor: pointer; }
+        button:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <h1>Supabase Auth Debugger</h1>
+    
+    <div id="env-check" class="log info">
+        <h3>Environment Check (Runtime)</h3>
+        <p>Checking process.env values...</p>
+        <div id="env-results"></div>
+    </div>
+
+    <div class="log info">
+        <h3>Manual Connection Test</h3>
+        <div>
+            <label>URL: </label>
+            <input type="text" id="manual-url" placeholder="https://xyz.supabase.co">
+        </div>
+        <div style="margin-top: 5px;">
+            <label>Key: </label>
+            <input type="text" id="manual-key" placeholder="eyJhbGci...">
+        </div>
+        <button onclick="testConnection()" style="margin-top: 10px;">Test Connection</button>
+    </div>
+
+    <div id="logs"></div>
+
+    <!-- Load Supabase JS from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toISOString()}] ${msg}`;
+            document.getElementById('logs').prepend(div);
+            console.log(msg);
+        }
+
+        function inspectString(str, name) {
+            if (!str) return `${name} is empty/undefined`;
+            
+            const len = str.length;
+            const first5 = str.substring(0, 5);
+            const last5 = str.substring(str.length - 5);
+            
+            // Check for invisible characters
+            const hiddenChars = [];
+            for (let i = 0; i < str.length; i++) {
+                const code = str.charCodeAt(i);
+                if (code <= 32 || code >= 127) {
+                    hiddenChars.push({ pos: i, code: code, char: JSON.stringify(str[i]) });
+                }
+            }
+
+            let result = `${name}: Length=${len}, Starts="${first5}...", Ends="...${last5}"`;
+            if (hiddenChars.length > 0) {
+                result += `\n⚠️ WARNING: Found ${hiddenChars.length} special/whitespace characters!`;
+                hiddenChars.forEach(c => {
+                    result += `\n   - Pos ${c.pos}: Code ${c.code} (${c.char})`;
+                });
+            } else {
+                result += `\n✅ No hidden whitespace found.`;
+            }
+            return result;
+        }
+
+        // Try to access env vars injected by React (might be empty in static HTML)
+        const envDiv = document.getElementById('env-results');
+        try {
+            // These won't exist in a static HTML file served from public/ unless explicitly injected
+            // But we can check if the user provides them manually
+            envDiv.innerHTML = "Enter your Supabase URL and Anon Key above to test.";
+        } catch (e) {
+            envDiv.textContent = "Could not access env vars directly.";
+        }
+
+        async function testConnection() {
+            const url = document.getElementById('manual-url').value;
+            const key = document.getElementById('manual-key').value;
+
+            if (!url || !key) {
+                log("Please enter both URL and Key", "error");
+                return;
+            }
+
+            log(inspectString(url, "URL"), "info");
+            log(inspectString(key, "Key"), "info");
+
+            try {
+                // Attempt creating client
+                const { createClient } = window.supabase;
+                const client = createClient(url.trim(), key.trim());
+                
+                log("Client created. Testing simple fetch...", "info");
+
+                // Try a simple public query first (if any public tables exist)
+                // Or just check auth config
+                const { data, error } = await client.from('projects').select('count').limit(1);
+                
+                if (error) {
+                    // RLS error is GOOD - it means the fetch worked and the server replied
+                    log(`Response received: ${error.message} (Code: ${error.code})`, error.code === 'PGRST116' || error.code === '42501' ? "success" : "error");
+                    if (error.code === '42501') {
+                        log("✅ Connection Successful! (RLS prevented data access, which is expected)", "success");
+                    }
+                } else {
+                    log("✅ Connection Successful! Data received.", "success");
+                }
+
+            } catch (err) {
+                log(`❌ CRITICAL ERROR: ${err.message}`, "error");
+                console.error(err);
+                if (err.message.includes("Invalid value")) {
+                    log("🚨 DIAGNOSIS: The 'Invalid value' error usually comes from a bad header. Check for spaces or newlines in your API Key.", "error");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
