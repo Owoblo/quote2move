@@ -112,7 +112,8 @@ export default async function handler(
 async function classifyPhotosByRoom(
   photoUrls: string[],
   context: any,
-  apiKey: string
+  apiKey: string,
+  maxRetries = 3
 ): Promise<Record<string, string[]>> {
 
   const prompt = `You are a real estate photo classifier. Analyze these ${photoUrls.length} property photos and classify each by room type.
@@ -145,54 +146,78 @@ Return ONLY a JSON object mapping room names to arrays of photo indices:
 
 Return ONLY valid JSON, no other text.`;
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...photoUrls.map((url: string) => ({
-              type: 'image_url',
-              image_url: { url, detail: 'low' } // Use 'low' detail for classification (faster/cheaper)
-            }))
-          ]
-        }],
-        max_tokens: 1000,
-        temperature: 0.1
-      })
-    });
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = Math.min(2000 * Math.pow(2, attempt - 1), 20000);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for classification after ${Math.round(delay)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              ...photoUrls.map((url: string) => ({
+                type: 'image_url',
+                image_url: { url, detail: 'low' } // Use 'low' detail for classification (faster/cheaper)
+              }))
+            ]
+          }],
+          max_tokens: 1000,
+          temperature: 0.1
+        })
+      });
+
+      if (!response.ok) {
+         const errorBody = await response.json().catch(() => ({}));
+         const status = response.status;
+         
+         if (status === 429 || status >= 500) {
+           const errorMsg = `OpenAI API error: ${status} ${JSON.stringify(errorBody)}`;
+           console.warn(errorMsg);
+           throw new Error(errorMsg);
+         }
+         throw new Error(`OpenAI API error: ${status} ${JSON.stringify(errorBody)}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+
+      // Parse JSON response
+      const jsonMatch = content.match(/```(?:json)?\s*(\{.*?\})\s*```/s) || content.match(/(\{.*?\})/s);
+      const classification = JSON.parse(jsonMatch ? jsonMatch[1] : content);
+
+      // Convert photo indices to URLs
+      const roomClassification: Record<string, string[]> = {};
+      for (const [room, indices] of Object.entries(classification)) {
+        if (Array.isArray(indices)) {
+          roomClassification[room] = indices.map((i: any) => photoUrls[i as number]).filter(Boolean);
+        }
+      }
+
+      return roomClassification;
+
+    } catch (error: any) {
+      console.error(`❌ Classification attempt ${attempt + 1} failed:`, error.message);
+      
+      if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
+        break;
+      }
     }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
-
-    // Parse JSON response
-    const jsonMatch = content.match(/```(?:json)?\s*(\{.*?\})\s*```/s) || content.match(/(\{.*?\})/s);
-    const classification = JSON.parse(jsonMatch ? jsonMatch[1] : content);
-
-    // Convert photo indices to URLs
-    const roomClassification: Record<string, string[]> = {};
-    for (const [room, indices] of Object.entries(classification)) {
-      roomClassification[room] = (indices as number[]).map(i => photoUrls[i]);
-    }
-
-    return roomClassification;
-
-  } catch (error: any) {
-    console.error('❌ Room classification failed:', error);
-    // Fallback: treat all photos as one group
-    return { 'all_rooms': photoUrls };
   }
+  
+  console.error('❌ All retry attempts exhausted for classification.');
+  // Fallback: treat all photos as one group
+  return { 'all_rooms': photoUrls };
 }
 
 // ============================================
@@ -202,7 +227,8 @@ async function detectFurnitureForRoom(
   roomName: string,
   roomPhotos: string[],
   context: any,
-  apiKey: string
+  apiKey: string,
+  maxRetries = 3
 ): Promise<any[]> {
 
   const contextText = `
@@ -260,47 +286,74 @@ Return ONLY a valid JSON array:
 
 Return ONLY valid JSON array, no other text.`;
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...roomPhotos.map((url: string) => ({
-              type: 'image_url',
-              image_url: { url, detail: 'high' } // Use 'high' detail for furniture detection
-            }))
-          ]
-        }],
-        max_tokens: 2000,
-        temperature: 0.1
-      })
-    });
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = Math.min(2000 * Math.pow(2, attempt - 1), 20000);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for ${roomName} detection after ${Math.round(delay)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              ...roomPhotos.map((url: string) => ({
+                type: 'image_url',
+                image_url: { url, detail: 'high' } // Use 'high' detail for furniture detection
+              }))
+            ]
+          }],
+          max_tokens: 2000,
+          temperature: 0.1
+        })
+      });
+
+      if (!response.ok) {
+         const errorBody = await response.json().catch(() => ({}));
+         const status = response.status;
+         
+         if (status === 429 || status >= 500) {
+           const errorMsg = `OpenAI API error: ${status} ${JSON.stringify(errorBody)}`;
+           console.warn(errorMsg);
+           throw new Error(errorMsg);
+         }
+         throw new Error(`OpenAI API error: ${status} ${JSON.stringify(errorBody)}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+
+      // Parse JSON response
+      const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
+      
+      if (!jsonMatch) {
+         console.warn(`Failed to parse JSON for room ${roomName}. Content: ${content.substring(0, 100)}...`);
+         return [];
+      }
+
+      const detections = JSON.parse(jsonMatch[1]);
+      return Array.isArray(detections) ? detections : [];
+
+    } catch (error: any) {
+      console.error(`❌ Detection attempt ${attempt + 1} failed for ${roomName}:`, error.message);
+      
+      if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
+        break;
+      }
     }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
-
-    // Parse JSON response
-    const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
-    const detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
-
-    return Array.isArray(detections) ? detections : [];
-
-  } catch (error: any) {
-    console.error(`❌ Detection failed for ${roomName}:`, error);
-    return [];
   }
+
+  console.error(`❌ All retry attempts exhausted for ${roomName}.`);
+  return [];
 }
 
 // ============================================

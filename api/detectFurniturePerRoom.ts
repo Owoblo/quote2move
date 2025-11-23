@@ -58,7 +58,8 @@ async function detectFurnitureForRoom(
   roomName: string,
   roomPhotos: string[],
   context: any,
-  apiKey: string
+  apiKey: string,
+  maxRetries = 3
 ): Promise<{ detections: any[], detectionTimeMs: number }> {
 
   const isBedroomRoom = roomName.toLowerCase().includes('bedroom');
@@ -143,78 +144,115 @@ Return ONLY a valid JSON array:
 
 Return ONLY valid JSON array, no other text.`;
 
-  try {
-    const startTime = performance.now();
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...roomPhotos.map((url: string) => ({
-              type: 'image_url',
-              image_url: { url, detail: 'high' }
-            }))
-          ]
-        }],
-        max_tokens: 2000,
-        temperature: 0.05 // Very low temperature for consistency
-      })
-    });
-    const endTime = performance.now();
+  let lastError: any;
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        // Exponential backoff with jitter
+        const delay = Math.min(2000 * Math.pow(2, attempt - 1) + Math.random() * 1000, 30000);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for ${roomName} detection after ${Math.round(delay)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+      const startTime = performance.now();
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              ...roomPhotos.map((url: string) => ({
+                type: 'image_url',
+                image_url: { url, detail: 'high' }
+              }))
+            ]
+          }],
+          max_tokens: 2000,
+          temperature: 0.05
+        })
+      });
+      const endTime = performance.now();
 
-    const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
-    const detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
-    
-    let processedDetections = Array.isArray(detections) ? detections : [];
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        const status = response.status;
+        
+        // Only retry on rate limits (429) or server errors (5xx)
+        if (status === 429 || status >= 500) {
+          const errorMsg = `OpenAI API error: ${status} ${JSON.stringify(errorBody)}`;
+          console.warn(errorMsg);
+          throw new Error(errorMsg);
+        }
+        
+        throw new Error(`OpenAI API error: ${status} ${JSON.stringify(errorBody)}`);
+      }
 
-    // Post-processing validation for bedrooms
-    if (isBedroomRoom && Array.isArray(detections)) {
-      const beds = detections.filter(d =>
-        d.label.toLowerCase().includes('bed') &&
-        !d.label.toLowerCase().includes('nightstand') &&
-        !d.label.toLowerCase().includes('bedside')
-      );
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
 
-      if (beds.length > 1) {
-        console.warn(`⚠️ Warning: ${beds.length} beds detected in ${roomName} - likely a mistake!`);
-        console.warn('Beds found:', beds.map(b => b.label).join(', '));
+      if (!content) {
+        throw new Error('No content in OpenAI response');
+      }
 
-        // Keep only the bed with highest confidence
-        const bestBed = beds.reduce((best, current) =>
-          (current.confidence || 0) > (best.confidence || 0) ? current : best
+      const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
+      if (!jsonMatch) {
+        console.warn(`Failed to parse JSON for room ${roomName}. Content: ${content.substring(0, 100)}...`);
+        // If content exists but isn't valid JSON, this might be a model refusal or hallucination.
+        // Treating as empty result to avoid breaking the flow.
+        return { detections: [], detectionTimeMs: endTime - startTime };
+      }
+      
+      const detections = JSON.parse(jsonMatch[1]);
+      
+      let processedDetections = Array.isArray(detections) ? detections : [];
+
+      // Post-processing validation for bedrooms
+      if (isBedroomRoom && Array.isArray(detections)) {
+        const beds = detections.filter(d =>
+          d.label.toLowerCase().includes('bed') &&
+          !d.label.toLowerCase().includes('nightstand') &&
+          !d.label.toLowerCase().includes('bedside')
         );
 
-        // Remove all other beds
-        processedDetections = detections.filter(d =>
-          !beds.includes(d) || d === bestBed
-        );
+        if (beds.length > 1) {
+          console.warn(`⚠️ Warning: ${beds.length} beds detected in ${roomName} - likely a mistake!`);
+          
+          // Keep only the bed with highest confidence
+          const bestBed = beds.reduce((best, current) =>
+            (current.confidence || 0) > (best.confidence || 0) ? current : best
+          );
 
-        console.log(`✅ Fixed: Kept only "${bestBed.label}" (confidence: ${bestBed.confidence})`);
+          // Remove all other beds
+          processedDetections = detections.filter(d =>
+            !beds.includes(d) || d === bestBed
+          );
+
+          console.log(`✅ Fixed: Kept only "${bestBed.label}" (confidence: ${bestBed.confidence})`);
+        }
+      }
+
+      return {
+        detections: processedDetections,
+        detectionTimeMs: endTime - startTime
+      };
+
+    } catch (error: any) {
+      lastError = error;
+      console.error(`❌ Attempt ${attempt + 1} failed for ${roomName}:`, error.message);
+      
+      if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
+        break;
       }
     }
-
-    return {
-      detections: processedDetections,
-      detectionTimeMs: endTime - startTime
-    };
-
-  } catch (error: any) {
-    console.error(`❌ Detection failed for ${roomName}:`, error);
-    return { detections: [], detectionTimeMs: 0 };
   }
-}
 
+  console.error(`❌ All retry attempts exhausted for ${roomName}.`);
+  return { detections: [], detectionTimeMs: 0 };
+}

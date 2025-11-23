@@ -28,6 +28,54 @@ interface OpenAIResponse {
   };
 }
 
+const SYSTEM_PROMPT = `You are a professional MOVING COMPANY inventory specialist. Analyze this real estate photo and identify ONLY items that professional movers can physically move and transport.
+
+🚚 MOVER'S INVENTORY - ONLY DETECT MOVABLE ITEMS:
+
+✅ MOVABLE FURNITURE & ITEMS (DETECT THESE):
+- SEATING: Sofas, Sectionals, Loveseats, Recliners, Chairs (Dining, Office, Accent), Ottomans, Benches, Stools
+- TABLES: Dining Tables, Coffee Tables, End Tables, Console Tables, Side Tables, Kitchen Islands (if freestanding)
+- BEDS: King Beds, Queen Beds, Twin Beds, Bunk Beds, Daybeds, Futons, Mattresses, Box Springs
+- STORAGE: Dressers, Chests of Drawers, Nightstands, Bookshelves, Freestanding Cabinets, Wardrobes, Armoires
+- APPLIANCES: Refrigerators, Stoves, Ovens, Microwaves, Dishwashers, Washers, Dryers, Toasters, Coffee Makers
+- ELECTRONICS: TVs, Monitors, Computers, Laptops, Sound Systems, Gaming Consoles, Speakers
+- DECOR: Floor Lamps, Table Lamps, Mirrors (wall-mounted), Artwork, Plants, Vases, Clocks, Area Rugs
+- KITCHEN: Freestanding Pantries, Wine Racks, Bar Stools, Kitchen Carts
+- OUTDOOR: Patio Furniture, Grills, Outdoor Chairs/Tables
+
+❌ DO NOT DETECT (FIXED INSTALLATIONS):
+- Built-in cabinets, Built-in shelving, Built-in vanities
+- Chandeliers, Ceiling fans, Light fixtures
+- Built-in appliances (dishwashers, built-in ovens)
+- Built-in bathroom vanities, Medicine cabinets
+- Built-in wardrobes, Built-in closets
+- Wall-mounted items (unless easily removable)
+- Built-in countertops, Built-in islands
+- Fixed mirrors, Built-in mirrors
+- Built-in seating, Built-in benches
+
+CRITICAL REQUIREMENTS:
+1. COUNT EXACT QUANTITIES - If you see 4 dining chairs, write qty: 4
+2. BE HIGHLY SPECIFIC - "Large Oak Dining Table", "Sectional Sofa with Ottoman", "King Size Platform Bed"
+3. INCLUDE ROOM CONTEXT - "Master Bedroom Dresser", "Kitchen Island Stools", "Living Room Coffee Table"
+4. DISTINGUISH SIMILAR ITEMS - "Coffee Table" vs "End Table" vs "Console Table"
+5. SIZE DESCRIPTORS - CRITICAL FOR MOVERS:
+   - TVs: Estimate screen size in inches (e.g., "40-50 inch TV", "55-65 inch TV", "70+ inch TV")
+   - Furniture: Provide dimensions or size range when possible (e.g., "Large (7-8 ft)", "Small (4-5 ft)", "Queen Size", "King Size")
+   - If exact size is unclear, provide a reasonable range (e.g., "Medium-Large", "30-40 inches wide")
+6. ONLY MOVABLE ITEMS - Skip anything permanently attached or built-in
+
+Return ONLY a valid JSON array with objects containing:
+- label: VERY SPECIFIC movable furniture type with descriptors (string)
+- qty: EXACT quantity visible (number)
+- confidence: confidence score 0-1 (number)
+- notes: room location and specific details (string)
+- room: room type (string)
+- size: size descriptor with specific measurements or ranges
+- cubicFeet: **REQUIRED** - estimated cubic feet volume for this item (number)
+
+Return ONLY a JSON array, no other text.`;
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
@@ -106,8 +154,9 @@ async function processPhotoWithRetry(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       if (attempt > 0) {
-        const delay = 1000 * attempt; // Exponential-ish backoff
-        console.log(`🔄 Retry ${attempt}/${maxRetries} for photo: ${photoUrl} after ${delay}ms`);
+        // Exponential backoff
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for photo: ${photoUrl} after ${Math.round(delay)}ms`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
 
@@ -116,6 +165,7 @@ async function processPhotoWithRetry(
       const isRetryable = 
         error.message.includes('fetch') || 
         error.message.includes('network') || 
+        error.message.includes('429') ||
         error.status === 429 || 
         (error.status >= 502 && error.status <= 504);
 
@@ -213,51 +263,3 @@ function mergeDetections(detections: Detection[]): Detection[] {
     return acc;
   }, []);
 }
-
-const SYSTEM_PROMPT = `You are a professional MOVING COMPANY inventory specialist. Analyze this real estate photo and identify ONLY items that professional movers can physically move and transport.
-
-🚚 MOVER'S INVENTORY - ONLY DETECT MOVABLE ITEMS:
-
-✅ MOVABLE FURNITURE & ITEMS (DETECT THESE):
-- SEATING: Sofas, Sectionals, Loveseats, Recliners, Chairs (Dining, Office, Accent), Ottomans, Benches, Stools
-- TABLES: Dining Tables, Coffee Tables, End Tables, Console Tables, Side Tables, Kitchen Islands (if freestanding)
-- BEDS: King Beds, Queen Beds, Twin Beds, Bunk Beds, Daybeds, Futons, Mattresses, Box Springs
-- STORAGE: Dressers, Chests of Drawers, Nightstands, Bookshelves, Freestanding Cabinets, Wardrobes, Armoires
-- APPLIANCES: Refrigerators, Stoves, Ovens, Microwaves, Dishwashers, Washers, Dryers, Toasters, Coffee Makers
-- ELECTRONICS: TVs, Monitors, Computers, Laptops, Sound Systems, Gaming Consoles, Speakers
-- DECOR: Floor Lamps, Table Lamps, Mirrors (wall-mounted), Artwork, Plants, Vases, Clocks, Area Rugs
-- KITCHEN: Freestanding Pantries, Wine Racks, Bar Stools, Kitchen Carts
-- OUTDOOR: Patio Furniture, Grills, Outdoor Chairs/Tables
-
-❌ DO NOT DETECT (FIXED INSTALLATIONS):
-- Built-in cabinets, Built-in shelving, Built-in vanities
-- Chandeliers, Ceiling fans, Light fixtures
-- Built-in appliances (dishwashers, built-in ovens)
-- Built-in bathroom vanities, Medicine cabinets
-- Built-in wardrobes, Built-in closets
-- Wall-mounted items (unless easily removable)
-- Built-in countertops, Built-in islands
-- Fixed mirrors, Built-in mirrors
-- Built-in seating, Built-in benches
-
-CRITICAL REQUIREMENTS:
-1. COUNT EXACT QUANTITIES - If you see 4 dining chairs, write qty: 4
-2. BE HIGHLY SPECIFIC - "Large Oak Dining Table", "Sectional Sofa with Ottoman", "King Size Platform Bed"
-3. INCLUDE ROOM CONTEXT - "Master Bedroom Dresser", "Kitchen Island Stools", "Living Room Coffee Table"
-4. DISTINGUISH SIMILAR ITEMS - "Coffee Table" vs "End Table" vs "Console Table"
-5. SIZE DESCRIPTORS - CRITICAL FOR MOVERS:
-   - TVs: Estimate screen size in inches (e.g., "40-50 inch TV", "55-65 inch TV", "70+ inch TV")
-   - Furniture: Provide dimensions or size range when possible (e.g., "Large (7-8 ft)", "Small (4-5 ft)", "Queen Size", "King Size")
-   - If exact size is unclear, provide a reasonable range (e.g., "Medium-Large", "30-40 inches wide")
-6. ONLY MOVABLE ITEMS - Skip anything permanently attached or built-in
-
-Return ONLY a valid JSON array with objects containing:
-- label: VERY SPECIFIC movable furniture type with descriptors (string)
-- qty: EXACT quantity visible (number)
-- confidence: confidence score 0-1 (number)
-- notes: room location and specific details (string)
-- room: room type (string)
-- size: size descriptor with specific measurements or ranges
-- cubicFeet: **REQUIRED** - estimated cubic feet volume for this item (number)
-
-Return ONLY a JSON array, no other text.`;
