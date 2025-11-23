@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import { supabaseSold2Move } from '../../lib/supabase';
 import { parseZillowPhotos } from '../../lib/zillowPhotos';
 import { detectFurniture } from '../../lib/aiDetectionServices';
 import { Photo, Detection } from '../../types';
@@ -155,12 +155,12 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
           setIsDetecting(true);
           
           const [currentResult, soldResult] = await Promise.all([
-            supabase
+            supabaseSold2Move
               .from('just_listed')
               .select('*')
               .ilike('address', `%125 Links Dr%`)
               .limit(1),
-            supabase
+            supabaseSold2Move
               .from('sold_listings')
               .select('*')
               .ilike('address', `%125 Links Dr%`)
@@ -240,12 +240,12 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         }
         
         const [currentListings, soldListings] = await Promise.all([
-          supabase
+          supabaseSold2Move
             .from('just_listed')
             .select('*')
             .or(query)
             .limit(3),
-          supabase
+          supabaseSold2Move
             .from('sold_listings')
             .select('*')
             .or(query)
@@ -313,12 +313,12 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
         }
         
         const [currentResult, soldResult] = await Promise.all([
-          supabase
+          supabaseSold2Move
             .from('just_listed')
             .select('id, address, addresscity, addressstate, carousel_photos_composable')
             .or(searchQuery)
             .limit(3),
-          supabase
+          supabaseSold2Move
             .from('sold_listings')
             .select('id, address, addresscity, addressstate, carousel_photos_composable')
             .or(searchQuery)
