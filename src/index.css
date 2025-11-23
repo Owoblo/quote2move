@@ -8,9 +8,9 @@
   /* Light Mode Variables */
   --color-primary: #2563EB;
   --color-primary-hover: #1D4ED8;
-  --color-background: #F8FAFC; /* Slate-50 */
+  --color-background: #F4F7FF; /* Brand-tinted very light blue */
   --color-surface: #FFFFFF;
-  --color-border: #E2E8F0; /* Slate-200 */
+  --color-border: #E0E7FF; /* Brand-tinted border */
   --color-text-primary: #0F172A; /* Slate-900 */
   --color-text-secondary: #475569; /* Slate-600 */
   --color-text-muted: #94A3B8; /* Slate-400 */
@@ -24,16 +24,16 @@
   /* Dark Mode Variables */
   --color-primary: #3B82F6; /* Blue-500 */
   --color-primary-hover: #60A5FA; /* Blue-400 */
-  --color-background: #0F172A; /* Slate-900 */
-  --color-surface: #1E293B; /* Slate-800 */
-  --color-border: #334155; /* Slate-700 */
+  --color-background: #0B1121; /* Brand-tinted deep midnight blue */
+  --color-surface: #151E32; /* Brand-tinted card surface */
+  --color-border: #1E293B; /* Slate-800 */
   --color-text-primary: #F8FAFC; /* Slate-50 */
   --color-text-secondary: #CBD5E1; /* Slate-300 */
   --color-text-muted: #94A3B8; /* Slate-400 */
-  --color-chip-bg: #1E3A8A; /* Blue-900 */
+  --color-chip-bg: #172554; /* Blue-950 */
   --color-chip-text: #BFDBFE; /* Blue-200 */
-  --color-chip-border: #2563EB; /* Blue-600 */
-  --color-card-bg: #1E293B;
+  --color-chip-border: #1E40AF; /* Blue-800 */
+  --color-card-bg: #151E32;
 }
 
 @layer base {
