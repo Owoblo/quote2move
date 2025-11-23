@@ -7,12 +7,14 @@ import { createClient } from '@supabase/supabase-js';
 // Explicitly accessing process.env properties ensures bundlers (Webpack/Vite) correctly replace them
 const getSupabaseUrl = () => {
   const url = process.env.REACT_APP_SOLD2MOVE_URL || process.env.REACT_APP_SUPABASE_URL || '';
-  return url.trim();
+  // Ensure no hidden whitespace characters (like \r \n etc) are present
+  return url.replace(/\s+/g, '').trim();
 };
 
 const getSupabaseKey = () => {
   const key = process.env.REACT_APP_SOLD2MOVE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY || '';
-  return key.trim();
+  // Ensure no hidden whitespace characters (like \r \n etc) are present
+  return key.replace(/\s+/g, '').trim();
 };
 
 const supabaseUrl = getSupabaseUrl();
