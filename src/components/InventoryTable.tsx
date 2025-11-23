@@ -194,7 +194,7 @@ export default function InventoryTable({
                       </td>
                       <td className="px-3 sm:px-6 py-4 text-sm text-[#111827]">
                         <div className="flex items-center space-x-2">
-                          <span className="font-medium text-[#111827]">{detection.qty}</span>
+                          <span className="font-medium text-[#111827] tabular-nums">{detection.qty}</span>
                           <button
                             onClick={() => {
                               const newQty = prompt(`Edit quantity for ${detection.label}:`, detection.qty.toString());
@@ -246,10 +246,10 @@ export default function InventoryTable({
       {/* Totals */}
       <div className="p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-2">
         <div className="text-sm font-medium text-[#374151]">
-          Total Items: <span className="font-semibold text-[#111827]">{totalItems}</span>
+          Total Items: <span className="font-semibold text-[#111827] tabular-nums">{totalItems}</span>
         </div>
         <div className="text-sm font-medium text-[#374151]">
-          Total Cubic Feet: <span className="font-semibold text-[#111827]">{totalCubicFeet.toFixed(2)} cf</span>
+          Total Cubic Feet: <span className="font-semibold text-[#111827] tabular-nums">{totalCubicFeet.toFixed(2)} cf</span>
         </div>
       </div>
     </div>
