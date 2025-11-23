@@ -55,3 +55,10 @@ export interface QuotePayload {
   estimate: Estimate;
   timestamp: Date;
 }
+
+export interface PropertyContext {
+  bedrooms?: number;
+  bathrooms?: number;
+  sqft?: number;
+  propertyType?: string;
+}
