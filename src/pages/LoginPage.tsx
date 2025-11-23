@@ -51,6 +51,15 @@ export default function LoginPage() {
     return 'weak';
   };
 
+  // Redirect if already logged in
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard');
+      }
+    });
+  }, [navigate]);
+
   // Update password strength when password changes
   React.useEffect(() => {
     if (isSignUp && password) {
