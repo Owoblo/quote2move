@@ -2,13 +2,21 @@ import { createClient } from '@supabase/supabase-js';
 
 // Using SOLD2MOVE as the single active database
 // This database contains EVERYTHING: listings, projects, quotes, users, etc.
-const getEnvVar = (key1: string, key2: string): string => {
-  const val = process.env[key1] || process.env[key2] || '';
-  return val.trim();
+
+// Helper to safely get and trim environment variables
+// Explicitly accessing process.env properties ensures bundlers (Webpack/Vite) correctly replace them
+const getSupabaseUrl = () => {
+  const url = process.env.REACT_APP_SOLD2MOVE_URL || process.env.REACT_APP_SUPABASE_URL || '';
+  return url.trim();
 };
 
-const supabaseUrl = getEnvVar('REACT_APP_SOLD2MOVE_URL', 'REACT_APP_SUPABASE_URL');
-const supabaseAnonKey = getEnvVar('REACT_APP_SOLD2MOVE_ANON_KEY', 'REACT_APP_SUPABASE_ANON_KEY');
+const getSupabaseKey = () => {
+  const key = process.env.REACT_APP_SOLD2MOVE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY || '';
+  return key.trim();
+};
+
+const supabaseUrl = getSupabaseUrl();
+const supabaseAnonKey = getSupabaseKey();
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase URL or Key is missing!');
