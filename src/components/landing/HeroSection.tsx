@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import InteractiveDemo from './InteractiveDemo';
 
 export default function HeroSection() {
   return (
@@ -74,7 +73,29 @@ export default function HeroSection() {
           <div className="relative animate-in slide-in-from-right-8 fade-in duration-1000 delay-200">
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-[2rem] opacity-20 blur-2xl dark:opacity-40"></div>
             <div className="relative">
-              <InteractiveDemo />
+              {/* InteractiveDemo was here, now removed */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
+                <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative group cursor-pointer" onClick={() => window.location.href = '#demo'}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2053&q=80" 
+                    alt="MoveSense Demo" 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                    <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center pl-1 shadow-lg transform transition-transform group-hover:scale-110">
+                      <svg className="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 space-y-3">
+                  <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded w-1/2"></div>
+                  <div className="flex gap-2 mt-4">
+                    <div className="h-8 bg-blue-50 dark:bg-blue-900/20 rounded w-20"></div>
+                    <div className="h-8 bg-blue-50 dark:bg-blue-900/20 rounded w-20"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
