@@ -5,7 +5,7 @@ import SearchPanel from '../components/SearchPanel';
 import PhotoGallery from '../components/PhotoGallery';
 import InventoryTable from '../components/InventoryTable';
 import PropertyInfo from '../components/PropertyInfo';
-import { Photo, Detection, MappingTable, PropertyContext } from '../types';
+import { AppState, Photo, MappingTable, QuotePayload, Detection, PropertyContext } from '../types';
 import { FurnitureDetectionService } from '../lib/furnitureDetection';
 import { parseZillowPhotos } from '../lib/zillowPhotos';
 import { supabaseSold2Move } from '../lib/supabase';
@@ -385,7 +385,7 @@ export default function DemoPage() {
 
           {/* Call to Action */}
           <div className="mt-16 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Ready to streamline your moving business?</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ready to streamline your moving business?</h2>
             <button
               onClick={handleActivateAccount}
               className="px-8 py-4 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg text-lg shadow-lg hover:shadow-xl transition-all"
