@@ -124,13 +124,13 @@ export default function DemoPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-6">
+      <section className="pt-20 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary dark:text-white mb-4 tracking-tight">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary dark:text-white mb-4 tracking-tight">
               Get Instant Moving Quotes from Just a Property Address.
             </h1>
-            <p className="text-xl text-[#374151] max-w-3xl mx-auto mb-8">
+            <p className="text-lg sm:text-xl text-[#374151] max-w-3xl mx-auto mb-6 sm:mb-8">
               Type any address in the activated cities below and watch MoveSense pull furniture and room data automatically from MLS photos.
             </p>
           </div>
@@ -147,8 +147,8 @@ export default function DemoPage() {
             />
             
             {/* Active Regions List */}
-            <div className="mt-6 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-6">
-              <p className="text-sm font-medium text-[#374151] mb-3">
+            <div className="mt-4 sm:mt-6 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-4 sm:p-6">
+              <p className="text-sm font-medium text-[#374151] mb-2 sm:mb-3">
                 Currently active regions:
               </p>
               <div className="flex flex-wrap gap-2">

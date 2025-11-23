@@ -85,16 +85,16 @@ export default function InventoryTable({
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
-      <div className="p-8 border-b border-gray-100 dark:border-gray-700">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-semibold text-[#111827] mb-2">Detected Inventory</h2>
-            <p className="text-sm text-[#374151]">
+            <h2 className="text-lg font-semibold text-[#111827] mb-1 sm:mb-2">Detected Inventory</h2>
+            <p className="text-xs sm:text-sm text-[#374151]">
               {isDetecting ? 'AI is analyzing photos and detecting furniture...' : 'Furniture and items found by AI analysis'}
             </p>
           </div>
           {isDetecting && (
-            <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg">
+            <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg self-start sm:self-auto">
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 dark:border-blue-400 border-t-transparent mr-2"></div>
               <span>Live Detection</span>
             </div>
@@ -106,16 +106,16 @@ export default function InventoryTable({
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-700/50">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Item
               </th>
-              <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Qty
               </th>
-              <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Notes
               </th>
-              <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16">
+              <th className="px-3 sm:px-6 py-4 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16">
                 {/* Actions column - subtle */}
               </th>
             </tr>
@@ -125,14 +125,14 @@ export default function InventoryTable({
               <React.Fragment key={roomName}>
                 {/* Room Header */}
                 <tr className="bg-blue-50 dark:bg-blue-900/20">
-                  <td colSpan={4} className="px-6 py-3">
+                  <td colSpan={4} className="px-3 sm:px-6 py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">
                           🏠 {roomName}
                         </span>
                         {roomPhotos[roomName] && roomPhotos[roomName].length > 0 && (
-                          <div className="flex items-center space-x-1">
+                          <div className="hidden sm:flex items-center space-x-1">
                             <span className="text-xs text-blue-600 dark:text-blue-400">from:</span>
                             <div className="flex space-x-1">
                               {roomPhotos[roomName].slice(0, 3).map((photoUrl, idx) => (
@@ -175,7 +175,7 @@ export default function InventoryTable({
                   
                   return (
                     <tr key={`${roomName}-${roomItemIndex}`} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
-                      <td className="px-6 py-4 text-sm text-[#111827]">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-[#111827]">
                         <div className="font-medium">{detection.label}</div>
                         {detection.size && (
                           <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
@@ -192,7 +192,7 @@ export default function InventoryTable({
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#111827]">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-[#111827]">
                         <div className="flex items-center space-x-2">
                           <span className="font-medium text-[#111827]">{detection.qty}</span>
                           <button
@@ -205,7 +205,7 @@ export default function InventoryTable({
                                 }
                               }
                             }}
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                             title="Edit quantity"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,19 +214,19 @@ export default function InventoryTable({
                           </button>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#111827]">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-[#111827]">
                           <textarea
                             value={detection.notes || ''}
                           onChange={(e) => onNotesChange(detectionIndex, e.target.value)}
-                            placeholder="Add notes about this item..."
+                            placeholder="Add notes..."
                             rows={2}
-                          className="w-full border-0 bg-transparent px-0 py-2 text-sm focus:outline-none resize-none text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
+                          className="w-full min-w-[120px] border-0 bg-transparent px-0 py-2 text-sm focus:outline-none resize-none text-[#111827] placeholder-gray-400 dark:placeholder-gray-500"
                         />
                       </td>
-                      <td className="px-6 py-4 text-sm text-center">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-center">
                         <button
                           onClick={() => onRemove(detectionIndex)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg p-2 transition-colors opacity-0 group-hover:opacity-100"
+                          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg p-2 transition-colors sm:opacity-0 sm:group-hover:opacity-100"
                           title="Remove this item"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,7 +244,7 @@ export default function InventoryTable({
       </div>
       
       {/* Totals */}
-      <div className="p-8 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+      <div className="p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-2">
         <div className="text-sm font-medium text-[#374151]">
           Total Items: <span className="font-semibold text-[#111827]">{totalItems}</span>
         </div>

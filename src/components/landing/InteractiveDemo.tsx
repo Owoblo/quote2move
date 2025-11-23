@@ -548,7 +548,7 @@ export default function InteractiveDemo({ initialAddress, hideSearch = false, tr
               <h3 className="text-xs font-bold text-text-primary mb-2 uppercase tracking-wider">
                 Property Photos ({photos.length})
               </h3>
-              <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto">
                 {photos.map((photo) => (
                   <div
                     key={photo.id}

@@ -40,14 +40,14 @@ export default function PhotoGallery({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-colors duration-200">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 md:p-8 transition-colors duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2">
         <div>
-          <h2 className="text-lg font-semibold text-[#111827] mb-2">Property Photos</h2>
-          <p className="text-sm text-[#374151]">AI will analyze these photos to detect furniture</p>
+          <h2 className="text-lg font-semibold text-[#111827] dark:text-white mb-1 sm:mb-2">Property Photos</h2>
+          <p className="text-xs sm:text-sm text-[#374151] dark:text-gray-400">AI will analyze these photos to detect furniture</p>
         </div>
         {photos.length > 0 && (
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between sm:justify-end space-x-3 w-full sm:w-auto">
             <button
               onClick={selectedPhotos.length === photos.length ? onDeselectAll : onSelectAll}
               className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-200"
@@ -65,9 +65,9 @@ export default function PhotoGallery({
           <div className="space-y-4">
             {/* Detection Progress Indicator */}
             {isDetecting && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 sm:p-4">
                 <div className="flex items-center space-x-3">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 dark:border-blue-400 border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 dark:border-blue-400 border-t-transparent flex-shrink-0"></div>
                   <div>
                     <p className="text-sm font-medium text-blue-900 dark:text-blue-200">AI Analyzing Photos</p>
                     <p className="text-xs text-blue-700 dark:text-blue-300">Detecting furniture in real-time...</p>
@@ -77,7 +77,7 @@ export default function PhotoGallery({
             )}
             
             {/* Photo Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}

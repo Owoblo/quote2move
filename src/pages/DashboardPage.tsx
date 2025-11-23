@@ -1067,8 +1067,8 @@ export default function DashboardPage() {
         </header>
 
         {/* Navigation Tabs - Segmented Style */}
-        <div className="px-6 py-4 bg-surface border-b border-gray-100 dark:border-gray-800/50">
-          <div className="inline-flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl relative">
+        <div className="px-4 sm:px-6 py-4 bg-surface border-b border-gray-100 dark:border-gray-800/50 overflow-x-auto no-scrollbar">
+          <div className="inline-flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl relative whitespace-nowrap">
             <div className="flex space-x-1 relative z-10">
               {['create', 'analytics', 'quotes', 'calendar'].map((tab) => (
               <button
@@ -1089,8 +1089,8 @@ export default function DashboardPage() {
           </div>
 
         {/* Main Scrollable Content */}
-        <main className="flex-1 overflow-y-auto bg-background p-6">
-          <div className="max-w-[1600px] mx-auto space-y-8">
+        <main className="flex-1 overflow-y-auto bg-background p-3 sm:p-6">
+          <div className="max-w-[1600px] mx-auto space-y-6 sm:space-y-8">
 
           {/* Analytics View */}
           {activeTab === 'analytics' && (
@@ -1417,17 +1417,17 @@ export default function DashboardPage() {
                   </div>
                   
                 {/* Floating Action Bar (Sticky Bottom) */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-surface/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 z-50 flex justify-center items-center gap-4 transition-transform duration-300 translate-y-0 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)]">
-                   <div className="flex items-center gap-3 w-full max-w-5xl px-4">
-                      <div className="flex-1 flex items-center gap-2">
+                <div className="fixed bottom-0 left-0 right-0 p-3 sm:p-4 bg-surface/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 z-50 flex justify-center items-center gap-4 transition-transform duration-300 translate-y-0 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)]">
+                   <div className="flex flex-col-reverse sm:flex-row items-center gap-3 w-full max-w-5xl px-0 sm:px-4">
+                      <div className="flex w-full sm:flex-1 items-center gap-2 justify-center sm:justify-start">
                          {/* Secondary Actions */}
-                        <button onClick={handleDownloadPDF} className="btn btn-secondary px-4 py-2.5 text-sm flex items-center gap-2">
+                        <button onClick={handleDownloadPDF} className="flex-1 sm:flex-none btn btn-secondary px-3 sm:px-4 py-2.5 text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                          PDF
+                          <span className="sm:inline">PDF</span>
                         </button>
-                        <button onClick={handleSendEmail} className="btn btn-secondary px-4 py-2.5 text-sm flex items-center gap-2">
+                        <button onClick={handleSendEmail} className="flex-1 sm:flex-none btn btn-secondary px-3 sm:px-4 py-2.5 text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                          Email
+                          <span className="sm:inline">Email</span>
                         </button>
                       </div>
 
