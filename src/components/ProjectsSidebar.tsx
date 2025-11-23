@@ -5,6 +5,8 @@ interface ProjectsSidebarProps {
   currentProject: Project | null;
   onSelectProject: (project: Project) => void;
   onNewQuote: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 type FilterStatus = 'all' | 'draft' | 'detecting' | 'editing' | 'quote_sent' | 'archived';
@@ -13,7 +15,9 @@ type FilterSource = 'all' | 'mls' | 'manual_upload' | 'customer_upload';
 export default function ProjectsSidebar({
   currentProject,
   onSelectProject,
-  onNewQuote
+  onNewQuote,
+  isOpen = false,
+  onClose
 }: ProjectsSidebarProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,11 +104,41 @@ export default function ProjectsSidebar({
   };
 
   return (
-    <div className="w-80 bg-surface border-r border-gray-200 dark:border-gray-800 flex flex-col h-full shadow-xl shadow-black/5 z-20">
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      <div className={`
+        fixed lg:static inset-y-0 left-0 z-40
+        w-80 bg-surface border-r border-gray-200 dark:border-gray-800 
+        flex flex-col h-full shadow-xl shadow-black/5 
+        transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
       {/* Header & New Quote */}
       <div className="p-5 border-b border-gray-100 dark:border-gray-800/50 bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
+          <div className="flex items-center justify-between mb-4 lg:hidden">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Projects</h2>
+            <button 
+              onClick={onClose}
+              className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
         <button
-          onClick={onNewQuote}
+            onClick={() => {
+              onNewQuote();
+              if (onClose) onClose();
+            }}
           className="w-full btn-primary py-3 font-semibold shadow-lg shadow-primary/20 flex items-center justify-center gap-2 group transform transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           <svg className="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +212,10 @@ export default function ProjectsSidebar({
           filteredProjects.map(project => (
             <button
               key={project.id}
-              onClick={() => onSelectProject(project)}
+              onClick={() => {
+                onSelectProject(project);
+                if (onClose) onClose();
+              }}
               className={`w-full p-3 text-left rounded-xl transition-all group relative overflow-hidden border ${
                 currentProject?.id === project.id
                   ? 'bg-white dark:bg-gray-800 border-primary/30 shadow-md shadow-primary/5 ring-1 ring-primary/20'
@@ -234,5 +271,6 @@ export default function ProjectsSidebar({
         )}
       </div>
     </div>
+    </>
   );
 }

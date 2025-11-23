@@ -37,6 +37,7 @@ const mockMapping: MappingTable = {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [state, setState] = useState<AppState>({
     address: '',
     photos: [],
@@ -1023,14 +1024,26 @@ export default function DashboardPage() {
         currentProject={currentProject}
         onSelectProject={handleSelectProject}
         onNewQuote={handleNewQuoteClick}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
         <header className="bg-surface/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
-          <div className="px-6 h-16 flex items-center justify-between">
+          <div className="px-4 sm:px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-4">
+              {/* Mobile Sidebar Toggle */}
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+
               <div className="flex flex-col">
                 <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
                   {currentProject ? (currentProject.projectName || currentProject.address || 'Untitled Project') : 'Dashboard'}
