@@ -105,11 +105,11 @@ export default async function handler(
     return res.status(400).json({ error: 'photoUrls array is required' });
   }
 
-  // Configuration
+  // Configuration - OPTIMIZED FOR RATE LIMITS
   const MAX_PHOTOS = 20;
-  const BATCH_SIZE = 5;
+  const BATCH_SIZE = 2; // Reduced from 5 to 2 to prevent token spikes
   const PHOTO_TIMEOUT_MS = 45000;
-  const MAX_RETRIES = 2;
+  const MAX_RETRIES = 4; // Increased retries
 
   const photosToProcess = photoUrls.slice(0, MAX_PHOTOS);
   console.log(`📸 Processing ${photosToProcess.length} photos (limited from ${photoUrls.length})`);
@@ -136,6 +136,12 @@ export default async function handler(
         allDetections.push(...detections);
       }
     });
+
+    // Add cooldown between batches to let TPM reset
+    if (i + BATCH_SIZE < photosToProcess.length) {
+      console.log('⏳ Cooling down for 2s between batches...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
   }
 
   // Deduplicate and merge detections
@@ -154,8 +160,8 @@ async function processPhotoWithRetry(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       if (attempt > 0) {
-        // Exponential backoff
-        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        // Increased delay: 2s, 4s, 8s, 16s
+        const delay = Math.min(2000 * Math.pow(2, attempt - 1), 15000);
         console.log(`🔄 Retry ${attempt}/${maxRetries} for photo: ${photoUrl} after ${Math.round(delay)}ms`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
