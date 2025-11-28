@@ -14,10 +14,14 @@ export default async function handler(
   const apiKey = process.env.OPENAI_API_KEY || process.env.VERCEL_OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY;
 
   if (!apiKey) {
+    console.error('❌ OpenAI API key not found in environment variables');
+    console.error('Checked: OPENAI_API_KEY, VERCEL_OPENAI_API_KEY, REACT_APP_OPENAI_API_KEY');
     return res.status(500).json({
-      error: 'Server configuration error: OpenAI API key not configured.'
+      error: 'Server configuration error: OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.'
     });
   }
+
+  console.log('✅ OpenAI API key found for furniture detection');
 
   const { roomName, roomPhotos, propertyContext } = req.body;
 
@@ -246,13 +250,17 @@ Return ONLY valid JSON array, no other text.`;
     } catch (error: any) {
       lastError = error;
       console.error(`❌ Attempt ${attempt + 1} failed for ${roomName}:`, error.message);
-      
+      console.error('Full error:', error);
+
       if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
+        console.error('❌ Non-retryable error detected. Breaking retry loop.');
         break;
       }
     }
   }
 
   console.error(`❌ All retry attempts exhausted for ${roomName}.`);
+  console.error('❌ Last error was:', lastError?.message);
+  console.error('⚠️ Returning empty detections for this room.');
   return { detections: [], detectionTimeMs: 0 };
 }

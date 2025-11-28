@@ -14,11 +14,15 @@ export default async function handler(
   const apiKey = process.env.OPENAI_API_KEY || process.env.VERCEL_OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY;
 
   if (!apiKey) {
-    console.error('❌ OpenAI API key not found');
+    console.error('❌ OpenAI API key not found in environment variables');
+    console.error('Checked: OPENAI_API_KEY, VERCEL_OPENAI_API_KEY, REACT_APP_OPENAI_API_KEY');
     return res.status(500).json({
-      error: 'Server configuration error: OpenAI API key not configured.'
+      error: 'Server configuration error: OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.'
     });
   }
+
+  console.log('✅ OpenAI API key found');
+  console.log('🔑 Key prefix:', apiKey.substring(0, 20) + '...');
 
   const { photoUrls, propertyContext } = req.body;
 
@@ -179,17 +183,23 @@ Return ONLY valid JSON, no other text.`;
     } catch (error: any) {
       lastError = error;
       console.error(`❌ Attempt ${attempt + 1} failed:`, error.message);
-      
+      console.error('Full error:', error);
+
       // Don't retry if it's not a rate limit or server error
       if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
-        break; 
+        console.error('❌ Non-retryable error detected. Breaking retry loop.');
+        break;
       }
     }
   }
 
   console.error('❌ All retry attempts exhausted for classification.');
+  console.error('❌ Last error was:', lastError?.message);
+  console.error('⚠️ FALLING BACK: Treating all photos as one group to prevent total failure');
+  console.error('⚠️ This is a fallback behavior. Check the errors above to fix the root cause.');
+
   // Fallback: treat all photos as one group to prevent total failure
-  return { 
+  return {
     rooms: { 'all_rooms': photoUrls },
     detectionTimeMs: 0
   };
