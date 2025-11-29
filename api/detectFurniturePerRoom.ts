@@ -61,8 +61,149 @@ async function detectFurnitureForRoom(
   apiKey: string
 ): Promise<{ detections: any[], detectionTimeMs: number }> {
 
+  const BATCH_SIZE = 5; // Very conservative batch size for 30k TPM limit
+  const RETRY_ATTEMPTS = 4;
+  const BASE_DELAY = 3000;
+
+  // If photos fit in one batch, use single request
+  if (roomPhotos.length <= BATCH_SIZE) {
+    return detectFurnitureInBatch(roomName, roomPhotos, context, apiKey, RETRY_ATTEMPTS, BASE_DELAY);
+  }
+
+  // Otherwise, process in batches and merge results
+  console.log(`📦 Room has ${roomPhotos.length} photos, batching into groups of ${BATCH_SIZE}...`);
+
+  const batches: string[][] = [];
+  for (let i = 0; i < roomPhotos.length; i += BATCH_SIZE) {
+    batches.push(roomPhotos.slice(i, i + BATCH_SIZE));
+  }
+
+  console.log(`📦 Created ${batches.length} batches for ${roomName}`);
+
+  const allDetections: any[] = [];
+  let totalTime = 0;
+
+  for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+    const batch = batches[batchIndex];
+
+    console.log(`📦 Processing batch ${batchIndex + 1}/${batches.length} for ${roomName} (${batch.length} photos)...`);
+
+    try {
+      const { detections, detectionTimeMs } = await detectFurnitureInBatch(
+        roomName,
+        batch,
+        context,
+        apiKey,
+        RETRY_ATTEMPTS,
+        BASE_DELAY,
+        batchIndex,
+        batches.length
+      );
+
+      totalTime += detectionTimeMs;
+      allDetections.push(...detections);
+
+      // Delay between batches to avoid TPM rate limiting (30k tokens/minute)
+      if (batchIndex < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+
+    } catch (error: any) {
+      console.error(`❌ Batch ${batchIndex + 1} failed for ${roomName}:`, error.message);
+      // Continue with next batch instead of failing completely
+    }
+  }
+
+  // Deduplicate and merge similar items
+  const mergedDetections = deduplicateDetections(allDetections, roomName);
+
+  console.log(`✅ ${roomName}: Merged ${allDetections.length} detections into ${mergedDetections.length} unique items`);
+
+  return {
+    detections: mergedDetections,
+    detectionTimeMs: totalTime
+  };
+}
+
+function deduplicateDetections(detections: any[], roomName: string): any[] {
+  const isBedroomRoom = roomName.toLowerCase().includes('bedroom');
+
+  // Group similar items
+  const itemMap = new Map<string, any>();
+
+  for (const detection of detections) {
+    const normalizedLabel = detection.label.toLowerCase().trim();
+
+    // Check if we already have a similar item
+    let found = false;
+    for (const [key, existingItem] of itemMap.entries()) {
+      const existingLabel = existingItem.label.toLowerCase().trim();
+
+      // Simple similarity check - if labels are very similar, merge them
+      if (normalizedLabel === existingLabel ||
+          normalizedLabel.includes(existingLabel) ||
+          existingLabel.includes(normalizedLabel)) {
+
+        // Keep the item with higher confidence
+        if ((detection.confidence || 0) > (existingItem.confidence || 0)) {
+          itemMap.set(key, detection);
+        }
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      itemMap.set(normalizedLabel, detection);
+    }
+  }
+
+  let mergedDetections = Array.from(itemMap.values());
+
+  // Special handling for bedrooms - ensure only one bed
+  if (isBedroomRoom) {
+    const beds = mergedDetections.filter(d =>
+      d.label.toLowerCase().includes('bed') &&
+      !d.label.toLowerCase().includes('nightstand') &&
+      !d.label.toLowerCase().includes('bedside')
+    );
+
+    if (beds.length > 1) {
+      console.warn(`⚠️ Warning: ${beds.length} beds detected in ${roomName} after merging - keeping only one!`);
+
+      // Keep only the bed with highest confidence
+      const bestBed = beds.reduce((best, current) =>
+        (current.confidence || 0) > (best.confidence || 0) ? current : best
+      );
+
+      mergedDetections = mergedDetections.filter(d =>
+        !beds.includes(d) || d === bestBed
+      );
+
+      console.log(`✅ Fixed: Kept only "${bestBed.label}" (confidence: ${bestBed.confidence})`);
+    }
+  }
+
+  return mergedDetections;
+}
+
+async function detectFurnitureInBatch(
+  roomName: string,
+  roomPhotos: string[],
+  context: any,
+  apiKey: string,
+  maxRetries: number,
+  baseDelay: number,
+  batchIndex: number = 0,
+  totalBatches: number = 1
+): Promise<{ detections: any[], detectionTimeMs: number }> {
+
   const isBedroomRoom = roomName.toLowerCase().includes('bedroom');
   const isBathroomRoom = roomName.toLowerCase().includes('bathroom');
+
+  const batchInfo = totalBatches > 1
+    ? `\n⚠️ NOTE: This is batch ${batchIndex + 1}/${totalBatches} of photos from this room. Focus on detecting items visible in THESE specific photos.`
+    : '';
 
   const contextText = `
 PROPERTY CONTEXT:
@@ -72,7 +213,7 @@ ${context.sqft ? `- Square Footage: ${context.sqft.toLocaleString()} sq ft` : ''
 ${context.propertyType ? `- Property Type: ${context.propertyType}` : ''}
 
 ROOM: ${roomName.replace(/_/g, ' ').toUpperCase()}
-PHOTOS: ${roomPhotos.length} photo${roomPhotos.length > 1 ? 's showing this room from different angles' : ''}
+PHOTOS: ${roomPhotos.length} photo${roomPhotos.length > 1 ? 's showing this room from different angles' : ''}${batchInfo}
 `;
 
   const bedroomSpecificRules = isBedroomRoom ? `
@@ -143,78 +284,74 @@ Return ONLY a valid JSON array:
 
 Return ONLY valid JSON array, no other text.`;
 
-  try {
-    const startTime = performance.now();
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...roomPhotos.map((url: string) => ({
-              type: 'image_url',
-              image_url: { url, detail: 'high' }
-            }))
-          ]
-        }],
-        max_tokens: 2000,
-        temperature: 0.05 // Very low temperature for consistency
-      })
-    });
-    const endTime = performance.now();
+  let lastError: any = null;
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`✅ OpenAI API key found for furniture detection`);
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+      const startTime = performance.now();
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              ...roomPhotos.map((url: string) => ({
+                type: 'image_url',
+                image_url: { url, detail: 'low' }
+              }))
+            ]
+          }],
+          max_tokens: 2000,
+          temperature: 0.05
+        })
+      });
+      const endTime = performance.now();
 
-    const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
-    const detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
-    
-    let processedDetections = Array.isArray(detections) ? detections : [];
+      if (!response.ok) {
+        const errorBody = await response.text();
+        const errorMessage = `OpenAI API error: ${response.status} ${errorBody}`;
+        console.warn(errorMessage);
+        throw new Error(errorMessage);
+      }
 
-    // Post-processing validation for bedrooms
-    if (isBedroomRoom && Array.isArray(detections)) {
-      const beds = detections.filter(d =>
-        d.label.toLowerCase().includes('bed') &&
-        !d.label.toLowerCase().includes('nightstand') &&
-        !d.label.toLowerCase().includes('bedside')
-      );
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
 
-      if (beds.length > 1) {
-        console.warn(`⚠️ Warning: ${beds.length} beds detected in ${roomName} - likely a mistake!`);
-        console.warn('Beds found:', beds.map(b => b.label).join(', '));
+      const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
+      const detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
 
-        // Keep only the bed with highest confidence
-        const bestBed = beds.reduce((best, current) =>
-          (current.confidence || 0) > (best.confidence || 0) ? current : best
-        );
+      const processedDetections = Array.isArray(detections) ? detections : [];
 
-        // Remove all other beds
-        processedDetections = detections.filter(d =>
-          !beds.includes(d) || d === bestBed
-        );
+      return {
+        detections: processedDetections,
+        detectionTimeMs: endTime - startTime
+      };
 
-        console.log(`✅ Fixed: Kept only "${bestBed.label}" (confidence: ${bestBed.confidence})`);
+    } catch (error: any) {
+      lastError = error;
+      console.error(`❌ Attempt ${attempt} failed for ${roomName}: ${error.message}`);
+      console.error('Full error:', error);
+
+      if (attempt < maxRetries) {
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for ${roomName} detection after ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        console.error(`❌ All retry attempts exhausted for ${roomName}.`);
+        console.error(`❌ Last error was: ${error.message}`);
+        console.error(`⚠️ Returning empty detections for this room.`);
       }
     }
-
-    return {
-      detections: processedDetections,
-      detectionTimeMs: endTime - startTime
-    };
-
-  } catch (error: any) {
-    console.error(`❌ Detection failed for ${roomName}:`, error);
-    return { detections: [], detectionTimeMs: 0 };
   }
+
+  return { detections: [], detectionTimeMs: 0 };
 }
 
