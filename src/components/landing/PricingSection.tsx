@@ -50,50 +50,53 @@ export default function PricingSection() {
     }
   ];
   return (
-    <section id="pricing" className="py-24 bg-[#F3F4F6]">
+    <section id="pricing" className="section-padding bg-background">
       <div className="container-max mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
+          <div className="chip mb-4">Pricing</div>
+          <h2 className="text-4xl md:text-5xl font-bold text-text-primary mb-4 tracking-tight">
             Early access pricing.
           </h2>
-          <p className="text-lg text-[#374151] max-w-2xl mx-auto">
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
             Simple pricing for early movers. No contracts.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`rounded-2xl border p-8 bg-white dark:bg-gray-900 shadow-lg ${
-                plan.mostPopular ? 'border-accent ring-2 ring-accent/30 relative' : 'border-gray-200 dark:border-gray-800'
+              className={`card p-8 relative flex flex-col ${
+                plan.mostPopular 
+                  ? 'border-primary ring-2 ring-primary/20 shadow-xl scale-105 z-10' 
+                  : 'border-border shadow-lg'
               }`}
             >
               {plan.mostPopular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full shadow-lg shadow-primary/20">
                   Most popular
                 </span>
               )}
-              <h3 className="text-2xl font-bold text-[#111827] mb-2">{plan.name}</h3>
-              <p className="text-sm text-[#6B7280] mb-6">{plan.highlight}</p>
-              <div className="mb-6">
-                <span className="text-5xl font-bold text-[#111827]">{plan.price}</span>
-                <span className="text-[#374151]">{plan.cadence}</span>
+              <h3 className="text-2xl font-bold text-text-primary mb-2">{plan.name}</h3>
+              <p className="text-sm text-text-muted mb-6 font-medium">{plan.highlight}</p>
+              <div className="mb-6 flex items-baseline gap-1">
+                <span className="text-5xl font-bold text-text-primary tracking-tight">{plan.price}</span>
+                <span className="text-text-secondary font-medium">{plan.cadence}</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-4 mb-8 flex-1">
                 {plan.perks.map((perk) => (
-                  <li key={perk} className="flex items-start gap-3 text-[#111827]">
-                    <span className="text-green-600 mt-1">✓</span>
-                    <span>{perk}</span>
+                  <li key={perk} className="flex items-start gap-3 text-text-primary">
+                    <svg className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span className="text-sm">{perk}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 to="/login"
-                className={`block text-center px-6 py-3 font-semibold rounded-lg transition-all ${
+                className={`block text-center px-6 py-3 font-bold rounded-xl transition-all duration-200 ${
                   plan.mostPopular
-                    ? 'bg-accent text-white hover:bg-accent-dark'
-                    : 'border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-[#111827] dark:text-gray-200 bg-white dark:bg-gray-800'
+                    ? 'btn-primary'
+                    : 'btn-secondary'
                 }`}
               >
                 {plan.cta}
@@ -102,12 +105,11 @@ export default function PricingSection() {
           ))}
         </div>
 
-        <div className="text-center text-[#374151] text-sm mt-10 space-y-2">
+        <div className="text-center text-text-secondary text-sm mt-12 space-y-2">
           <p>💡 Not sure where to start? Pick Starter—upgrade anytime.</p>
-          <p>📞 Prefer to talk? <a href="https://calendly.com" className="text-accent underline">Book a 15-min call</a> or email sales@movsense.com.</p>
+          <p>📞 Prefer to talk? <a href="https://calendly.com" className="text-primary hover:underline font-medium">Book a 15-min call</a> or email <a href="mailto:sales@movsense.com" className="text-primary hover:underline">sales@movsense.com</a>.</p>
         </div>
       </div>
     </section>
   );
 }
-

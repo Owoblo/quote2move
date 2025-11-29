@@ -1,22 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  /* Light Mode Variables */
   --color-primary: #2563EB;
   --color-primary-hover: #1D4ED8;
-  --color-background: #F3F4F6;
+  --color-background: #F4F7FF; /* Brand-tinted very light blue */
   --color-surface: #FFFFFF;
-  --color-border: #E5E7EB;
-  --color-text-primary: #111827;
-  --color-text-secondary: #374151;
-  --color-text-muted: #9CA3AF;
+  --color-border: #E0E7FF; /* Brand-tinted border */
+  --color-text-primary: #0F172A; /* Slate-900 */
+  --color-text-secondary: #475569; /* Slate-600 */
+  --color-text-muted: #94A3B8; /* Slate-400 */
   --color-chip-bg: #EFF6FF;
-  --color-chip-text: #1D4ED8;
+  --color-chip-text: #2563EB;
   --color-chip-border: #BFDBFE;
-  --color-card-bg: #F9FAFB;
+  --color-card-bg: #FFFFFF;
+}
+
+.dark {
+  /* Dark Mode Variables */
+  --color-primary: #3B82F6; /* Blue-500 */
+  --color-primary-hover: #60A5FA; /* Blue-400 */
+  --color-background: #0B1121; /* Brand-tinted deep midnight blue */
+  --color-surface: #151E32; /* Brand-tinted card surface */
+  --color-border: #1E293B; /* Slate-800 */
+  --color-text-primary: #F8FAFC; /* Slate-50 */
+  --color-text-secondary: #CBD5E1; /* Slate-300 */
+  --color-text-muted: #94A3B8; /* Slate-400 */
+  --color-chip-bg: #172554; /* Blue-950 */
+  --color-chip-text: #BFDBFE; /* Blue-200 */
+  --color-chip-border: #1E40AF; /* Blue-800 */
+  --color-card-bg: #151E32;
 }
 
 @layer base {
@@ -31,133 +48,156 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--color-background);
     color: var(--color-text-primary);
+    @apply transition-colors duration-300 ease-in-out;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text-primary);
+    @apply tracking-tight;
   }
 
   h1 {
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--color-text-primary);
+    @apply text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1];
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   h2 {
-    font-size: 16px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    line-height: 1.5;
-    color: var(--color-text-primary);
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold leading-tight;
+    letter-spacing: -0.01em;
   }
 
   h3 {
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--color-text-primary);
+    @apply text-xl font-semibold leading-snug;
   }
 
   p {
-    font-size: 16px;
-    line-height: 1.75;
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
+    @apply text-base leading-relaxed;
+    text-wrap: pretty;
   }
 
   .text-small,
   .text-meta {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
+    @apply text-sm text-text-muted;
   }
 }
 
 @layer components {
   /* Button Styles */
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB];
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 transform;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply active:scale-95 hover:-translate-y-0.5;
   }
 
+  /* 
+   * NOTE: Opacity modifiers (like /25) only work with Tailwind utility classes, NOT with custom CSS variables inside @apply.
+   * We must use rgba/hex or standard utility classes. Here we rely on specific shadow utilities or inline styles if needed.
+   * For now, we'll use standard shadow utilities to avoid build errors.
+   */
   .btn-primary {
-    @apply bg-[#2563EB] text-white hover:bg-[#1D4ED8] focus:ring-[#2563EB];
+    @apply bg-primary text-white shadow-lg;
+    @apply hover:bg-primary-hover hover:shadow-xl;
   }
 
   .btn-secondary {
-    @apply bg-white dark:bg-gray-800 text-[#374151] dark:text-gray-200 border border-[#E5E7EB] dark:border-gray-700 hover:bg-[#F9FAFB] dark:hover:bg-gray-700 focus:ring-[#2563EB];
+    @apply bg-surface text-text-primary border border-border shadow-sm;
+    @apply hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-[#374151] dark:text-gray-200 hover:bg-[#F9FAFB] dark:hover:bg-gray-800 focus:ring-[#2563EB];
+    @apply bg-transparent text-text-secondary;
+    @apply hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-text-primary;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    @apply bg-red-600 text-white shadow-lg;
+    @apply hover:bg-red-700 focus:ring-red-500;
   }
 
   .btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+    @apply bg-emerald-600 text-white shadow-lg;
+    @apply hover:bg-emerald-700 focus:ring-emerald-500;
   }
 
   /* Input Styles */
   .input {
-    @apply w-full px-4 py-2 text-base bg-white border border-[#E5E7EB] rounded-xl;
-    @apply focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB];
+    @apply w-full px-4 py-2.5 text-base bg-surface border border-border rounded-xl;
+    /* Removing opacity modifier from border/ring with custom variables */
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
     @apply transition-all duration-200;
-    @apply placeholder:text-[#9CA3AF];
-    @apply text-[#111827];
+    @apply placeholder:text-text-muted;
+    @apply text-text-primary;
   }
 
   /* Card Styles */
   .card {
-    @apply bg-white rounded-[24px] border border-[#E5E7EB];
-    @apply shadow-[0_12px_40px_rgba(15,23,42,0.08)];
-    @apply transition-shadow duration-200;
+    @apply bg-card-bg rounded-2xl border border-border;
+    @apply shadow-sm hover:shadow-md transition-all duration-300;
   }
 
   .card-hover {
-    @apply hover:shadow-[0_16px_48px_rgba(15,23,42,0.12)];
+    @apply hover:shadow-xl hover:-translate-y-1 hover:border-primary;
   }
 
   /* Metric/Card Styles */
   .metric-card {
-    @apply bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB] p-6;
+    @apply bg-surface rounded-xl border border-border p-6;
   }
 
   /* Chip/Tag Styles */
   .chip {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full;
-    @apply text-[13px] font-medium;
-    @apply bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE];
+    @apply inline-flex items-center px-3 py-1 rounded-full;
+    @apply text-xs font-medium uppercase tracking-wide;
+    background-color: var(--color-chip-bg);
+    color: var(--color-chip-text);
+    border: 1px solid var(--color-chip-border);
   }
 
   /* Link Styles */
   .link {
-    @apply text-[#2563EB] hover:underline transition-colors;
+    @apply text-primary hover:text-primary-hover underline hover:decoration-primary transition-all;
   }
 
   /* Modal Styles */
   .modal-overlay {
-    @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-50;
+    @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50;
     @apply flex items-center justify-center p-4;
+    @apply animate-in fade-in duration-200;
   }
 
   .modal-content {
-    @apply bg-white rounded-[24px] shadow-[0_12px_40px_rgba(15,23,42,0.08)] max-w-lg w-full p-6;
-    @apply border border-[#E5E7EB];
+    @apply bg-surface rounded-2xl shadow-2xl max-w-lg w-full p-6;
+    @apply border border-border;
+    @apply animate-in zoom-in-95 duration-200;
   }
 
   /* Container Styles */
-.container-max {
-    @apply max-w-[1200px] mx-auto w-full;
+  .container-max {
+    @apply max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8;
   }
 
   /* Section Padding */
   .section-padding {
-    @apply px-6 md:px-12 lg:px-16 py-12 lg:py-16;
+    @apply py-16 lg:py-24;
   }
+}
+
+/* Utility classes */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+                    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
 .logo-font {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
 }

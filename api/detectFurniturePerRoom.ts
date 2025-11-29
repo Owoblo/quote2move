@@ -14,10 +14,14 @@ export default async function handler(
   const apiKey = process.env.OPENAI_API_KEY || process.env.VERCEL_OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY;
 
   if (!apiKey) {
+    console.error('❌ OpenAI API key not found in environment variables');
+    console.error('Checked: OPENAI_API_KEY, VERCEL_OPENAI_API_KEY, REACT_APP_OPENAI_API_KEY');
     return res.status(500).json({
-      error: 'Server configuration error: OpenAI API key not configured.'
+      error: 'Server configuration error: OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.'
     });
   }
+
+  console.log('✅ OpenAI API key found for furniture detection');
 
   const { roomName, roomPhotos, propertyContext } = req.body;
 
@@ -284,11 +288,16 @@ Return ONLY a valid JSON array:
 
 Return ONLY valid JSON array, no other text.`;
 
-  let lastError: any = null;
+  let lastError: any;
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`✅ OpenAI API key found for furniture detection`);
+      if (attempt > 0) {
+        // Exponential backoff with jitter using baseDelay
+        const delay = Math.min(baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000, 30000);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for ${roomName} detection after ${Math.round(delay)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
 
       const startTime = performance.now();
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -316,19 +325,62 @@ Return ONLY valid JSON array, no other text.`;
       const endTime = performance.now();
 
       if (!response.ok) {
-        const errorBody = await response.text();
-        const errorMessage = `OpenAI API error: ${response.status} ${errorBody}`;
-        console.warn(errorMessage);
-        throw new Error(errorMessage);
+        const errorBody = await response.json().catch(() => ({}));
+        const status = response.status;
+
+        // Only retry on rate limits (429) or server errors (5xx)
+        if (status === 429 || status >= 500) {
+          const errorMsg = `OpenAI API error: ${status} ${JSON.stringify(errorBody)}`;
+          console.warn(errorMsg);
+          throw new Error(errorMsg);
+        }
+
+        throw new Error(`OpenAI API error: ${status} ${JSON.stringify(errorBody)}`);
       }
 
       const data = await response.json();
       const content = data.choices[0]?.message?.content;
 
-      const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
-      const detections = JSON.parse(jsonMatch ? jsonMatch[1] : content);
+      if (!content) {
+        throw new Error('No content in OpenAI response');
+      }
 
-      const processedDetections = Array.isArray(detections) ? detections : [];
+      const jsonMatch = content.match(/```(?:json)?\s*(\[.*?\])\s*```/s) || content.match(/(\[.*?\])/s);
+      if (!jsonMatch) {
+        console.warn(`Failed to parse JSON for room ${roomName}. Content: ${content.substring(0, 100)}...`);
+        // If content exists but isn't valid JSON, this might be a model refusal or hallucination.
+        // Treating as empty result to avoid breaking the flow.
+        return { detections: [], detectionTimeMs: endTime - startTime };
+      }
+
+      const detections = JSON.parse(jsonMatch[1]);
+
+      let processedDetections = Array.isArray(detections) ? detections : [];
+
+      // Post-processing validation for bedrooms
+      if (isBedroomRoom && Array.isArray(detections)) {
+        const beds = detections.filter(d =>
+          d.label.toLowerCase().includes('bed') &&
+          !d.label.toLowerCase().includes('nightstand') &&
+          !d.label.toLowerCase().includes('bedside')
+        );
+
+        if (beds.length > 1) {
+          console.warn(`⚠️ Warning: ${beds.length} beds detected in ${roomName} - likely a mistake!`);
+
+          // Keep only the bed with highest confidence
+          const bestBed = beds.reduce((best, current) =>
+            (current.confidence || 0) > (best.confidence || 0) ? current : best
+          );
+
+          // Remove all other beds
+          processedDetections = detections.filter(d =>
+            !beds.includes(d) || d === bestBed
+          );
+
+          console.log(`✅ Fixed: Kept only "${bestBed.label}" (confidence: ${bestBed.confidence})`);
+        }
+      }
 
       return {
         detections: processedDetections,
@@ -337,21 +389,18 @@ Return ONLY valid JSON array, no other text.`;
 
     } catch (error: any) {
       lastError = error;
-      console.error(`❌ Attempt ${attempt} failed for ${roomName}: ${error.message}`);
+      console.error(`❌ Attempt ${attempt + 1} failed for ${roomName}:`, error.message);
       console.error('Full error:', error);
 
-      if (attempt < maxRetries) {
-        const delay = baseDelay * Math.pow(2, attempt - 1);
-        console.log(`🔄 Retry ${attempt}/${maxRetries} for ${roomName} detection after ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } else {
-        console.error(`❌ All retry attempts exhausted for ${roomName}.`);
-        console.error(`❌ Last error was: ${error.message}`);
-        console.error(`⚠️ Returning empty detections for this room.`);
+      if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
+        console.error('❌ Non-retryable error detected. Breaking retry loop.');
+        break;
       }
     }
   }
 
+  console.error(`❌ All retry attempts exhausted for ${roomName}.`);
+  console.error('❌ Last error was:', lastError?.message);
+  console.error('⚠️ Returning empty detections for this room.');
   return { detections: [], detectionTimeMs: 0 };
 }
-

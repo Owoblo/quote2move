@@ -51,6 +51,15 @@ export default function LoginPage() {
     return 'weak';
   };
 
+  // Redirect if already logged in
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard');
+      }
+    });
+  }, [navigate]);
+
   // Update password strength when password changes
   React.useEffect(() => {
     if (isSignUp && password) {
@@ -94,6 +103,14 @@ export default function LoginPage() {
     setError('');
 
     try {
+      // DEBUG: Log the attempt
+      console.log('Attempting auth action:', isSignUp ? 'Sign Up' : 'Sign In');
+      
+      // Check environment variables (safely)
+      const hasUrl = !!process.env.REACT_APP_SOLD2MOVE_URL || !!process.env.REACT_APP_SUPABASE_URL;
+      const hasKey = !!process.env.REACT_APP_SOLD2MOVE_ANON_KEY || !!process.env.REACT_APP_SUPABASE_ANON_KEY;
+      console.log('Auth Environment Check:', { hasUrl, hasKey });
+
       // Validate and sanitize email
       const trimmedEmail = email.trim().toLowerCase();
       if (!validateEmail(trimmedEmail)) {
@@ -163,17 +180,29 @@ export default function LoginPage() {
           setError('success:Check your email for the confirmation link! We sent you a verification email.');
         }
       } else {
+        console.log('Starting signInWithPassword...');
         const { error } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
           password,
         });
-        if (error) throw error;
+        
+        if (error) {
+          console.error('Sign In Error:', error);
+          throw error;
+        }
+        
+        console.log('Sign in successful, navigating...');
         navigate('/dashboard');
       }
     } catch (error: any) {
+      console.error('Auth Handler Error:', error);
       // Handle common errors with user-friendly messages
       let errorMessage = error.message;
-      if (error.message.includes('Invalid login credentials')) {
+      
+      if (errorMessage.includes('Invalid value')) {
+        errorMessage = 'Configuration Error: Invalid API Key format. Please contact support.';
+        console.error('CRITICAL: Invalid Value error usually means headers are malformed.');
+      } else if (error.message.includes('Invalid login credentials')) {
         errorMessage = 'Invalid email or password. Please try again.';
       } else if (error.message.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and click the confirmation link to verify your account.';
@@ -450,6 +479,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-
-

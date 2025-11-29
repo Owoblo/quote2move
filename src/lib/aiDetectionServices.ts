@@ -1,13 +1,5 @@
-import { Detection } from '../types';
+import { Detection, PropertyContext } from '../types';
 import { estimateCubicFeet, estimateWeight } from './cubicFeetEstimator';
-
-// Property context interface
-export interface PropertyContext {
-  bedrooms?: number;
-  bathrooms?: number;
-  sqft?: number;
-  propertyType?: string;
-}
 
 // Phase 1: Room Classification ONLY
 export const classifyRooms = async (

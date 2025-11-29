@@ -1,5 +1,5 @@
-import { Detection } from '../types';
-import { detectFurniture, classifyRooms, detectFurnitureInRoom, PropertyContext } from './aiDetectionServices';
+import { Detection, PropertyContext } from '../types';
+import { detectFurniture, classifyRooms, detectFurnitureInRoom } from './aiDetectionServices';
 
 // AI Furniture Detection Service
 export class FurnitureDetectionService {

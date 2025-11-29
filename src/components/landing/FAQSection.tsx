@@ -36,10 +36,11 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 bg-[#F3F4F6]">
+    <section id="faq" className="section-padding bg-surface">
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4 tracking-tight">
+          <div className="chip mb-4">FAQ</div>
+          <h2 className="text-4xl md:text-5xl font-bold text-text-primary mb-4 tracking-tight">
             Frequently asked questions
           </h2>
         </div>
@@ -48,31 +49,33 @@ export default function FAQSection() {
           {faqs.map((faq, index) => (
             <div 
               key={index}
-              className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden bg-white dark:bg-gray-900"
+              className="card overflow-hidden transition-all duration-300 hover:border-primary/30"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
-                <span className="font-semibold text-[#111827] pr-8">
+                <span className="font-semibold text-lg text-text-primary pr-8">
                   {faq.question}
                 </span>
-                <svg 
-                  className={`w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 transition-transform ${
-                    openIndex === index ? 'rotate-180' : ''
-                  }`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {openIndex === index && (
-                <div className="px-6 py-4 pt-0 text-[#374151]">
-                  {faq.answer}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 transition-transform duration-300 ${openIndex === index ? 'rotate-180 bg-primary/10 text-primary' : 'text-text-secondary'}`}>
+                  <svg 
+                    className="w-5 h-5"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
-              )}
+              </button>
+              <div 
+                className={`px-6 text-text-secondary transition-all duration-300 ease-in-out overflow-hidden ${
+                  openIndex === index ? 'max-h-48 py-5 pt-0 opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <p className="leading-relaxed">{faq.answer}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -80,4 +83,3 @@ export default function FAQSection() {
     </section>
   );
 }
-

@@ -10,8 +10,8 @@
     <div id="result"></div>
 
     <script>
-        // Initialize EmailJS
-        emailjs.init('76u8oYQivGpfWe3Il');
+        // Initialize EmailJS - REPLACE WITH YOUR PUBLIC KEY
+        emailjs.init('YOUR_PUBLIC_KEY');
 
         function testEmail() {
             const templateParams = {
@@ -27,7 +27,8 @@
                 company_name: 'Instant Quote Builder'
             };
 
-            emailjs.send('service_f3176eh', 'template_dy40bdv', templateParams)
+            // REPLACE WITH YOUR SERVICE ID AND TEMPLATE ID
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
                 .then(function(response) {
                     console.log('SUCCESS!', response.status, response.text);
                     document.getElementById('result').innerHTML = 'SUCCESS: ' + response.text;
@@ -39,8 +40,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

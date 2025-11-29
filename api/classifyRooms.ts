@@ -14,11 +14,15 @@ export default async function handler(
   const apiKey = process.env.OPENAI_API_KEY || process.env.VERCEL_OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY;
 
   if (!apiKey) {
-    console.error('❌ OpenAI API key not found');
+    console.error('❌ OpenAI API key not found in environment variables');
+    console.error('Checked: OPENAI_API_KEY, VERCEL_OPENAI_API_KEY, REACT_APP_OPENAI_API_KEY');
     return res.status(500).json({
-      error: 'Server configuration error: OpenAI API key not configured.'
+      error: 'Server configuration error: OpenAI API key not configured. Please set OPENAI_API_KEY in your environment variables.'
     });
   }
+
+  console.log('✅ OpenAI API key found');
+  console.log('🔑 Key prefix:', apiKey.substring(0, 20) + '...');
 
   const { photoUrls, propertyContext } = req.body;
 
@@ -65,7 +69,7 @@ async function classifyPhotosByRoom(
   photoUrls: string[],
   context: any,
   apiKey: string
-): Promise<Record<string, any>> {
+): Promise<{ rooms: Record<string, any>, detectionTimeMs: number }> {
 
   const BATCH_SIZE = 5; // Very conservative batch size for 30k TPM (tokens per minute) limit
   const RETRY_ATTEMPTS = 3;
@@ -195,12 +199,16 @@ Return ONLY a JSON object mapping room names to arrays of photo indices (0-${pho
 
 Return ONLY valid JSON, no other text.`;
 
-  let lastError: any = null;
+  let lastError: any;
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`✅ OpenAI API key found`);
-      console.log(`🔑 Key prefix: ${apiKey.substring(0, 20)}...`);
+      if (attempt > 0) {
+        // Exponential backoff with jitter: 3s, 6s, 12s... + random jitter
+        const delay = Math.min(baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000, 30000);
+        console.log(`🔄 Retry ${attempt}/${maxRetries} for classification after ${Math.round(delay)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
 
       const startTime = performance.now();
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -228,22 +236,39 @@ Return ONLY valid JSON, no other text.`;
       const endTime = performance.now();
 
       if (!response.ok) {
-        const errorBody = await response.text();
-        const errorMessage = `OpenAI API error: ${response.status} ${errorBody}`;
-        console.warn(errorMessage);
-        throw new Error(errorMessage);
+        const errorBody = await response.json().catch(() => ({}));
+        const status = response.status;
+
+        // Only retry on rate limits (429) or server errors (5xx)
+        if (status === 429 || status >= 500) {
+          const errorMsg = `OpenAI API error: ${status} ${JSON.stringify(errorBody)}`;
+          console.warn(errorMsg);
+          throw new Error(errorMsg);
+        }
+
+        throw new Error(`OpenAI API error: ${status} ${JSON.stringify(errorBody)}`);
       }
 
       const data = await response.json();
       const content = data.choices[0]?.message?.content;
 
+      if (!content) {
+        throw new Error('No content in OpenAI response');
+      }
+
       const jsonMatch = content.match(/```(?:json)?\s*(\{.*?\})\s*```/s) || content.match(/(\{.*?\})/s);
-      const classification = JSON.parse(jsonMatch ? jsonMatch[1] : content);
+      if (!jsonMatch) {
+        throw new Error('Failed to parse JSON from OpenAI response');
+      }
+
+      const classification = JSON.parse(jsonMatch[1]);
 
       // Adjust indices to account for batch offset
       const adjustedClassification: Record<string, number[]> = {};
       for (const [room, indices] of Object.entries(classification)) {
-        adjustedClassification[room] = (indices as number[]).map(i => i + batchOffset);
+        if (Array.isArray(indices)) {
+          adjustedClassification[room] = indices.map((i: any) => (i as number) + batchOffset);
+        }
       }
 
       return {
@@ -253,19 +278,29 @@ Return ONLY valid JSON, no other text.`;
 
     } catch (error: any) {
       lastError = error;
-      console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
+      console.error(`❌ Attempt ${attempt + 1} failed:`, error.message);
       console.error('Full error:', error);
 
-      if (attempt < maxRetries) {
-        const delay = baseDelay * Math.pow(2, attempt - 1);
-        console.log(`🔄 Retry ${attempt}/${maxRetries} for classification after ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } else {
-        console.error(`❌ All retry attempts exhausted for classification.`);
-        console.error(`❌ Last error was: ${error.message}`);
+      // Don't retry if it's not a rate limit or server error
+      if (!error.message.includes('429') && !error.message.includes('500') && !error.message.includes('502') && !error.message.includes('503') && !error.message.includes('504')) {
+        console.error('❌ Non-retryable error detected. Breaking retry loop.');
+        break;
       }
     }
   }
 
-  throw lastError;
+  console.error('❌ All retry attempts exhausted for classification.');
+  console.error('❌ Last error was:', lastError?.message);
+  console.error('⚠️ FALLING BACK: Treating all photos as one group to prevent total failure');
+  console.error('⚠️ This is a fallback behavior. Check the errors above to fix the root cause.');
+
+  // Fallback: treat all photos as one group to prevent total failure
+  // Return indices instead of URLs since parent function handles conversion
+  const fallbackIndices: Record<string, number[]> = {
+    'all_rooms': photoUrls.map((_, i) => i + batchOffset)
+  };
+  return {
+    rooms: fallbackIndices,
+    detectionTimeMs: 0
+  };
 }
