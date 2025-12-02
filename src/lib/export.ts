@@ -1,17 +1,37 @@
 import { Detection, QuotePayload } from '../types';
 
 export function toCSV(detections: Detection[]): string {
-  const headers = ['Item', 'Quantity', 'Confidence', 'Notes'];
-  const rows = detections.map(detection => [
-    detection.label,
-    detection.qty.toString(),
-    `${Math.round(detection.confidence * 100)}%`,
-    detection.notes || ''
-  ]);
+  // Group detections by room
+  const roomGroups = detections.reduce((acc, detection) => {
+    const room = detection.room || 'Unassigned';
+    if (!acc[room]) {
+      acc[room] = [];
+    }
+    acc[room].push(detection);
+    return acc;
+  }, {} as Record<string, Detection[]>);
 
-  return [headers, ...rows]
-    .map(row => row.map(cell => `"${cell}"`).join(','))
-    .join('\n');
+  // Build inventory by room
+  let output = 'INVENTORY\n\n';
+
+  Object.keys(roomGroups).sort().forEach(room => {
+    output += `${room.toUpperCase()}\n`;
+    roomGroups[room].forEach(detection => {
+      output += `${detection.label} x ${detection.qty}\n`;
+    });
+    output += '\n';
+  });
+
+  // Calculate totals
+  const totalCubicFeet = detections.reduce((sum, d) => sum + (d.cubicFeet || 0), 0);
+  const totalWeight = detections.reduce((sum, d) => sum + (d.weight || 0), 0);
+
+  // Add totals at the bottom
+  output += '---\n';
+  output += `Total Cubic Feet: ${totalCubicFeet.toFixed(2)}\n`;
+  output += `Total Weight: ${totalWeight.toFixed(2)} lbs\n`;
+
+  return output;
 }
 
 export function generatePdf(quotePayload: QuotePayload): Promise<Blob> {

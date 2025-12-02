@@ -47,7 +47,7 @@ export default function HeroSection() {
                 rel="noopener noreferrer"
                 className="btn btn-secondary px-8 py-4 text-base w-full sm:w-auto text-center"
               >
-                Watch 2-min demo
+                See Live Demo
               </a>
             </div>
 
