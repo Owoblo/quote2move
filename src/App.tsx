@@ -17,6 +17,9 @@ import SettingsPage from './pages/SettingsPage';
 import CustomerUploadPage from './pages/CustomerUploadPage';
 import CompanySignupPage from './pages/CompanySignupPage';
 import QuoteFeedbackPage from './pages/QuoteFeedbackPage';
+import AboutPage from './pages/AboutPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -87,6 +90,9 @@ function App() {
             path="/customer-upload/:token"
             element={<CustomerUploadPage />}
           />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

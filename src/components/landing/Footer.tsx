@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import MovSenseLogo from '../MovSenseLogo';
 
 export default function Footer() {
@@ -45,21 +46,21 @@ export default function Footer() {
             <h4 className="font-bold text-text-primary mb-4">Company</h4>
             <ul className="space-y-3 text-sm text-text-secondary">
               <li>
-                <button type="button" className="hover:text-primary transition-colors text-left">
+                <Link to="/about" className="hover:text-primary transition-colors">
                   About
-                </button>
+                </Link>
               </li>
               <li>
-                <a 
-                  href="mailto:support@movsense.com" 
+                <a
+                  href="mailto:support@movsense.com"
                   className="hover:text-primary transition-colors"
                 >
                   Contact
                 </a>
               </li>
               <li>
-                <a 
-                  href="mailto:support@movsense.com" 
+                <a
+                  href="mailto:support@movsense.com"
                   className="hover:text-primary transition-colors"
                 >
                   support@movsense.com
@@ -73,14 +74,14 @@ export default function Footer() {
             <h4 className="font-bold text-text-primary mb-4">Legal</h4>
             <ul className="space-y-3 text-sm text-text-secondary">
               <li>
-                <button type="button" className="hover:text-primary transition-colors text-left">
+                <Link to="/terms" className="hover:text-primary transition-colors">
                   Terms
-                </button>
+                </Link>
               </li>
               <li>
-                <button type="button" className="hover:text-primary transition-colors text-left">
+                <Link to="/privacy" className="hover:text-primary transition-colors">
                   Privacy
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
