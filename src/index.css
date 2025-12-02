@@ -1,19 +1,5 @@
-/* Public Sans Font - Brand Guidelines */
-@font-face {
-  font-family: 'Public Sans';
-  src: url('/fonts/PublicSans-VariableFont_wght.ttf') format('truetype-variations');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Public Sans';
-  src: url('/fonts/PublicSans-Italic-VariableFont_wght.ttf') format('truetype-variations');
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
+/* Public Sans Font - Brand Guidelines (via Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
