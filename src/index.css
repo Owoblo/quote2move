@@ -1,39 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* Public Sans Font - Brand Guidelines */
+@font-face {
+  font-family: 'Public Sans';
+  src: url('/fonts/PublicSans-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Public Sans';
+  src: url('/fonts/PublicSans-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Light Mode Variables */
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-background: #F4F7FF; /* Brand-tinted very light blue */
-  --color-surface: #FFFFFF;
-  --color-border: #E0E7FF; /* Brand-tinted border */
-  --color-text-primary: #0F172A; /* Slate-900 */
-  --color-text-secondary: #475569; /* Slate-600 */
-  --color-text-muted: #94A3B8; /* Slate-400 */
-  --color-chip-bg: #EFF6FF;
-  --color-chip-text: #2563EB;
-  --color-chip-border: #BFDBFE;
-  --color-card-bg: #FFFFFF;
+  /* Brand Guidelines - Primary Colors */
+  --color-base: #1E88E6;        /* Primary brand color */
+  --color-dark: #1F2937;        /* Dark for text/borders */
+  --color-white: #FFFFFF;       /* White for backgrounds */
+
+  /* Brand Guidelines - Color Shades (Secondary) */
+  --color-700: #0D4373;
+  --color-600: #125EA1;
+  --color-500: #1778CF;
+  --color-300: #5EAAED;
+  --color-200: #8CC2F2;
+  --color-100: #BADBF7;
+
+  /* Application Color Mapping - Light Mode */
+  --color-primary: var(--color-base);
+  --color-primary-hover: var(--color-600);
+  --color-background: var(--color-white);
+  --color-surface: var(--color-white);
+  --color-border: #E5E7EB;
+  --color-text-primary: var(--color-dark);
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-chip-bg: var(--color-100);
+  --color-chip-text: var(--color-700);
+  --color-chip-border: var(--color-200);
+  --color-card-bg: var(--color-white);
 }
 
 .dark {
-  /* Dark Mode Variables */
-  --color-primary: #3B82F6; /* Blue-500 */
-  --color-primary-hover: #60A5FA; /* Blue-400 */
-  --color-background: #0B1121; /* Brand-tinted deep midnight blue */
-  --color-surface: #151E32; /* Brand-tinted card surface */
-  --color-border: #1E293B; /* Slate-800 */
-  --color-text-primary: #F8FAFC; /* Slate-50 */
-  --color-text-secondary: #CBD5E1; /* Slate-300 */
-  --color-text-muted: #94A3B8; /* Slate-400 */
-  --color-chip-bg: #172554; /* Blue-950 */
-  --color-chip-text: #BFDBFE; /* Blue-200 */
-  --color-chip-border: #1E40AF; /* Blue-800 */
-  --color-card-bg: #151E32;
+  /* Application Color Mapping - Dark Mode */
+  --color-primary: var(--color-500);
+  --color-primary-hover: var(--color-300);
+  --color-background: var(--color-dark);
+  --color-surface: #111827;
+  --color-border: #374151;
+  --color-text-primary: var(--color-white);
+  --color-text-secondary: #D1D5DB;
+  --color-text-muted: #9CA3AF;
+  --color-chip-bg: var(--color-700);
+  --color-chip-text: var(--color-100);
+  --color-chip-border: var(--color-600);
+  --color-card-bg: #111827;
 }
 
 @layer base {
@@ -42,7 +70,7 @@
   }
   
   body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -84,32 +112,47 @@
 }
 
 @layer components {
-  /* Button Styles */
+  /* Button Styles - Per Brand Guidelines */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 transform;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
-    @apply active:scale-95 hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* 
-   * NOTE: Opacity modifiers (like /25) only work with Tailwind utility classes, NOT with custom CSS variables inside @apply.
-   * We must use rgba/hex or standard utility classes. Here we rely on specific shadow utilities or inline styles if needed.
-   * For now, we'll use standard shadow utilities to avoid build errors.
-   */
+  /* Primary CTA - White on color-500 (inactive) / color-600 (hover) */
   .btn-primary {
-    @apply bg-primary text-white shadow-lg;
-    @apply hover:bg-primary-hover hover:shadow-xl;
+    background-color: var(--color-500);
+    color: var(--color-white);
+    @apply shadow-lg;
   }
 
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-600);
+    @apply shadow-xl;
+  }
+
+  /* Secondary CTA - color-500 on White (inactive) / color-600 on White (hover) */
   .btn-secondary {
-    @apply bg-surface text-text-primary border border-border shadow-sm;
-    @apply hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-500);
+    color: var(--color-500);
+    @apply shadow-sm;
   }
 
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-600);
+    color: var(--color-600);
+  }
+
+  /* Ghost/Tertiary - Transparent background */
   .btn-ghost {
-    @apply bg-transparent text-text-secondary;
-    @apply hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-text-primary;
+    @apply bg-transparent;
+    color: var(--color-text-secondary);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    @apply bg-slate-100 dark:bg-slate-800;
+    color: var(--color-text-primary);
   }
 
   .btn-danger {
@@ -198,6 +241,6 @@
 }
 
 .logo-font {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 800;
+  font-family: 'Public Sans', sans-serif;
+  font-weight: 700;
 }

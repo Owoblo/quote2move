@@ -26,8 +26,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        logo: ['Plus Jakarta Sans', 'sans-serif'],
+        sans: ['Public Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        logo: ['Public Sans', 'sans-serif'],
       },
       fontSize: {
         xs: ['0.875rem', { lineHeight: '1.25rem' }],
