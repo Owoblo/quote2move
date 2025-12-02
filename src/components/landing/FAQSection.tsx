@@ -10,6 +10,10 @@ export default function FAQSection() {
 
   const faqs: FAQItem[] = [
     {
+      question: 'Does the AI see inside closets, garages, or hidden storage?',
+      answer: 'No—and that is where your expertise comes in. MovSense automates the tedious part: listing the visible furniture (beds, sofas, tables) from the photos. This gives you an 80% complete inventory in seconds. You then quickly add the estimated box count for closets and garages based on your experience. We do the heavy lifting; you apply the finishing touches.'
+    },
+    {
       question: 'What if the AI misses something?',
       answer: 'MovSense detects ~96% of items from MLS photos. You can manually add garage/shed/attic items or custom pieces in seconds before you send the quote—still 10x faster than a walkthrough.'
     },
