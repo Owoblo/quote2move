@@ -1,0 +1,30 @@
+{
+  "short_name": "MovSense",
+  "name": "MovSense - AI-Powered Moving Quotes",
+  "description": "AI that sees what movers can't. Turn property photos into precise moving quotes instantly.",
+  "icons": [
+    {
+      "src": "movsense_icon_color.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "movsense_social_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0D1321",
+  "background_color": "#0D1321",
+  "orientation": "portrait-primary"
+}

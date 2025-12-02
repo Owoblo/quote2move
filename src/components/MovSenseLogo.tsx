@@ -14,12 +14,24 @@ export default function MovSenseLogo({ size = 'md', showIcon = true, className =
     xl: 'h-12',
   };
 
+  // Explicit dimensions for better CLS (Cumulative Layout Shift)
+  const dimensions = {
+    sm: { height: 24, width: 120 },
+    md: { height: 32, width: 160 },
+    lg: { height: 40, width: 200 },
+    xl: { height: 48, width: 240 },
+  };
+
   return (
     <div className={`flex items-center ${className}`}>
       <img
         src="/movsense_logo.svg"
-        alt="MovSense Logo"
+        alt="MovSense - AI-Powered Moving Quotes"
         className={`${logoHeights[size]} w-auto`}
+        width={dimensions[size].width}
+        height={dimensions[size].height}
+        loading="eager"
+        decoding="async"
       />
     </div>
   );

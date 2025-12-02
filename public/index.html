@@ -2,14 +2,29 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon.png" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Favicons - Multiple sizes for different devices -->
+    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Mobile Optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
     <meta name="theme-color" content="#0D1321" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MovSense" />
+
+    <!-- SEO -->
     <meta
       name="description"
       content="MovSense - AI that sees what movers can't. Turn property photos into precise moving quotes instantly. No walkthroughs. No spreadsheets. No wasted hours."
     />
+    <meta name="keywords" content="moving quotes, AI moving estimates, moving company software, property photo analysis, instant moving quotes" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -22,6 +37,9 @@
     <meta property="twitter:title" content="MovSense - AI-Powered Moving Quotes" />
     <meta property="twitter:description" content="AI that sees what movers can't. Turn property photos into precise moving quotes instantly. No walkthroughs. No spreadsheets. No wasted hours." />
     <meta property="twitter:image" content="%PUBLIC_URL%/movsense_social_icon.png" />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/movsense_logo.svg" type="image/svg+xml" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
