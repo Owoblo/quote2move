@@ -7,32 +7,38 @@ interface MovSenseLogoProps {
 }
 
 export default function MovSenseLogo({ size = 'md', showIcon = true, className = '' }: MovSenseLogoProps) {
-  const logoHeights = {
-    sm: 'h-6',
-    md: 'h-8',
-    lg: 'h-10',
-    xl: 'h-12',
+  const sizeClasses = {
+    sm: 'text-lg',
+    md: 'text-2xl',
+    lg: 'text-3xl',
+    xl: 'text-4xl',
   };
 
-  // Explicit dimensions for better CLS (Cumulative Layout Shift)
-  const dimensions = {
-    sm: { height: 24, width: 120 },
-    md: { height: 32, width: 160 },
-    lg: { height: 40, width: 200 },
-    xl: { height: 48, width: 240 },
+  const iconSizes = {
+    sm: 'w-6 h-6',
+    md: 'w-8 h-8',
+    lg: 'w-10 h-10',
+    xl: 'w-12 h-12',
   };
 
   return (
-    <div className={`flex items-center ${className}`}>
-      <img
-        src="/movsense_logo.svg"
-        alt="MovSense - AI-Powered Moving Quotes"
-        className={`${logoHeights[size]} w-auto`}
-        width={dimensions[size].width}
-        height={dimensions[size].height}
-        loading="eager"
-        decoding="async"
-      />
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      {showIcon && (
+        <div className={`${iconSizes[size]} relative flex-shrink-0`}>
+          <img
+            src="/movsense_icon_color.png"
+            alt="MovSense Icon"
+            className="w-full h-full object-contain"
+            loading="eager"
+          />
+        </div>
+      )}
+      <span
+        className={`${sizeClasses[size]} font-bold tracking-tight`}
+        style={{ fontFamily: 'Public Sans, sans-serif' }}
+      >
+        MovSense
+      </span>
     </div>
   );
 }
