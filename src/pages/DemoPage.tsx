@@ -9,6 +9,7 @@ import { AppState, Photo, MappingTable, QuotePayload, Detection, PropertyContext
 import { FurnitureDetectionService } from '../lib/furnitureDetection';
 import { parseZillowPhotos } from '../lib/zillowPhotos';
 import { supabaseSold2Move } from '../lib/supabase';
+import { toCSV } from '../lib/export';
 
 const mockMapping: MappingTable = {
   'Sofa': { cf: 25, minutes: 30, wrap: true },
@@ -284,6 +285,12 @@ export default function DemoPage() {
     window.location.href = 'https://buy.stripe.com/3cI5kw04pfsI2BD3Vp1Nu00';
   };
 
+  const handleCopyInventory = () => {
+    const inventoryText = toCSV(detections);
+    navigator.clipboard.writeText(inventoryText);
+    addToast('Inventory copied to clipboard', 'success');
+  };
+
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadEmail) return;
@@ -367,7 +374,18 @@ export default function DemoPage() {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                     </span>
                     Inventory
-            </h2>
+                  </h2>
+                  {detections.length > 0 && (
+                    <button
+                      onClick={handleCopyInventory}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy
+                    </button>
+                  )}
                 </div>
                 <div className="flex-1 p-0 overflow-hidden">
                   <InventoryTable
