@@ -41,8 +41,10 @@ export default function HeroSection() {
               >
                 Start Free Trial
               </Link>
-              <a 
-                href="#demo"
+              <a
+                href="https://movsense.com/demo"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn btn-secondary px-8 py-4 text-base w-full sm:w-auto text-center"
               >
                 Watch 2-min demo
@@ -75,7 +77,7 @@ export default function HeroSection() {
             <div className="relative">
               {/* InteractiveDemo was here, now removed */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
-                <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative group cursor-pointer" onClick={() => window.location.href = '#demo'}>
+                <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative group cursor-pointer" onClick={() => window.open('https://movsense.com/demo', '_blank')}>
                   <img 
                     src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2053&q=80" 
                     alt="MoveSense Demo" 
